@@ -1,4 +1,5 @@
 import logo from './logo.svg';
+import { Button } from '@mui/material';
 import './App.css';
 
 function App() {
@@ -7,8 +8,9 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.AAAAAAAAAAAAAA
+          Edit <code>src/App.js</code> and save to reload.
         </p>
+        <Button variant="contained" className='button'>Quiero egresar</Button>
         <a
           className="App-link"
           href="https://reactjs.org"
