@@ -1,0 +1,11 @@
+.lateralMenuButton{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-size: 14px;
+}
+
+.buttonSelected{
+    font-weight: 600 !important; 
+}
