@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Divider, List, ListItem } from '@mui/material';
+import { Divider, List, ListItem, Typography } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import * as ROUTES from "../../routes/routes";
 import { useNavigate } from 'react-router';
 import { Icon } from '@iconify/react';
@@ -10,9 +11,9 @@ import './MenuLateral.css'
 const MenuLateral = (props) => {
     
     const navigate = useNavigate();
-
-    const routes = [ROUTES.MAPAVUELO, ROUTES.ENVIOS, ROUTES.SIMULACION]
-    const [selectedIndex, setSelectedIndex] = React.useState('Envios')
+    const icons = ["ion:home-sharp", "mdi:calendar-clock-outline","icon-park-outline:setting-laptop"];
+    const routes = [ROUTES.MAPAVUELO, ROUTES.ENVIOS, ROUTES.SIMULACION];
+    const [selectedIndex, setSelectedIndex] = React.useState('Login');
     const handleListItemClick = (event, index) => {
         setSelectedIndex(index);
       };
@@ -20,8 +21,8 @@ const MenuLateral = (props) => {
     return (
         <div >
             <div className='logoContainer'>
-                <Icon icon="carbon:content-delivery-network" color="white" width="50px"/>
-                <b>Envifast</b>
+                <Icon icon="carbon:content-delivery-network" color="white" width="40px"/>
+                <Typography className='logoText'>EnviFast</Typography>
             </div>
             <Divider/>
             <List className='menuLateralContainer'>
@@ -31,6 +32,9 @@ const MenuLateral = (props) => {
                             selected={selectedIndex === text}
                             onClick={(event) => { handleListItemClick(event, text); navigate(routes[index]); console.log(routes[index])}}
                             className={'lateralMenuButton ' +  (selectedIndex === text ? "buttonSelected" : " ")}>
+                            <ListItemIcon>
+                                <Icon className="menuIcon" icon={icons[index]} color="white" width="30px" />
+                            </ListItemIcon>
                             <ListItemText primary={text} />
                         </ListItemButton>
                     </ListItem>

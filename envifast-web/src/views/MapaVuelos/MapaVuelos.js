@@ -2,6 +2,7 @@ import React from 'react';
 import './../../App';
 import {MapContainer, TileLayer} from 'react-leaflet'; // objeto principal para los mapas
 import 'leaflet/dist/leaflet.css'; // 
+import './MapaVuelos.css'
 
 
 // const MapaVuelos  = (props) => {
@@ -21,7 +22,7 @@ import 'leaflet/dist/leaflet.css'; //
 
         return <div>
                 <h3>Mapa de vuelos</h3>
-                <MapContainer center = {{lat: '28.058522', lng: '-20.591226'}} zoom = {2.8}>
+                <MapContainer className="mapaVuelo" center = {{lat: '28.058522', lng: '-20.591226'}} zoom = {2.8}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'>
 
                 </TileLayer>

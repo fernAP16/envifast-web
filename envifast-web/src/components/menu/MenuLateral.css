@@ -1,24 +1,34 @@
 .logoContainer{
     background: #407070;
     color: #FFFFFF;
-    height: 120px;
+    height: 100px;
     width: 280px;
-    font-size: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+.logoText{
+    font-size: 28px;
+    font-weight: 100 !important;
+}
+
 .menuLateralContainer{
-    background: linear-gradient(#6CBDBD 60%, #407070 47%);
+    background-color: linear;
+    background: linear-gradient(#6CBDBD, #407070);
 }
 
 .lateralMenuButton{
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: left;
+    text-align: left;
     font-size: 14px;
+    color: #FFFFFF;
+}
+
+.menuIcon{
+    color: white;
+    width: 60px;
 }
 
 .buttonSelected{
