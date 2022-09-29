@@ -1,5 +1,11 @@
 .toolbar-main {
-    background-color: #FFFFFF;
+    background: #AFD6D6;
     box-shadow: none !important; 
     justify-content: space-between;
+    height: 120px;
+}
+
+.toolbar-text {
+    color: #000000;
+    font-size: 32px;
 }

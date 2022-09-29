@@ -4,6 +4,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import * as ROUTES from "../../routes/routes";
 import { useNavigate } from 'react-router';
+import { Icon } from '@iconify/react';
 import './MenuLateral.css'
 
 const MenuLateral = (props) => {
@@ -17,12 +18,13 @@ const MenuLateral = (props) => {
       };
 
     return (
-        <div>
-            <div >
+        <div >
+            <div className='logoContainer'>
+                <Icon icon="carbon:content-delivery-network" color="white" width="50px"/>
                 <b>Envifast</b>
             </div>
             <Divider/>
-            <List>
+            <List className='menuLateralContainer'>
                 {['Mapa de vuelos','Envios','Simulacion'].map((text,index) => (
                     <ListItem key={text} disablePadding>
                         <ListItemButton 

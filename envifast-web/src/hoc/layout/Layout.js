@@ -1,6 +1,7 @@
 import { CssBaseline, Drawer, Toolbar, Typography } from "@mui/material";
 import React from "react";
 import MenuLateral from "../../components/menu/MenuLateral";
+import AppBar from '@mui/material/AppBar';
 import Auxiliar from "../auxiliar/Auxiliar";
 import Box from "@mui/material/Box";
 import './Layout.css';
@@ -13,20 +14,31 @@ const Layout = (props) => {
         <Auxiliar>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline/>
-                <Toolbar className="toolbar-main">
-                    <Typography>
-                        Envifast
-                    </Typography>
-                </Toolbar>
+                <AppBar
+                    position="fixed"
+                    sx={{
+                    width: { sm: `calc(100% - 100px)` },
+                    ml: { sm: `100px` },
+                    }}
+                >
+                    <Toolbar className="toolbar-main">
+                        <Typography>
+                            Usuario
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
                 <Drawer 
                     variant="permanent" 
-                    sx={{display: 'block'}}
+                    sx={{
+                        display:'block',
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 281 },
+                    }}
                     open>
                     <MenuLateral/>
                 </Drawer>
                 <Box
                     component="main"
-                    style={{marginLeft:"60px"}}
+                    style={{marginLeft:"300px", marginTop:"55px"}}
                 >
                     <Toolbar />
                     {props.children}

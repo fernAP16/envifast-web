@@ -1,3 +1,18 @@
+.logoContainer{
+    background: #407070;
+    color: #FFFFFF;
+    height: 120px;
+    width: 280px;
+    font-size: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menuLateralContainer{
+    background: linear-gradient(#6CBDBD 60%, #407070 47%);
+}
+
 .lateralMenuButton{
     display: flex;
     flex-direction: column;
