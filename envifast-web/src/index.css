@@ -15,3 +15,9 @@ code {
 button {
   background-color: #19D2A6 !important; 
 }
+
+/* Este atributo tiene que estar si o si aqui*/
+.leaflet-container{
+  width: 65vw;
+  height: 100vh;
+}
