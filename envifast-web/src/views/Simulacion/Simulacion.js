@@ -1,4 +1,4 @@
 const Simulacion  = (props) => {   
-    return <h3>Simulacion</h3>;
+    return <h3>Simulación</h3>;
 }
 export default Simulacion;

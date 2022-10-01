@@ -16,6 +16,7 @@
 .menuLateralContainer{
     background-color: linear;
     background: linear-gradient(#6CBDBD, #407070);
+    height: 247%;
 }
 
 .lateralMenuButton{
@@ -33,4 +34,11 @@
 
 .buttonSelected{
     font-weight: 600 !important; 
+}
+
+.menuBox{
+    width: max-content;
+    inline-size: max-content;
+    height: max-content;
+    block-size: max-content;
 }

@@ -3,6 +3,7 @@ import { Divider, List, ListItem, Typography } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import Box from '@mui/material/Box';
 import * as ROUTES from "../../routes/routes";
 import { useNavigate } from 'react-router';
 import { Icon } from '@iconify/react';
@@ -31,7 +32,8 @@ const MenuLateral = (props) => {
                         <ListItemButton 
                             selected={selectedIndex === text}
                             onClick={(event) => { handleListItemClick(event, text); navigate(routes[index]); console.log(routes[index])}}
-                            className={'lateralMenuButton ' +  (selectedIndex === text ? "buttonSelected" : " ")}>
+                            className={'lateralMenuButton ' +  (selectedIndex === text ? "buttonSelected" : " ")}
+                            disabled={text === ''}>
                             <ListItemIcon>
                                 <Icon className="menuIcon" icon={icons[index]} color="white" width="30px" />
                             </ListItemIcon>
@@ -39,6 +41,7 @@ const MenuLateral = (props) => {
                         </ListItemButton>
                     </ListItem>
                 ))}
+                <Box className='menuBox'></Box>  
             </List>
         </div>
         
