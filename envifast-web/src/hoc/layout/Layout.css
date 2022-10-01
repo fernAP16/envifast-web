@@ -1,11 +1,19 @@
 .toolbar-main {
     background: #AFD6D6;
-    box-shadow: none !important; 
     justify-content: space-between;
     height: 100px;
+}
+
+.toolbar-main .MuiAppBar-paper{
+    box-shadow: 0px !important; 
 }
 
 .toolbar-text {
     color: #000000;
     font-size: 32px;
+}
+
+.layoutDrawer .MuiDrawer-paper{
+    display:'block';
+    background: linear-gradient(#6CBDBD, #407070);
 }

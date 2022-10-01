@@ -27,13 +27,11 @@ const Layout = (props) => {
                         </Typography>
                     </Toolbar>
                 </AppBar>
-                <Drawer 
+                <Drawer
+                    className="layoutDrawer"
                     variant="permanent" 
-                    sx={{
-                        display:'block',
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 281 },
-                    }}
-                    open>
+                    open
+                >
                     <MenuLateral/>
                 </Drawer>
                 <Box
