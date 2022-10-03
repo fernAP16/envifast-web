@@ -1,6 +1,7 @@
 import React from 'react';
 import './../../App';
 import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'; // objeto principal para los mapas
+import { getCoordenadasAeropuertos } from '../../services/envios/EnviosServices';
 import Markers from '../../components/Markers/Markers';
 import AirportLocation from '../../components/AirportLocation/AirportLocation';
 
@@ -11,16 +12,7 @@ import L from "leaflet";
 // const MapaVuelos  = (props) => {
     const MapaVuelos  = () => {
 
-        const [airportsCoordinates, setAirportsCoordinates] = React.useState([{
-            id: 1,
-            lat: -12.0219,
-            lng: -77.1112
-        },{
-            id: 2,
-            lat: 4.70083,
-            lng: -74.1415
-        }])
-            
+        const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
 
         const getIcon = () => {
             return L.icon({
@@ -29,7 +21,28 @@ import L from "leaflet";
                 iconSize : 20
             })
         }
-    
+
+        React.useEffect(() => {
+            getCoordenadasAeropuertos()
+            .then(function (response) {
+                // setAirportsCoordinates(response.data);
+                var array = [];
+                for (const element of response.data) {
+                    array.push({
+                        id: element.id,
+                        cityName: element.cityName,
+                        lat: element.x_pos,
+                        lng: element.y_pos
+                    })
+                };
+                setAirportsCoordinates(array);
+                console.log(airportsCoordinates)
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+        },[])
+
         const AirportMarket = () => {
             return (
                 <>
@@ -38,10 +51,6 @@ import L from "leaflet";
                 ))}
                 </> 
             )
-        }
-
-        const Airports = () => {
-
         }
 
         return (
