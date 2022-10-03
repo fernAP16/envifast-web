@@ -1,7 +1,7 @@
 window.globalConfig = {
     // Producción
-    //url: "https://......./envifast-service/",
+    //url: "https://......./",
 
     // Desarrollo
-    url: "http://localhost:8080/envifast-service/",
+    url: "http://localhost:8080/",
 }
