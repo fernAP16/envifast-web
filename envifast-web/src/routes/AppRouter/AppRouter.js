@@ -6,6 +6,8 @@ import MapaVuelo from "../../views/MapaVuelos/MapaVuelos";
 import Envios from "../../views/Envios/Envios";
 import Simulacion from "../../views/Simulacion/Simulacion";
 import Layout from '../../hoc/layout/Layout';
+import Simulacion5Dias from '../../views/Simulacion/Simulacion5Dias';
+import SimulacionColapso from '../../views/Simulacion/SimulacionColapso';
 
 const AppRouter = (props) => {
 
@@ -22,6 +24,8 @@ const AppRouter = (props) => {
             <Route path={ROUTES.MAPAVUELO} element={<Layout title='Mapa de vuelos'><MapaVuelo/></Layout>}/>          
             <Route path={ROUTES.ENVIOS} element={<Layout title='Envios'><Envios/></Layout>}/>  
             <Route path={ROUTES.SIMULACION} element={<Layout title='Simulacion'><Simulacion/></Layout>}/>  
+            <Route path={ROUTES.SIMULACION5DIAS} element={<Layout title='Simulacion 5 dias'><Simulacion5Dias/></Layout>}/>  
+            <Route path={ROUTES.SIMULACIONCOLAPSO} element={<Layout title='Simulacion colapso logístico'><SimulacionColapso/></Layout>}/>  
         </Routes>
     );
 

@@ -12,10 +12,19 @@ const MenuLateral = (props) => {
     
     const navigate = useNavigate();
     const icons = ["ion:home-sharp", "mdi:calendar-clock-outline","icon-park-outline:setting-laptop"];
-    const routes = [ROUTES.MAPAVUELO, ROUTES.ENVIOS, ROUTES.SIMULACION];
+    const routes = [ROUTES.MAPAVUELO, ROUTES.ENVIOS, '', ROUTES.SIMULACION5DIAS, ROUTES.SIMULACIONCOLAPSO];
+    const [enableSimulacion, setEnableSimulacion] = React.useState(true);
     const [selectedIndex, setSelectedIndex] = React.useState('Login');
-    const handleListItemClick = (event, index) => {
-        setSelectedIndex(index);
+    
+    const handleListItemClick = (event, index, text) => {
+        setSelectedIndex(text);
+        if(index >= 2){
+            setEnableSimulacion(false);
+        } else {
+            setEnableSimulacion(true);
+        }
+        navigate(routes[index]);
+        
       };
 
     return (
@@ -26,13 +35,14 @@ const MenuLateral = (props) => {
             </div>
             <Divider/>
             <List className='menuLateralContainer'>
-                {['Mapa de vuelos','Envios','Simulacion'].map((text,index) => (
+                {['Mapa de vuelos','Envios','Simulacion','De 5 dias','Colapso logístico'].map((text,index) => (
                     <ListItem key={text} disablePadding>
                         <ListItemButton 
                             selected={selectedIndex === text}
-                            onClick={(event) => { handleListItemClick(event, text); navigate(routes[index]); console.log(routes[index])}}
-                            className={'lateralMenuButton ' +  (selectedIndex === text ? "buttonSelected" : " ")}
-                            disabled={text === ''}>
+                            onClick={(event) => { handleListItemClick(event, index, text) }}
+                            className={'lateralMenuButton ' +  (selectedIndex === text ? 'buttonSelected ' : ' ') + ((index > 2 && enableSimulacion === true)? 'buttonInvisible' : 'buttonVisible')}
+                            disabled={(index > 2 ? enableSimulacion : false)}
+                            >
                             <ListItemIcon>
                                 <Icon className="menuIcon" icon={icons[index]} color="white" width="30px" />
                             </ListItemIcon>

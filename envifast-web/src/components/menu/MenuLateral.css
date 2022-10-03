@@ -13,12 +13,6 @@
     font-weight: 100 !important;
 }
 
-.menuLateralContainer{
-    /*background-color: linear;
-    background: linear-gradient(#6CBDBD, #407070);
-    height: 247%;*/
-}
-
 .lateralMenuButton{
     display: flex;
     align-items: left;
@@ -32,6 +26,14 @@
     width: 60px;
 }
 
-.buttonSelected{
-    font-weight: 600 !important;
+.buttonSelected .MuiTypography-root{
+    font-weight: 600;
+}
+
+.buttonInvisible{
+    visibility: hidden;
+}
+
+.buttonVisible{
+    visibility: visible;
 }
