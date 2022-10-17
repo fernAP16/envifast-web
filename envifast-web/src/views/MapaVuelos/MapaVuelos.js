@@ -9,8 +9,9 @@ import 'leaflet/dist/leaflet.css'; //
 import './MapaVuelos.css';
 import L from "leaflet";
 
-// const MapaVuelos  = (props) => {
-    const MapaVuelos  = () => {
+
+ const MapaVuelos  = (props) => {
+    // const MapaVuelos  = () => {
 
         const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
 
@@ -70,6 +71,5 @@ import L from "leaflet";
             </div>
         )
 }
-
 
 export default MapaVuelos;
