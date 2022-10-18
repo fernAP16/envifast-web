@@ -1,0 +1,61 @@
+@import './../MapaVuelos/MapaVuelos.css';
+
+.containerMapa{
+    display: flex;
+    margin-top: 20px;
+}
+
+.title{
+    position: absolute;
+    margin: 10px 0px 0px 20px;
+    font-size: 28px;
+    z-index: 2000;
+}
+
+.mapa-vuelo{
+    position: relative;
+    max-width: 850px;
+    max-height: 600px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+}
+
+.leaflet-left .leaflet-control {
+    margin-left: 806px;
+}
+
+.leaflet-bar a{
+    color:#19D2A6;
+}
+
+.container-buttons{
+    height: 100px;
+}
+
+.button-control{
+    position: relative;
+    color: white;
+    height: 30px;
+    width: 60px;
+    margin: 0px 10px 0px 10px;
+    font-size: 11px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+}
+
+.button-disabled-a{
+    background-color: #D6D6D6 !important;
+    font-size: 11px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+}
+
+.button-pause{
+    background-color: #1976D2 !important;
+}
+.button-stop{
+    background-color: #D32F2F !important;
+}
+
+.container-legend{
+    height: 100px;
+}
