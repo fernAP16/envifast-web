@@ -11,6 +11,7 @@ import L from "leaflet";
 
 import AirplaneMarker from "./AirplaneMarker";
 import {useState} from 'react'
+import { Grid, Typography } from '@mui/material';
 
 const dataStory = [
     {
@@ -93,19 +94,20 @@ const dataStory = [
 
     return (
         <div>
-            <h3>Mapa de vuelos</h3>
-            <MapContainer
-                className="mapaVuelo"
-                center = {{lat: '28.058522', lng: '-20.591226'}}
-                zoom = {2.8}
-                minZoom = {2.0}
-                maxZoom = {18.0}
-            >
-                <AirportMarket/>
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
-                <AirplaneMarker data={currentTrack ?? {}} />
-            </MapContainer>
-            
+            <Grid item container className='containerMapa'>
+                <Typography className='title'>Mapa de vuelos</Typography>
+                <MapContainer
+                    className="mapa-vuelo"
+                    center = {{lat: '28.058522', lng: '-20.591226'}}
+                    zoom = {2.8}
+                    minZoom = {2.0}
+                    maxZoom = {18.0}
+                >
+                    <AirportMarket/>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
+                    <AirplaneMarker data={currentTrack ?? {}} />
+                </MapContainer>
+            </Grid>
         </div>
     )
 }

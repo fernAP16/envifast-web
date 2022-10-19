@@ -2,11 +2,14 @@ import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'; // objeto principal para los mapas
 import { getCoordenadasAeropuertos } from '../../services/envios/EnviosServices';
-import { Grid, Button, Typography } from '@mui/material';
-import 'leaflet/dist/leaflet.css'; // 
-import './Simulacion5Dias.css';
+import { Grid, Button, Typography, Box } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
+import AirplaneIcon from '../../assets/icons/avion.png'
+import AirportIcon from '../../assets/icons/aeropuerto.png'
+import 'leaflet/dist/leaflet.css'; // 
+import './Simulacion5Dias.css';
+
 
 const Simulacion5Dias = () => {
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
@@ -87,18 +90,32 @@ const Simulacion5Dias = () => {
             </Grid>
             <Grid marginLeft="10px">
               <Grid item className='container-buttons' display='flex' alignItems='center'> 
-                <Typography position='relative'>Controles</Typography>
+                <Typography fontWeight="bold" position='relative'>Controles</Typography>
                 <Button className={'button-control button-play ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>INICIAR</Button>
                 <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause}>PAUSAR</Button>
                 <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop}>DETENER</Button>
               </Grid> 
-              <Grid container> 
-                <Grid item className='container-legend'>
-                  <Typography position='relative'>Leyenda</Typography>
+              <Box height="70px"> 
+                <Grid container className='container-legend'>
+                  <Typography fontWeight="bold">Leyenda</Typography>
                 </Grid>
-              </Grid> 
+                <Grid display="flex">
+                  <Grid container position="relative">
+                    <img src={AirportIcon} width="20px" height="20px"></img>
+                    <Typography>Aeropuerto</Typography>
+                  </Grid>
+                  <Grid container position="relative" width="70%">
+                    <img src={AirplaneIcon} width="20px" height="20px" className='object-legend'></img>
+                    <Typography>Avión</Typography>
+                  </Grid>
+                  <Grid container position="relative">
+                    <img src={AirportIcon} width="20px" height="20px" className='object-legend'></img>
+                    <Typography>Trayectos</Typography>
+                  </Grid>
+                </Grid>
+              </Box> 
               <Grid container> 
-                <Typography position='relative'>Listado de vuelos</Typography>
+                <Typography fontWeight="bold">Listado de vuelos</Typography>
               </Grid> 
             </Grid> 
             
