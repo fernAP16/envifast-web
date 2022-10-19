@@ -68,7 +68,19 @@ const Simulacion5Dias = () => {
     const handleStart = () => {
       setDisableStart(true);
       setDisablePause(false);
-      setDisableStop(false)
+      setDisableStop(false);
+    }
+
+    const handlePause = () => {
+      setDisableStart(false);
+      setDisablePause(true);
+      setDisableStop(false);
+    }
+
+    const handleStop = () => {
+      setDisableStart(false);
+      setDisablePause(true);
+      setDisableStop(true);
     }
 
     return (
@@ -88,27 +100,27 @@ const Simulacion5Dias = () => {
                   <AirportMarket/>                
               </MapContainer>
             </Grid>
-            <Grid marginLeft="10px">
-              <Grid item className='container-buttons' display='flex' alignItems='center'> 
+            <Box marginLeft="10px">
+              <Grid className='container-buttons' display='flex' alignItems='center'> 
                 <Typography fontWeight="bold" position='relative'>Controles</Typography>
                 <Button className={'button-control button-play ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>INICIAR</Button>
-                <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause}>PAUSAR</Button>
-                <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop}>DETENER</Button>
+                <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause} onClick={handlePause}>PAUSAR</Button>
+                <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop} onClick={handleStop}>DETENER</Button>
               </Grid> 
-              <Box height="70px"> 
-                <Grid container className='container-legend'>
-                  <Typography fontWeight="bold">Leyenda</Typography>
+              <Box height="80px"> 
+                <Grid container>
+                  <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
                 </Grid>
                 <Grid display="flex">
-                  <Grid container position="relative">
+                  <Grid container>
                     <img src={AirportIcon} width="20px" height="20px"></img>
                     <Typography>Aeropuerto</Typography>
                   </Grid>
-                  <Grid container position="relative" width="70%">
+                  <Grid container width="70%">
                     <img src={AirplaneIcon} width="20px" height="20px" className='object-legend'></img>
                     <Typography>Avión</Typography>
                   </Grid>
-                  <Grid container position="relative">
+                  <Grid container>
                     <img src={AirportIcon} width="20px" height="20px" className='object-legend'></img>
                     <Typography>Trayectos</Typography>
                   </Grid>
@@ -117,7 +129,7 @@ const Simulacion5Dias = () => {
               <Grid container> 
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
               </Grid> 
-            </Grid> 
+            </Box> 
             
             
           </Grid>
