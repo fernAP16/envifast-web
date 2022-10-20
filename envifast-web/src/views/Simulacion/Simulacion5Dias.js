@@ -5,9 +5,17 @@ import { getCoordenadasAeropuertos } from '../../services/envios/EnviosServices'
 import { Grid, Button, Typography, Box } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
-import AirplaneIcon from '../../assets/icons/avion.png'
-import AirportIcon from '../../assets/icons/aeropuerto.png'
-import 'leaflet/dist/leaflet.css'; // 
+import AirplaneIcon from '../../assets/icons/avion.png';
+import AirportIcon from '../../assets/icons/aeropuerto.png';
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 
 
@@ -32,7 +40,42 @@ const Simulacion5Dias = () => {
         })
     }
 
+    const StyledTableCell = styled(TableCell)(({ theme }) => ({
+      [`&.${tableCellClasses.head}`]: {
+        backgroundColor: "#AFD6D6",
+        color: theme.palette.common.black,
+      },
+      [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+      },
+    }));
 
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+      },
+      // hide last border
+      '&:last-child td, &:last-child th': {
+        border: 0,
+      },
+    }));
+
+    function createData(name, calories) {
+      return { name, calories };
+    }
+
+    const rows = [
+      createData('TAP011', 0),
+      createData('TAP012', 1),
+      createData('TAP013', 2),
+      createData('TAP014', 0),
+      createData('TAP015', 1),
+      createData('TAP016', 0),
+      createData('TAP017', 1),
+      createData('TAP018', 2),
+      createData('TAP019', 0),
+      createData('TAP020', 1),
+    ];
 
     React.useEffect(() => {
         getCoordenadasAeropuertos()
@@ -86,7 +129,7 @@ const Simulacion5Dias = () => {
     return (
         <div>
           <Grid display='flex'>
-            <Grid item container className='containerMapa'>
+            <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
               <MapContainer
                   className="mapa-vuelo"
@@ -126,9 +169,36 @@ const Simulacion5Dias = () => {
                   </Grid>
                 </Grid>
               </Box> 
-              <Grid container> 
+              <Grid > 
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
+                <TableContainer component={Paper} className="table-flights">
+                  <Table aria-label="customized table">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell align="center">Nombre del avión</StyledTableCell>
+                        <StyledTableCell align="center">Estado</StyledTableCell>
+                        <StyledTableCell align="center">Acciones</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row) => (
+                        <StyledTableRow key={row.name}>
+                          <StyledTableCell align="center">{row.name}</StyledTableCell>
+                          <StyledTableCell align="center">{row.calories}</StyledTableCell>
+                          <StyledTableCell align="center">
+                            <Button className='button-flights' disabled={row.calories === 0}>
+                              <Typography fontSize="8px" color="white">Ver plan de vuelo</Typography>
+                            </Button>
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Grid> 
+
+
+
             </Box> 
             
             

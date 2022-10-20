@@ -1,7 +1,8 @@
-import { Button } from "@mui/material";
+import { Button, Icon } from "@mui/material";
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import * as ROUTES from '../../routes/routes.js'
+import ArrowIcon from '../../assets/icons/arrow-right.png'
 
 const Login  = (props) => {   
     let navigate = useNavigate();
@@ -12,8 +13,9 @@ const Login  = (props) => {
             <Button 
                 className="buttonLogin"
                 onClick={() => {navigate(ROUTES.ENVIOS);}}
+                endIcon={<img src={ArrowIcon} width="22px" />}
             >
-                INICIAR SESION
+                INGRESAR
             </Button>
         </div>
     );
