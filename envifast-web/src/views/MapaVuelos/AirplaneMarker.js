@@ -16,14 +16,17 @@ export default function AirplaneMarker({ data }) {
 
   useEffect(() => {
     if (prevPos[1] !== lng && prevPos[0] !== lat) setPrevPos([lat, lng]);
-  }, [lat, lng, prevPos]);
+    console.log("Lat " + lat)
+    console.log("lng " + lng)
+  // }, [lat, lng, prevPos]);
+  }, [lat, lng]);
 
   return (
     <LeafletTrackingMarker
       icon={icon}
       position={[lat, lng]}
       previousPosition={prevPos}
-      duration={1000}
+      duration={1000 * 43}// poner el factor de transformacion
     />
   );
 }

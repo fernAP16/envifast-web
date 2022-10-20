@@ -3,7 +3,7 @@ window.globalConfig = {
     //url: "https://......./",
 
     // Desarrollo
-     url: "http://localhost:8080/",
+    //  url: "http://localhost:8080/",
     // Desarrollo Alfredo
-    // url: "http://localhost:8081/",
+    url: "http://localhost:8081/",
 }

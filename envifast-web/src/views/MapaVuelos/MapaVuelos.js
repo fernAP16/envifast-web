@@ -53,7 +53,7 @@ const dataStory = [
     
           cursor += 1;
           setCurrentTrack(dataStory[cursor]);
-        }, 1000);
+        }, 1000 * 43);// poner el factor de transformacion
         return () => {
           clearInterval(interval);
         };
