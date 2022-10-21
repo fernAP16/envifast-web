@@ -27,9 +27,15 @@ const dataStory = [
 
 
   let cursor = 0;
+  
 
  const MapaVuelos  = (props) => {
-    const [currentTrack, setCurrentTrack] = useState({});
+    const [currentTrack, setCurrentTrack] = useState({
+      // Lima: -12.098056, -77.015278
+      // LA POSICION INICIAL
+      lat: -12.098056,
+      lng: -77.015278
+    });
 
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
 
@@ -41,23 +47,64 @@ const dataStory = [
         })
     }
 
-    React.useEffect(() => {
+    const show_interval = () => {
         setCurrentTrack(dataStory[cursor]);
-    
-        const interval = setInterval(() => {
-          if (cursor === dataStory.length - 1) {
-            cursor = 0;
-            setCurrentTrack(dataStory[cursor]);
+        console.log("entra al set interval") 
+        if (cursor === dataStory.length - 1) {
+            // ENTRA AQUI PARA VOLVER AL ORIGEN
+            // console.log("Entro al setCurrent Track para volver al origen")
+            // cursor = 0;
+            // setCurrentTrack(dataStory[cursor]);setCurrentTrack(dataStory[cursor]);
             return;
-          }
+        }
     
-          cursor += 1;
-          setCurrentTrack(dataStory[cursor]);
-        }, 1000 * 43);// poner el factor de transformacion
-        return () => {
-          clearInterval(interval);
-        };
-    }, []);
+        // ENTRA AQUI PARA IR A SU DESTINO
+        console.log("Entro al setCurrent Track, para llegar a su destino")
+        cursor += 1;
+        setCurrentTrack(dataStory[cursor]);
+    }
+
+    React.useEffect(() => {
+
+        show_interval()
+    })
+
+    // React.useEffect(() => {
+    //     console.log("Entro al useEffect de AirplaneMarket")
+
+    //     setCurrentTrack(dataStory[cursor]);// AQUI
+        
+
+        
+
+        
+
+    //     const interval = setInterval( show_interval, 1000 * 10);// poner el factor de transformacion
+
+
+    //     return () => {
+    //       clearInterval(interval);
+    //     };
+
+    //     // const interval = setInterval(function hello(){
+    //     //     console.log("entra al set interval") 
+    //     //     if (cursor === dataStory.length - 1) {
+    //     //       // ENTRA AQUI PARA VOLVER AL ORIGEN
+    //     //       console.log("Entro al setCurrent Track para volver al origen")
+    //     //       cursor = 0;
+    //     //       setCurrentTrack(dataStory[cursor]);
+    //     //       return;
+    //     //     }
+      
+    //     //     // ENTRA AQUI PARA IR A SU DESTINO
+    //     //     console.log("Entro al setCurrent Track, para llegar a su destino")
+    //     //     cursor += 1;
+    //     //     setCurrentTrack(dataStory[cursor]);
+    //     //     return hello;
+    //     // }(), 1000 * 10)
+
+
+    // }, []);
 
     // para la animacion
     React.useEffect(() => {
@@ -74,6 +121,7 @@ const dataStory = [
                 })
             };
             setAirportsCoordinates(array);
+            setCurrentTrack(dataStory[cursor]);
             console.log(airportsCoordinates)
         })
         .catch(function (error) {
@@ -105,7 +153,7 @@ const dataStory = [
                 >
                     <AirportMarket/>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
-                    <AirplaneMarker data={currentTrack ?? {}} />
+                    <AirplaneMarker data={ currentTrack ?? {}} />
                 </MapContainer>
             </Grid>
         </div>
