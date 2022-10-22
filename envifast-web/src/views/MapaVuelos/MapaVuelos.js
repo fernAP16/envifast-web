@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia } from '../../services/envios/EnviosServices';
 import Markers from '../../components/Markers/Markers';
 import AirportLocation from '../../components/AirportLocation/AirportLocation';
 
@@ -12,6 +12,7 @@ import L from "leaflet";
 import AirplaneMarker from "./AirplaneMarker";
 import {useState} from 'react'
 import { Grid, Typography } from '@mui/material';
+import { isElementOfType } from 'react-dom/test-utils';
 
 const dataStory = [
     {
@@ -38,6 +39,8 @@ const dataStory = [
     });
 
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
+
+    const [flightsSchedule, setFlightsSchedule] = React.useState([])
 
     const getIcon = () => {
         return L.icon({
@@ -69,42 +72,32 @@ const dataStory = [
         show_interval()
     })
 
-    // React.useEffect(() => {
-    //     console.log("Entro al useEffect de AirplaneMarket")
+    // api para obtener los vuelos de un dia. Por ahora estara hardcodeado para el 22
+    React.useEffect(() => {
+        let variables = {fecha: "2022-10-22"}
+        getVuelosPorDia(variables)
+        .then((response) => {
+            var array = [];
+            for (const element of response.data){
+                array.push(
+                    {
+                        id: element.id,
+                        idAeropuertoOrigen: element.idAeropuertoOrigen,
+                        idAeropuertoDestino: element.idAeropuertoDestino,
+                        horaSalida: element.horaSalida,
+                        horaLLegada: element.horaLLegada,
+                        duracion: element.duracion
+                    }
+                )
+            };
+            
+            setFlightsSchedule(array)
+            console.log(array) // es lo mismo que flightsSchedule
+        }
 
-    //     setCurrentTrack(dataStory[cursor]);// AQUI
-        
+        )
+    }, [])
 
-        
-
-        
-
-    //     const interval = setInterval( show_interval, 1000 * 10);// poner el factor de transformacion
-
-
-    //     return () => {
-    //       clearInterval(interval);
-    //     };
-
-    //     // const interval = setInterval(function hello(){
-    //     //     console.log("entra al set interval") 
-    //     //     if (cursor === dataStory.length - 1) {
-    //     //       // ENTRA AQUI PARA VOLVER AL ORIGEN
-    //     //       console.log("Entro al setCurrent Track para volver al origen")
-    //     //       cursor = 0;
-    //     //       setCurrentTrack(dataStory[cursor]);
-    //     //       return;
-    //     //     }
-      
-    //     //     // ENTRA AQUI PARA IR A SU DESTINO
-    //     //     console.log("Entro al setCurrent Track, para llegar a su destino")
-    //     //     cursor += 1;
-    //     //     setCurrentTrack(dataStory[cursor]);
-    //     //     return hello;
-    //     // }(), 1000 * 10)
-
-
-    // }, []);
 
     // para la animacion
     React.useEffect(() => {
@@ -121,7 +114,7 @@ const dataStory = [
                 })
             };
             setAirportsCoordinates(array);
-            setCurrentTrack(dataStory[cursor]);
+            setCurrentTrack(dataStory[cursor]);//
             console.log(airportsCoordinates)
         })
         .catch(function (error) {
