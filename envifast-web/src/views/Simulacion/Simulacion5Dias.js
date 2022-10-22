@@ -2,7 +2,7 @@ import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'; // objeto principal para los mapas
 import { getCoordenadasAeropuertos } from '../../services/envios/EnviosServices';
-import { Grid, Button, Typography, Box } from '@mui/material';
+import { Grid, Button, Typography, Box, TextField } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
 import AirplaneIcon from '../../assets/icons/avion.png';
@@ -15,6 +15,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { formatDate } from '../../constants/commonFunctions'
 import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 
@@ -24,6 +25,9 @@ const Simulacion5Dias = () => {
     const [disableStart, setDisableStart] = React.useState(false);
     const [disablePause, setDisablePause] = React.useState(true);
     const [disableStop, setDisableStop] = React.useState(true);
+    const [startDateString, setStartDateString] = React.useState('');
+    const [startDate, setStartDate] = React.useState(new Date());
+    const [currentTime, setCurrentTime] = React.useState('');
     const marker = new DriftMarker([10, 10]);
     
 
@@ -78,24 +82,25 @@ const Simulacion5Dias = () => {
     ];
 
     React.useEffect(() => {
-        getCoordenadasAeropuertos()
-        .then(function (response) {
-            // setAirportsCoordinates(response.data);
-            var array = [];
-            for (const element of response.data) {
-                array.push({
-                    id: element.id,
-                    cityName: element.cityName,
-                    lat: element.x_pos,
-                    lng: element.y_pos
-                })
-            };
-            setAirportsCoordinates(array);
-            console.log(airportsCoordinates)
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
+      setCurrentTime('00:00:00 AM');
+      getCoordenadasAeropuertos()
+      .then(function (response) {
+          // setAirportsCoordinates(response.data);
+          var array = [];
+          for (const element of response.data) {
+              array.push({
+                  id: element.id,
+                  cityName: element.cityName,
+                  lat: element.x_pos,
+                  lng: element.y_pos
+              })
+          };
+          setAirportsCoordinates(array);
+          console.log(airportsCoordinates)
+      })
+      .catch(function (error) {
+          console.log(error);
+      })
     },[])
 
     const AirportMarket = () => {
@@ -126,11 +131,24 @@ const Simulacion5Dias = () => {
       setDisableStop(true);
     }
 
+    // 2022-09-22
+
+    const handleDate = event => {
+      setStartDate(event.target.value);
+      setStartDateString(formatDate(event.target.value));
+    }
+
+    function changeTime(timeValueFrom, dateValueFrom = null){
+  
+    }
+
     return (
         <div>
           <Grid display='flex'>
             <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
+              <Typography className='date-map'>{"Fecha: " + startDateString}</Typography>
+              <Typography className='time-map'>{"Hora: " + currentTime} </Typography>
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
@@ -150,6 +168,14 @@ const Simulacion5Dias = () => {
                 <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause} onClick={handlePause}>PAUSAR</Button>
                 <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop} onClick={handleStop}>DETENER</Button>
               </Grid> 
+              <Grid container xs={12} alignItems='center'>
+                <Grid container xs={5}>
+                  <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
+                </Grid>
+                <Grid container xs={6}>
+                  <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate}/>
+                </Grid>
+              </Grid>
               <Box height="80px"> 
                 <Grid container>
                   <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
@@ -172,10 +198,10 @@ const Simulacion5Dias = () => {
               <Grid > 
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
                 <TableContainer component={Paper} className="table-flights">
-                  <Table aria-label="customized table">
-                    <TableHead>
+                  <Table stickyHeader  aria-label="customized table">
+                    <TableHead >
                       <TableRow>
-                        <StyledTableCell align="center">Nombre del avión</StyledTableCell>
+                        <StyledTableCell align="center">Nombre del vuelo</StyledTableCell>
                         <StyledTableCell align="center">Estado</StyledTableCell>
                         <StyledTableCell align="center">Acciones</StyledTableCell>
                       </TableRow>
