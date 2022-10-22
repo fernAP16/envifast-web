@@ -99,10 +99,6 @@ const Simulacion5Dias = () => {
     ];
 
     React.useEffect(() => {
-      setCurrentTrack({
-        lat: -12.098056,
-        lng: -77.015278
-      })
       getCoordenadasAeropuertos()
       .then(function (response) {
           // setAirportsCoordinates(response.data);
@@ -116,7 +112,7 @@ const Simulacion5Dias = () => {
               })
           };
           setAirportsCoordinates(array);
-          console.log(airportsCoordinates)
+          console.log(array)
       })
       .catch(function (error) {
           console.log(error);
@@ -133,19 +129,31 @@ const Simulacion5Dias = () => {
         )
     }
 
-    const show_interval = () => {
-      setCurrentTrack(dataStory[cursor]);
-      console.log("A");
+    const show_interval = (flightsSchedule) => {
+      // setCurrentTrack(dataStory[cursor]); // las coordenadas origen
+      setCurrentTrack({
+        lat: flightsSchedule.coordenadasOrigen[0],
+        lng: flightsSchedule.coordenadasOrigen[1]
+      }); 
       if (cursor !== dataStory.length - 1) {
         console.log("Entro al setCurrent Track, para llegar a su destino")
-        cursor += 1;
-        setCurrentTrack(dataStory[cursor]);
+        // cursor += 1;
+        // setCurrentTrack(dataStory[cursor]); /// las coordenadas destino
+        setCurrentTrack({
+          lat: flightsSchedule.coordenadasDestinos[0],
+          lng: flightsSchedule.coordenadasDestinos[1],
+        }
+          ); /// las coordenadas destino
       }
     }
 
     React.useEffect(() => {
-      if(stateButtons === 1)
-        show_interval()
+      if(stateButtons === 1){
+        for(var i = 0; i < 10; i++){
+          show_interval(() => flightsSchedule[i])
+        }
+      }
+        // show_interval()
     }, [stateButtons])
 
     React.useEffect(() => {
@@ -155,7 +163,11 @@ const Simulacion5Dias = () => {
       getVuelosPorDia(variables)
       .then((response) => {
         var array = [];
+        var arrayCursor = [];
         for (const element of response.data){
+          console.log("Las coordenadas y el element de la api")
+          console.log(element.idAeropuertoOrigen)
+          console.log(airportsCoordinates[element.idAeropuertoOrigen - 1])
           array.push(
             {
               id: element.id,
@@ -163,20 +175,19 @@ const Simulacion5Dias = () => {
               idAeropuertoDestino: element.idAeropuertoDestino,
               horaSalida: element.horaSalida,
               horaLLegada: element.horaLLegada,
-              duracion: element.duracion
+              duracion: element.duracion,
+              coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+              coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng]
             }
           )
         };
         setFlightsSchedule(array);
+        console.log(array)
       })
   }, [])
 
     const handleStart = () => {
       if(stateButtons === 0){
-        setCurrentTrack({
-          lat: -12.098056,
-          lng: -77.015278
-        })
         setStateButtons(1);
       }
       else setStateButtons(3)
@@ -225,7 +236,13 @@ const Simulacion5Dias = () => {
               >
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
-                  <AirplaneMarker data={currentTrack ?? {}} />                
+                  {flightsSchedule.slice(0,10).map((flight)=>(
+                    <AirplaneMarker data={
+                      {lat: flight.coordenadasOrigen[0],
+                      lng: flight.coordenadasOrigen[1]} ?? {}
+                    }></AirplaneMarker>
+                  ))}
+                  {/* <AirplaneMarker data={currentTrack ?? {}} />                 */}
               </MapContainer>
             </Grid>
             <Box marginLeft="10px">
