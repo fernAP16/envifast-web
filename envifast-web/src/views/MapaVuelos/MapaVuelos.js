@@ -98,7 +98,6 @@ const dataStory = [
         )
     }, [])
 
-
     // para la animacion
     React.useEffect(() => {
         getCoordenadasAeropuertos()

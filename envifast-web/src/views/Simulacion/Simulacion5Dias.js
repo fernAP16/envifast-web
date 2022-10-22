@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -15,26 +15,43 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { formatDate } from '../../constants/commonFunctions'
+import { formatDate, formatDateTimeToString } from '../../constants/commonFunctions'
 import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
+import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
 
+const dataStory = [
+  {
+      // Lima: -12.098056, -77.015278
+    lat: -12.098056,
+    lng: -77.015278
+  },
+  {   // Madrid: 40.472222, -3.560833
+    lat: 40.472222,
+    lng: -3.560833
+  }
+];
+
+let cursor = 0;
 
 const Simulacion5Dias = () => {
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
     const [disableStart, setDisableStart] = React.useState(false);
     const [disablePause, setDisablePause] = React.useState(true);
     const [disableStop, setDisableStop] = React.useState(true);
-    const [startDateString, setStartDateString] = React.useState('');
+    const [startDateString, setStartDateString] = React.useState(formatDateTimeToString(new Date())[0]);
     const [startDate, setStartDate] = React.useState(new Date());
-    const [currentTime, setCurrentTime] = React.useState('');
+    const [currentTime, setCurrentTime] = React.useState('00:00:00 AM');
+    const [currentTrack, setCurrentTrack] = React.useState({});
+    const [flightsSchedule, setFlightsSchedule] = React.useState([]);
+    const [stateButtons, setStateButtons] = React.useState(0);
     const marker = new DriftMarker([10, 10]);
     
 
     marker.slideTo([50, 50], {
-        duration: 2000,
-        keepAtCenter: true,
-        });
+      duration: 2000,
+      keepAtCenter: true,
+    });
 
     const getIcon = () => {
         return L.icon({
@@ -82,7 +99,10 @@ const Simulacion5Dias = () => {
     ];
 
     React.useEffect(() => {
-      setCurrentTime('00:00:00 AM');
+      setCurrentTrack({
+        lat: -12.098056,
+        lng: -77.015278
+      })
       getCoordenadasAeropuertos()
       .then(function (response) {
           // setAirportsCoordinates(response.data);
@@ -113,27 +133,74 @@ const Simulacion5Dias = () => {
         )
     }
 
+    const show_interval = () => {
+      setCurrentTrack(dataStory[cursor]);
+      console.log("A");
+      if (cursor !== dataStory.length - 1) {
+        console.log("Entro al setCurrent Track, para llegar a su destino")
+        cursor += 1;
+        setCurrentTrack(dataStory[cursor]);
+      }
+    }
+
+    React.useEffect(() => {
+      if(stateButtons === 1)
+        show_interval()
+    }, [stateButtons])
+
+    React.useEffect(() => {
+      let variables = {
+        fecha: "2022-10-22"
+      }
+      getVuelosPorDia(variables)
+      .then((response) => {
+        var array = [];
+        for (const element of response.data){
+          array.push(
+            {
+              id: element.id,
+              idAeropuertoOrigen: element.idAeropuertoOrigen,
+              idAeropuertoDestino: element.idAeropuertoDestino,
+              horaSalida: element.horaSalida,
+              horaLLegada: element.horaLLegada,
+              duracion: element.duracion
+            }
+          )
+        };
+        setFlightsSchedule(array);
+      })
+  }, [])
+
     const handleStart = () => {
-      setDisableStart(true);
-      setDisablePause(false);
-      setDisableStop(false);
+      if(stateButtons === 0){
+        setCurrentTrack({
+          lat: -12.098056,
+          lng: -77.015278
+        })
+        setStateButtons(1);
+      }
+      else setStateButtons(3)
+      // setDisableStart(true);
+      // setDisablePause(false);
+      // setDisableStop(false);
     }
 
     const handlePause = () => {
+      setStateButtons(2);
       setDisableStart(false);
       setDisablePause(true);
       setDisableStop(false);
     }
 
     const handleStop = () => {
+      setStateButtons(4);
       setDisableStart(false);
       setDisablePause(true);
       setDisableStop(true);
     }
 
-    // 2022-09-22
-
     const handleDate = event => {
+      console.log(startDate)
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
     }
@@ -157,8 +224,8 @@ const Simulacion5Dias = () => {
                   maxZoom = {18.0}
               >
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
-                  
-                  <AirportMarket/>                
+                  <AirportMarket/>
+                  <AirplaneMarker data={currentTrack ?? {}} />                
               </MapContainer>
             </Grid>
             <Box marginLeft="10px">
@@ -199,19 +266,19 @@ const Simulacion5Dias = () => {
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
                 <TableContainer component={Paper} className="table-flights">
                   <Table stickyHeader  aria-label="customized table">
-                    <TableHead >
+                    <TableHead>
                       <TableRow>
-                        <StyledTableCell align="center">Nombre del vuelo</StyledTableCell>
-                        <StyledTableCell align="center">Estado</StyledTableCell>
-                        <StyledTableCell align="center">Acciones</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell' align="center">Nombre del vuelo</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell' align="center">Estado</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell'align="center">Acciones</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {rows.map((row) => (
                         <StyledTableRow key={row.name}>
-                          <StyledTableCell align="center">{row.name}</StyledTableCell>
-                          <StyledTableCell align="center">{row.calories}</StyledTableCell>
-                          <StyledTableCell align="center">
+                          <StyledTableCell className='table-flights-cell' align="center">{row.name}</StyledTableCell>
+                          <StyledTableCell className='table-flights-cell' align="center">{row.calories}</StyledTableCell>
+                          <StyledTableCell className='table-flights-cell' align="center">
                             <Button className='button-flights' disabled={row.calories === 0}>
                               <Typography fontSize="8px" color="white">Ver plan de vuelo</Typography>
                             </Button>
