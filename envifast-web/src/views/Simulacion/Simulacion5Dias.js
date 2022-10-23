@@ -103,52 +103,50 @@ const Simulacion5Dias = () => {
       getCoordenadasAeropuertos()
       .then(function (response) {
           // setAirportsCoordinates(response.data);
-          var array = [];
+          var arrayAirports = [];
           for (const element of response.data) {
-              array.push({
+            arrayAirports.push({
                   id: element.id,
                   cityName: element.cityName,
                   lat: element.x_pos,
                   lng: element.y_pos
               })
           };
-          setAirportsCoordinates(array);
-          console.log(array)
+          setAirportsCoordinates(arrayAirports);
+          console.log(arrayAirports)
+          let variables = {
+            fecha: "2022-10-22",
+            periodo: 4
+          }
+          console.log("GETVUELOSPORDIA")
+          getVuelosPorDia(variables)
+          .then((response) => {
+            var array = [];
+            console.log(response.data);
+            for (const element of response.data){
+              array.push(
+                {
+                  id: element.id,
+                  idAeropuertoOrigen: element.idAeropuertoOrigen,
+                  idAeropuertoDestino: element.idAeropuertoDestino,
+                  horaSalida: element.horaSalida,
+                  horaLLegada: element.horaLLegada,
+                  duracion: element.duracion,
+                  coordenadasOrigen: [arrayAirports[element.idAeropuertoOrigen - 1].lat,arrayAirports[element.idAeropuertoOrigen - 1].lng],
+                  coordenadasDestinos: [arrayAirports[element.idAeropuertoDestino - 1].lat,arrayAirports[element.idAeropuertoDestino - 1].lng]
+                }
+              )
+            };
+            console.log("Llego a hacer el set")
+            setFlightsSchedule(array);
+            console.log(array)
+          })
       })
       .catch(function (error) {
           console.log(error);
       })
+      
     },[])
-
-    const AirportMarket = () => {
-        return (
-            <>
-            {airportsCoordinates.map((airport) => (
-                <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
-            ))}
-            </> 
-        )
-    }
-
-    const show_interval = (flightsSchedule) => {
-      // setCurrentTrack(dataStory[cursor]); // las coordenadas origen
-      console.log("entro a show interval")
-      console.log(flightsSchedule.coordenadasOrigen[0])
-      console.log(flightsSchedule.coordenadasOrigen[1])
-      setCurrentTrack({
-        lat: flightsSchedule.coordenadasOrigen[0],
-        lng: flightsSchedule.coordenadasOrigen[1]
-      }); 
-      // if (cursor !== dataStory.length - 1) {
-        console.log("Entro al setCurrent Track, para llegar a su destino")
-        // cursor += 1;
-        // setCurrentTrack(dataStory[cursor]); /// las coordenadas destino
-        setCurrentTrack({
-          lat: flightsSchedule.coordenadasDestinos[0],
-          lng: flightsSchedule.coordenadasDestinos[1],
-        }
-          ); 
-    }
 
     React.useEffect(() => {
       if(stateButtons === 1){
@@ -161,33 +159,41 @@ const Simulacion5Dias = () => {
 
     }, [stateButtons])
 
-    React.useEffect(() => {
-      let variables = {
-        fecha: "2022-10-22",
-        periodo: 4
-      }
-      getVuelosPorDia(variables)
-      .then((response) => {
-        var array = [];
-        for (const element of response.data){
-          array.push(
-            {
-              id: element.id,
-              idAeropuertoOrigen: element.idAeropuertoOrigen,
-              idAeropuertoDestino: element.idAeropuertoDestino,
-              horaSalida: element.horaSalida,
-              horaLLegada: element.horaLLegada,
-              duracion: element.duracion,
-              coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
-              coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng]
-            }
-          )
-        };
-        console.log("Llego a hacer el set")
-        setFlightsSchedule(array);
-        console.log(array)
-      })
-  })
+    const show_interval = (flightSchedule) => {
+      // setCurrentTrack(dataStory[cursor]); // las coordenadas origen
+      console.log("entro a show interval")
+      console.log(flightSchedule.coordenadasOrigen[0])
+      console.log(flightSchedule.coordenadasOrigen[1])
+      console.log(flightSchedule.duracion)
+      setCurrentTrack({
+        lat: flightSchedule.coordenadasOrigen[0],
+        lng: flightSchedule.coordenadasOrigen[1],
+        duration_flight: flightSchedule.duracion
+      }); 
+      console.log("Entro al setCurrent Track, para llegar a su destino")
+      // setCurrentTrack(dataStory[cursor]); /// las coordenadas destino
+      setCurrentTrack({
+        lat: flightSchedule.coordenadasDestinos[0],
+        lng: flightSchedule.coordenadasDestinos[1],
+        duration_flight: flightSchedule.duracion
+      }); 
+
+      // Igualamos el origen al destino
+      flightSchedule.coordenadasOrigen[0] = flightSchedule.coordenadasDestinos[0];
+      flightSchedule.coordenadasOrigen[1] = flightSchedule.coordenadasDestinos[1];
+    }
+
+    const AirportMarket = () => {
+      return (
+        <>
+        {airportsCoordinates.map((airport) => (
+            <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
+        ))}
+        </> 
+      )
+    }
+
+    
 
     const handleStart = () => {
       if(stateButtons === 0){

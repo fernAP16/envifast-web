@@ -27,7 +27,7 @@ export default function AirplaneMarker({ data }) {
       icon={icon}
       position={[lat, lng]}
       previousPosition={prevPos}
-      duration={1000 * duration_flight}// poner el factor de transformacion
+      duration={1000 * duration_flight / 360}// poner el factor de transformacion
     />
   );
 }
