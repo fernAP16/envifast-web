@@ -164,11 +164,11 @@ const Simulacion5Dias = () => {
       // console.log("Entro al use effect")
       if(stateButtons === 1){       
         
-        if(currentDateTime !== null){
-          for(var i = 0 ; i < 10; i++){
-            show_interval(flightsSchedule[i])
-          } 
-        }
+        // if(currentDateTime !== null){
+        //   for(var i = 0 ; i < 10; i++){
+        //     show_interval(flightsSchedule[i])
+        //   } 
+        // }
         
         const interval = setInterval(() => {
           const dateTime = currentDateTime;  
@@ -181,6 +181,19 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
         
+      }
+    }, [stateButtons])
+
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        if(currentDateTime !== null){
+          const interval = setInterval(() => {
+            for(var i = 0 ; i < 10; i++){
+              show_interval(flightsSchedule[i])
+            } 
+          }, 1000 / 360)
+          
+        }
       }
     }, [stateButtons])
 
