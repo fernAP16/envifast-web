@@ -114,7 +114,7 @@ const Simulacion5Dias = () => {
           })
         };
         setAirportsCoordinates(arrayAirports);
-        console.log(arrayAirports)
+        // console.log(arrayAirports)
       })
       .catch(function (error) {
           console.log(error);
@@ -126,7 +126,6 @@ const Simulacion5Dias = () => {
         fecha: startDate,
         periodo: 1
       }
-      console.log(startDate)
       getVuelosPorDia(variables)
       .then((response) => {
         var array = [];
@@ -145,12 +144,12 @@ const Simulacion5Dias = () => {
             }
           )
         };
-        console.log("Llego a hacer el set");
+        
         setFlightsSchedule(array);
-        console.log(array);
+
         // let dateTime = new Date(startDate);
-        let dateTime = new Date(formatDateToString(startDate));
-        console.log(dateTime)
+        // let dateTime = new Date(formatDateToString(startDate));
+        let dateTime = new Date(startDate);
         dateTime.setHours(0)
         dateTime.setMinutes(0)
         dateTime.setSeconds(0)        
@@ -160,60 +159,77 @@ const Simulacion5Dias = () => {
 
 
 
-    // Se hace click en Iniciar -> Inicia la simulacion
+    // PARA INICIAR LA SIMULACION
     React.useEffect(() => {
-      
-
-      if(stateButtons === 1){
-        console.log("Entro al for del use effect")
-        console.log(flightsSchedule)
-        for(var i = 0; i < 10; i++){
-          show_interval(flightsSchedule[i])
+      // console.log("Entro al use effect")
+      if(stateButtons === 1){       
+        
+        if(currentDateTime !== null){
+          for(var i = 0 ; i < 10; i++){
+            show_interval(flightsSchedule[i])
+          } 
         }
+        
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          
+        }, 1000 / 360)
+
+        return () => {
+          clearInterval(interval);
+        };
+        
       }
-
-      const interval = setInterval(() => {
-        const dateTime = currentDateTime;
-        console.log("El tiempo de currentDateTimes es: " + dateTime)
-        dateTime.setSeconds(dateTime.getSeconds() + 1)
-        setCurrentDateTime(dateTime)
-        // setFormatoFecha(formatDateTimeToString(currentDateTime)[0] + " " + formatDateTimeToString(currentDateTime)[1])
-      }, 1000 / 360)
-      return () => {
-        clearInterval(interval);
-      };
-
-
     }, [stateButtons])
 
+    // React.useEffect(() => {
+    //   const interval = setInterval(() => {
+    //     const dateTime = currentDateTime;  
+    //     currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+    //     console.log("El tiempo de currentDateTimes es: " + currentDateTime)
+    //     setCurrentDateTime(dateTime)
+        
+    //   }, 1000 / 360)
+    // })
+
+
+    // React.useEffect(() => {
+    //   const interval = setInterval(() => {
+    //     const dateTime = currentDateTime;  
+    //     currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+    //     console.log("El tiempo de currentDateTimes es: " + currentDateTime)
+    //     setCurrentDateTime(dateTime)        
+    //   }, 1000 / 360)
+    // }, [stateButtons])
+    
     
 
     const show_interval = (flightSchedule) => {
-      // setCurrentTrack(dataStory[cursor]); // las coordenadas origen
-      console.log("entro a show interval")
-      console.log(flightSchedule.coordenadasOrigen[0])
-      console.log(flightSchedule.coordenadasOrigen[1])
-      console.log(flightSchedule.duracion)
-      setCurrentTrack({
-        lat: flightSchedule.coordenadasOrigen[0],
-        lng: flightSchedule.coordenadasOrigen[1],
-        duration_flight: flightSchedule.duracion
-      }); 
-      console.log("Entro al setCurrent Track, para llegar a su destino")
-      // setCurrentTrack(dataStory[cursor]); /// las coordenadas destino
-      setCurrentTrack({
-        lat: flightSchedule.coordenadasDestinos[0],
-        lng: flightSchedule.coordenadasDestinos[1],
-        duration_flight: flightSchedule.duracion
-      }); 
+      // el current date time se mantiene constante aqui
+      let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20)// esto captura bien la hora. Ahora 
+      
+      let arrTiempo = horaSalida.split(":")
+      let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600;
+      let tiempoSalida = parseInt(arrTiempo[2]) + parseInt(arrTiempo[1]) * 60 +  parseInt(arrTiempo[0]) * 3600;
 
-      // Igualamos el origen al destino
-      flightSchedule.coordenadasOrigen[0] = flightSchedule.coordenadasDestinos[0];
-      flightSchedule.coordenadasOrigen[1] = flightSchedule.coordenadasDestinos[1];
+      setCurrentTrack({
+          lat: flightSchedule.coordenadasOrigen[0],
+          lng: flightSchedule.coordenadasOrigen[1],
+          duration_flight: flightSchedule.duracion
+        }); 
+
+      console.log("Tiempo actual: " + tiempoActual)
+      console.log("Tiempo Salida: " + tiempoSalida)  
+      if(tiempoActual >= tiempoSalida){
+        console.log("Entor al if, Entro al setCurrent Track, para llegar a su destino")
+        flightSchedule.coordenadasOrigen[0] = flightSchedule.coordenadasDestinos[0];
+        flightSchedule.coordenadasOrigen[1] = flightSchedule.coordenadasDestinos[1];
+      }
+      
     }
 
-    
-    
 
     const AirportMarket = () => {
       return (
@@ -250,10 +266,10 @@ const Simulacion5Dias = () => {
     }
 
     const handleDate = event => {
-      console.log(startDate)
+      // console.log(startDate)
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
-      console.log(typeof event.target.value)
+      // console.log(typeof event.target.value)
     }
 
     function changeTime(timeValueFrom, dateValueFrom = null){
@@ -279,13 +295,14 @@ const Simulacion5Dias = () => {
               >
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
-                  {flightsSchedule.slice(0,10).map((flight)=>(
-                    <AirplaneMarker data={
-                      { lat: flight.coordenadasOrigen[0],
-                        lng: flight.coordenadasOrigen[1],
-                        duration_flight: flight.duracion
-                      } ?? {}
-                    }></AirplaneMarker>
+                  {flightsSchedule &&
+                    flightsSchedule.slice(0,10).map((flight)=>(
+                      <AirplaneMarker data={
+                        { lat: flight.coordenadasOrigen[0],
+                          lng: flight.coordenadasOrigen[1],
+                          duration_flight: flight.duracion
+                        } ?? {}
+                      }></AirplaneMarker>
                   ))}
                   {/* <AirplaneMarker data={currentTrack ?? {}} />                 */}
               </MapContainer>
