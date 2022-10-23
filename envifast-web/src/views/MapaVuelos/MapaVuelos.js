@@ -18,11 +18,13 @@ const dataStory = [
     {
         // Lima: -12.098056, -77.015278
       lat: -12.098056,
-      lng: -77.015278
+      lng: -77.015278,
+      duration_flight: 43
     },
     {   // Madrid: 40.472222, -3.560833
       lat: 40.472222,
-      lng: -3.560833
+      lng: -3.560833,
+      duration_flight: 43
     }
   ];
 
@@ -35,7 +37,8 @@ const dataStory = [
       // Lima: -12.098056, -77.015278
       // LA POSICION INICIAL
       lat: -12.098056,
-      lng: -77.015278
+      lng: -77.015278,
+      duration_flight: 43
     });
 
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
@@ -54,10 +57,7 @@ const dataStory = [
         setCurrentTrack(dataStory[cursor]);
         console.log("entra al set interval") 
         if (cursor === dataStory.length - 1) {
-            // ENTRA AQUI PARA VOLVER AL ORIGEN
-            // console.log("Entro al setCurrent Track para volver al origen")
-            // cursor = 0;
-            // setCurrentTrack(dataStory[cursor]);setCurrentTrack(dataStory[cursor]);
+            
             return;
         }
     
@@ -72,31 +72,7 @@ const dataStory = [
         show_interval()
     })
 
-    // api para obtener los vuelos de un dia. Por ahora estara hardcodeado para el 22
-    React.useEffect(() => {
-        let variables = {fecha: "2022-10-22"}
-        getVuelosPorDia(variables)
-        .then((response) => {
-            var array = [];
-            for (const element of response.data){
-                array.push(
-                    {
-                        id: element.id,
-                        idAeropuertoOrigen: element.idAeropuertoOrigen,
-                        idAeropuertoDestino: element.idAeropuertoDestino,
-                        horaSalida: element.horaSalida,
-                        horaLLegada: element.horaLLegada,
-                        duracion: element.duracion
-                    }
-                )
-            };
-            
-            setFlightsSchedule(array)
-            console.log(array) // es lo mismo que flightsSchedule
-        }
-
-        )
-    }, [])
+    
 
     // para la animacion
     React.useEffect(() => {
@@ -120,6 +96,32 @@ const dataStory = [
             console.log(error);
         })
     },[])
+
+    // api para obtener los vuelos de un dia. Por ahora estara hardcodeado para el 22
+    React.useEffect(() => {
+        let variables = {fecha: "2022-10-22", periodo: 4}
+        getVuelosPorDia(variables)
+        .then((response) => {
+            var array = [];
+            for (const element of response.data){
+                array.push(
+                    {
+                        id: element.id,
+                        idAeropuertoOrigen: element.idAeropuertoOrigen,
+                        idAeropuertoDestino: element.idAeropuertoDestino,
+                        horaSalida: element.horaSalida,
+                        horaLLegada: element.horaLLegada,
+                        duracion: element.duracion
+                    }
+                )
+            };
+            
+            setFlightsSchedule(array)
+            console.log(array) // es lo mismo que flightsSchedule
+        }
+
+        )
+    }, [])
 
 
     const AirportMarket = () => {
