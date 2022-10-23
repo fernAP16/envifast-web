@@ -11,7 +11,7 @@ const icon = L.icon({
 });
 
 export default function AirplaneMarker({ data }) {
-  const { lat, lng } = data;
+  const { lat, lng , duration_flight} = data;
   const [prevPos, setPrevPos] = useState([lat, lng]);
 
   // ejecutar lo que que esta dentro si se cambia los parametros despues de la ,
@@ -27,7 +27,7 @@ export default function AirplaneMarker({ data }) {
       icon={icon}
       position={[lat, lng]}
       previousPosition={prevPos}
-      duration={1000 * 10}// poner el factor de transformacion
+      duration={1000 * duration_flight}// poner el factor de transformacion
     />
   );
 }

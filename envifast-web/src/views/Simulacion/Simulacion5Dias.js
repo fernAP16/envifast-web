@@ -87,7 +87,7 @@ const Simulacion5Dias = () => {
     }
 
     const rows = [
-      createData('TAP011', 0),
+      // createData('TAP011', 0),
       createData('TAP012', 1),
       createData('TAP013', 2),
       createData('TAP014', 0),
@@ -147,17 +147,18 @@ const Simulacion5Dias = () => {
           lat: flightsSchedule.coordenadasDestinos[0],
           lng: flightsSchedule.coordenadasDestinos[1],
         }
-          ); /// las coordenadas destino
-      // }
+          ); 
     }
 
     React.useEffect(() => {
       if(stateButtons === 1){
+        console.log("Entro al for del use effect")
+        console.log(flightsSchedule)
         for(var i = 0; i < 10; i++){
-          show_interval(() => flightsSchedule[i])
+          show_interval(flightsSchedule[i])
         }
       }
-        // show_interval()
+
     }, [stateButtons])
 
     React.useEffect(() => {
@@ -168,12 +169,7 @@ const Simulacion5Dias = () => {
       getVuelosPorDia(variables)
       .then((response) => {
         var array = [];
-        var arrayCursor = [];
         for (const element of response.data){
-          console.log("Las coordenadas y el element de la api")
-          console.log(element.idAeropuertoOrigen)
-          console.log(airportsCoordinates[element.idAeropuertoOrigen - 1].lat)
-          console.log(airportsCoordinates[element.idAeropuertoOrigen - 1].lng)
           array.push(
             {
               id: element.id,
@@ -187,10 +183,11 @@ const Simulacion5Dias = () => {
             }
           )
         };
+        console.log("Llego a hacer el set")
         setFlightsSchedule(array);
         console.log(array)
       })
-  }, [])
+  })
 
     const handleStart = () => {
       if(stateButtons === 0){
@@ -244,8 +241,10 @@ const Simulacion5Dias = () => {
                   <AirportMarket/>
                   {flightsSchedule.slice(0,10).map((flight)=>(
                     <AirplaneMarker data={
-                      {lat: flight.coordenadasOrigen[0],
-                      lng: flight.coordenadasOrigen[1]} ?? {}
+                      { lat: flight.coordenadasOrigen[0],
+                        lng: flight.coordenadasOrigen[1],
+                        duration_flight: flight.duracion
+                      } ?? {}
                     }></AirplaneMarker>
                   ))}
                   {/* <AirplaneMarker data={currentTrack ?? {}} />                 */}
