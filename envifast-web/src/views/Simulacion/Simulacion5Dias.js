@@ -40,9 +40,9 @@ const Simulacion5Dias = () => {
     const [disableStart, setDisableStart] = React.useState(false);
     const [disablePause, setDisablePause] = React.useState(true);
     const [disableStop, setDisableStop] = React.useState(true);
-    const [startDateString, setStartDateString] = React.useState(formatDateTimeToString(new Date())[0]);
-    const [startDate, setStartDate] = React.useState(new Date());
-    const [currentTime, setCurrentTime] = React.useState('00:00:00 AM');
+    const [startDateString, setStartDateString] = React.useState('dd/mm/aaaa');
+    const [startDate, setStartDate] = React.useState(null);
+    const [currentTime, setCurrentTime] = React.useState(null);
     const [currentTrack, setCurrentTrack] = React.useState({});
     const [flightsSchedule, setFlightsSchedule] = React.useState([]);
     const [stateButtons, setStateButtons] = React.useState(0);
@@ -102,52 +102,56 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       getCoordenadasAeropuertos()
       .then(function (response) {
-          // setAirportsCoordinates(response.data);
-          var arrayAirports = [];
-          for (const element of response.data) {
-            arrayAirports.push({
-                  id: element.id,
-                  cityName: element.cityName,
-                  lat: element.x_pos,
-                  lng: element.y_pos
-              })
-          };
-          setAirportsCoordinates(arrayAirports);
-          console.log(arrayAirports)
-          let variables = {
-            fecha: "2022-10-22",
-            periodo: 4
-          }
-          console.log("GETVUELOSPORDIA")
-          getVuelosPorDia(variables)
-          .then((response) => {
-            var array = [];
-            console.log(response.data);
-            for (const element of response.data){
-              array.push(
-                {
-                  id: element.id,
-                  idAeropuertoOrigen: element.idAeropuertoOrigen,
-                  idAeropuertoDestino: element.idAeropuertoDestino,
-                  horaSalida: element.horaSalida,
-                  horaLLegada: element.horaLLegada,
-                  duracion: element.duracion,
-                  coordenadasOrigen: [arrayAirports[element.idAeropuertoOrigen - 1].lat,arrayAirports[element.idAeropuertoOrigen - 1].lng],
-                  coordenadasDestinos: [arrayAirports[element.idAeropuertoDestino - 1].lat,arrayAirports[element.idAeropuertoDestino - 1].lng]
-                }
-              )
-            };
-            console.log("Llego a hacer el set")
-            setFlightsSchedule(array);
-            console.log(array)
+        var arrayAirports = [];
+        for (const element of response.data) {
+          arrayAirports.push({
+            id: element.id,
+            cityName: element.cityName,
+            lat: element.x_pos,
+            lng: element.y_pos
           })
+        };
+        setAirportsCoordinates(arrayAirports);
+        console.log(arrayAirports)
       })
       .catch(function (error) {
           console.log(error);
       })
-      
     },[])
 
+    React.useEffect(() => {
+      let variables = {
+        fecha: startDate,
+        periodo: 1
+      }
+      console.log(startDate)
+      getVuelosPorDia(variables)
+      .then((response) => {
+        var array = [];
+        console.log(response.data);
+        for (const element of response.data){
+          array.push(
+            {
+              id: element.id,
+              idAeropuertoOrigen: element.idAeropuertoOrigen,
+              idAeropuertoDestino: element.idAeropuertoDestino,
+              horaSalida: element.horaSalida,
+              horaLLegada: element.horaLLegada,
+              duracion: element.duracion,
+              coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+              coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng]
+            }
+          )
+        };
+        console.log("Llego a hacer el set")
+        setFlightsSchedule(array);
+        console.log(array)
+        setCurrentTime("00:00:00")
+      })
+    }, [startDateString])
+
+
+    // Se hace click en Iniciar -> Inicia la simulacion
     React.useEffect(() => {
       if(stateButtons === 1){
         console.log("Entro al for del use effect")
@@ -193,8 +197,6 @@ const Simulacion5Dias = () => {
       )
     }
 
-    
-
     const handleStart = () => {
       if(stateButtons === 0){
         setStateButtons(1);
@@ -223,6 +225,7 @@ const Simulacion5Dias = () => {
       console.log(startDate)
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
+      console.log(typeof event.target.value)
     }
 
     function changeTime(timeValueFrom, dateValueFrom = null){
@@ -234,8 +237,8 @@ const Simulacion5Dias = () => {
           <Grid display='flex'>
             <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
-              <Typography className='date-map'>{"Fecha: " + startDateString}</Typography>
-              <Typography className='time-map'>{"Hora: " + currentTime} </Typography>
+              <Typography className='date-map'>{"Fecha: " + (startDate ? formatDate(startDate) : 'dd/mm/aaaa')}</Typography>
+              <Typography className='time-map'>{"Hora: " + (currentTime ? currentTime : 'hh:mm:ss')} </Typography>
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
