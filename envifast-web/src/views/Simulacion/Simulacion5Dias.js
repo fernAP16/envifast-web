@@ -15,7 +15,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { formatDate, formatDateTimeToString } from '../../constants/commonFunctions'
+import { formatDate, formatDateTimeToString , formatDateToString} from '../../constants/commonFunctions'
 import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
@@ -48,6 +48,7 @@ const Simulacion5Dias = () => {
     const [flightsSchedule, setFlightsSchedule] = React.useState([]);
     const [stateButtons, setStateButtons] = React.useState(0);
     const marker = new DriftMarker([10, 10]);
+    const [formatoFecha, setFormatoFecha] = React.useState("");
     
 
     marker.slideTo([50, 50], {
@@ -147,18 +148,22 @@ const Simulacion5Dias = () => {
         console.log("Llego a hacer el set");
         setFlightsSchedule(array);
         console.log(array);
-        setCurrentTime("00:00:00");
-        let dateTime = new Date(startDate);
+        // let dateTime = new Date(startDate);
+        let dateTime = new Date(formatDateToString(startDate));
+        console.log(dateTime)
         dateTime.setHours(0)
         dateTime.setMinutes(0)
-        dateTime.setSeconds(0)
+        dateTime.setSeconds(0)        
         setCurrentDateTime(dateTime);
       })
     }, [startDateString])
 
 
+
     // Se hace click en Iniciar -> Inicia la simulacion
     React.useEffect(() => {
+      
+
       if(stateButtons === 1){
         console.log("Entro al for del use effect")
         console.log(flightsSchedule)
@@ -167,7 +172,21 @@ const Simulacion5Dias = () => {
         }
       }
 
+      const interval = setInterval(() => {
+        const dateTime = currentDateTime;
+        console.log("El tiempo de currentDateTimes es: " + dateTime)
+        dateTime.setSeconds(dateTime.getSeconds() + 1)
+        setCurrentDateTime(dateTime)
+        // setFormatoFecha(formatDateTimeToString(currentDateTime)[0] + " " + formatDateTimeToString(currentDateTime)[1])
+      }, 1000 / 360)
+      return () => {
+        clearInterval(interval);
+      };
+
+
     }, [stateButtons])
+
+    
 
     const show_interval = (flightSchedule) => {
       // setCurrentTrack(dataStory[cursor]); // las coordenadas origen
@@ -192,6 +211,9 @@ const Simulacion5Dias = () => {
       flightSchedule.coordenadasOrigen[0] = flightSchedule.coordenadasDestinos[0];
       flightSchedule.coordenadasOrigen[1] = flightSchedule.coordenadasDestinos[1];
     }
+
+    
+    
 
     const AirportMarket = () => {
       return (
@@ -243,8 +265,11 @@ const Simulacion5Dias = () => {
           <Grid display='flex'>
             <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
-              <Typography className='date-map'>{"Fecha: " + (startDate ? formatDate(startDate) : 'dd/mm/aaaa')}</Typography>
-              <Typography className='time-map'>{"Hora: " + (currentTime ? currentTime : 'hh:mm:ss')} </Typography>
+              {/* <Typography className='date-map'>{"Fecha y hora: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0] + " " + formatDateTimeToString(currentDateTime)[1]: 'dd/mm/aaaa  hh:mm:ss')}</Typography> */}
+              {/* <Typography className='date-map'>{formatoFecha}</Typography> */}
+              <Typography className='date-map'>{"Fecha: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0]: 'dd/mm/aaaa')}</Typography>
+              {/* <Typography className='date-map'>{"Hora: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[1]: 'hh:mm:ss')}</Typography> */}
+              {/* <Typography className='time-map'>{"Hora: " + (currentTime ? currentTime : 'hh:mm:ss')} </Typography> */}
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
