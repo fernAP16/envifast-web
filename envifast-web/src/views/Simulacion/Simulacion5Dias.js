@@ -15,7 +15,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { formatDate, formatDateTimeToString } from '../../constants/commonFunctions'
+import { formatDate, formatDateTimeToString , formatDateToString} from '../../constants/commonFunctions'
 import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
@@ -43,10 +43,12 @@ const Simulacion5Dias = () => {
     const [startDateString, setStartDateString] = React.useState('dd/mm/aaaa');
     const [startDate, setStartDate] = React.useState(null);
     const [currentTime, setCurrentTime] = React.useState(null);
+    const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [currentTrack, setCurrentTrack] = React.useState({});
     const [flightsSchedule, setFlightsSchedule] = React.useState([]);
     const [stateButtons, setStateButtons] = React.useState(0);
     const marker = new DriftMarker([10, 10]);
+    const [formatoFecha, setFormatoFecha] = React.useState("");
     
 
     marker.slideTo([50, 50], {
@@ -112,7 +114,7 @@ const Simulacion5Dias = () => {
           })
         };
         setAirportsCoordinates(arrayAirports);
-        console.log(arrayAirports)
+        // console.log(arrayAirports)
       })
       .catch(function (error) {
           console.log(error);
@@ -124,7 +126,6 @@ const Simulacion5Dias = () => {
         fecha: startDate,
         periodo: 1
       }
-      console.log(startDate)
       getVuelosPorDia(variables)
       .then((response) => {
         var array = [];
@@ -143,49 +144,105 @@ const Simulacion5Dias = () => {
             }
           )
         };
-        console.log("Llego a hacer el set")
+        
         setFlightsSchedule(array);
-        console.log(array)
-        setCurrentTime("00:00:00")
+
+        // let dateTime = new Date(startDate);
+        // let dateTime = new Date(formatDateToString(startDate));
+        let dateTime = new Date(startDate);
+        dateTime.setHours(0)
+        dateTime.setMinutes(0)
+        dateTime.setSeconds(0)        
+        setCurrentDateTime(dateTime);
       })
     }, [startDateString])
 
 
-    // Se hace click en Iniciar -> Inicia la simulacion
-    React.useEffect(() => {
-      if(stateButtons === 1){
-        console.log("Entro al for del use effect")
-        console.log(flightsSchedule)
-        for(var i = 0; i < 10; i++){
-          show_interval(flightsSchedule[i])
-        }
-      }
 
+    // PARA INICIAR LA SIMULACION
+    React.useEffect(() => {
+      // console.log("Entro al use effect")
+      if(stateButtons === 1){       
+        
+        // if(currentDateTime !== null){
+        //   for(var i = 0 ; i < 10; i++){
+        //     show_interval(flightsSchedule[i])
+        //   } 
+        // }
+        
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          
+        }, 1000 / 360)
+
+        return () => {
+          clearInterval(interval);
+        };
+        
+      }
     }, [stateButtons])
 
-    const show_interval = (flightSchedule) => {
-      // setCurrentTrack(dataStory[cursor]); // las coordenadas origen
-      console.log("entro a show interval")
-      console.log(flightSchedule.coordenadasOrigen[0])
-      console.log(flightSchedule.coordenadasOrigen[1])
-      console.log(flightSchedule.duracion)
-      setCurrentTrack({
-        lat: flightSchedule.coordenadasOrigen[0],
-        lng: flightSchedule.coordenadasOrigen[1],
-        duration_flight: flightSchedule.duracion
-      }); 
-      console.log("Entro al setCurrent Track, para llegar a su destino")
-      // setCurrentTrack(dataStory[cursor]); /// las coordenadas destino
-      setCurrentTrack({
-        lat: flightSchedule.coordenadasDestinos[0],
-        lng: flightSchedule.coordenadasDestinos[1],
-        duration_flight: flightSchedule.duracion
-      }); 
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        if(currentDateTime !== null){
+          const interval = setInterval(() => {
+            for(var i = 0 ; i < 10; i++){
+              show_interval(flightsSchedule[i])
+            } 
+          }, 1000 / 360)
+          
+        }
+      }
+    }, [stateButtons])
 
-      // Igualamos el origen al destino
-      flightSchedule.coordenadasOrigen[0] = flightSchedule.coordenadasDestinos[0];
-      flightSchedule.coordenadasOrigen[1] = flightSchedule.coordenadasDestinos[1];
+    // React.useEffect(() => {
+    //   const interval = setInterval(() => {
+    //     const dateTime = currentDateTime;  
+    //     currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+    //     console.log("El tiempo de currentDateTimes es: " + currentDateTime)
+    //     setCurrentDateTime(dateTime)
+        
+    //   }, 1000 / 360)
+    // })
+
+
+    // React.useEffect(() => {
+    //   const interval = setInterval(() => {
+    //     const dateTime = currentDateTime;  
+    //     currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+    //     console.log("El tiempo de currentDateTimes es: " + currentDateTime)
+    //     setCurrentDateTime(dateTime)        
+    //   }, 1000 / 360)
+    // }, [stateButtons])
+    
+    
+
+    const show_interval = (flightSchedule) => {
+      // el current date time se mantiene constante aqui
+      let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20)// esto captura bien la hora. Ahora 
+      
+      let arrTiempo = horaSalida.split(":")
+      let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600;
+      let tiempoSalida = parseInt(arrTiempo[2]) + parseInt(arrTiempo[1]) * 60 +  parseInt(arrTiempo[0]) * 3600;
+
+      setCurrentTrack({
+          lat: flightSchedule.coordenadasOrigen[0],
+          lng: flightSchedule.coordenadasOrigen[1],
+          duration_flight: flightSchedule.duracion
+        }); 
+
+      console.log("Tiempo actual: " + tiempoActual)
+      console.log("Tiempo Salida: " + tiempoSalida)  
+      if(tiempoActual >= tiempoSalida){
+        console.log("Entor al if, Entro al setCurrent Track, para llegar a su destino")
+        flightSchedule.coordenadasOrigen[0] = flightSchedule.coordenadasDestinos[0];
+        flightSchedule.coordenadasOrigen[1] = flightSchedule.coordenadasDestinos[1];
+      }
+      
     }
+
 
     const AirportMarket = () => {
       return (
@@ -222,10 +279,10 @@ const Simulacion5Dias = () => {
     }
 
     const handleDate = event => {
-      console.log(startDate)
+      // console.log(startDate)
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
-      console.log(typeof event.target.value)
+      // console.log(typeof event.target.value)
     }
 
     function changeTime(timeValueFrom, dateValueFrom = null){
@@ -237,8 +294,11 @@ const Simulacion5Dias = () => {
           <Grid display='flex'>
             <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
-              <Typography className='date-map'>{"Fecha: " + (startDate ? formatDate(startDate) : 'dd/mm/aaaa')}</Typography>
-              <Typography className='time-map'>{"Hora: " + (currentTime ? currentTime : 'hh:mm:ss')} </Typography>
+              {/* <Typography className='date-map'>{"Fecha y hora: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0] + " " + formatDateTimeToString(currentDateTime)[1]: 'dd/mm/aaaa  hh:mm:ss')}</Typography> */}
+              {/* <Typography className='date-map'>{formatoFecha}</Typography> */}
+              <Typography className='date-map'>{"Fecha: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0]: 'dd/mm/aaaa')}</Typography>
+              {/* <Typography className='date-map'>{"Hora: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[1]: 'hh:mm:ss')}</Typography> */}
+              {/* <Typography className='time-map'>{"Hora: " + (currentTime ? currentTime : 'hh:mm:ss')} </Typography> */}
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
@@ -248,13 +308,14 @@ const Simulacion5Dias = () => {
               >
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
-                  {flightsSchedule.slice(0,10).map((flight)=>(
-                    <AirplaneMarker data={
-                      { lat: flight.coordenadasOrigen[0],
-                        lng: flight.coordenadasOrigen[1],
-                        duration_flight: flight.duracion
-                      } ?? {}
-                    }></AirplaneMarker>
+                  {flightsSchedule &&
+                    flightsSchedule.slice(0,10).map((flight)=>(
+                      <AirplaneMarker data={
+                        { lat: flight.coordenadasOrigen[0],
+                          lng: flight.coordenadasOrigen[1],
+                          duration_flight: flight.duracion
+                        } ?? {}
+                      }></AirplaneMarker>
                   ))}
                   {/* <AirplaneMarker data={currentTrack ?? {}} />                 */}
               </MapContainer>
