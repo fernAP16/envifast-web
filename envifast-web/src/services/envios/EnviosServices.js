@@ -11,9 +11,10 @@ export const getCoordenadasAeropuertos = () => {
 
 export const getVuelosPorDia = (variables) => {
     const obj = {
-        fecha: variables.fecha
+        fecha: variables.fecha,
+        periodo: variables.periodo
     }
     return axios.get(
-        API_URL.url + "flights/{fecha}?fecha=" + obj.fecha,
+        API_URL.url + "flights/{fecha} {per}?fecha=" + obj.fecha + "&per=" + obj.periodo,
     );
 }

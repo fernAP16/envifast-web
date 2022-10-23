@@ -19,6 +19,7 @@ import { formatDate, formatDateTimeToString } from '../../constants/commonFuncti
 import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
+import vuelos from './planes_vuelos.txt';
 
 const dataStory = [
   {
@@ -131,11 +132,14 @@ const Simulacion5Dias = () => {
 
     const show_interval = (flightsSchedule) => {
       // setCurrentTrack(dataStory[cursor]); // las coordenadas origen
+      console.log("entro a show interval")
+      console.log(flightsSchedule.coordenadasOrigen[0])
+      console.log(flightsSchedule.coordenadasOrigen[1])
       setCurrentTrack({
         lat: flightsSchedule.coordenadasOrigen[0],
         lng: flightsSchedule.coordenadasOrigen[1]
       }); 
-      if (cursor !== dataStory.length - 1) {
+      // if (cursor !== dataStory.length - 1) {
         console.log("Entro al setCurrent Track, para llegar a su destino")
         // cursor += 1;
         // setCurrentTrack(dataStory[cursor]); /// las coordenadas destino
@@ -144,7 +148,7 @@ const Simulacion5Dias = () => {
           lng: flightsSchedule.coordenadasDestinos[1],
         }
           ); /// las coordenadas destino
-      }
+      // }
     }
 
     React.useEffect(() => {
@@ -158,7 +162,8 @@ const Simulacion5Dias = () => {
 
     React.useEffect(() => {
       let variables = {
-        fecha: "2022-10-22"
+        fecha: "2022-10-22",
+        periodo: 4
       }
       getVuelosPorDia(variables)
       .then((response) => {
@@ -167,7 +172,8 @@ const Simulacion5Dias = () => {
         for (const element of response.data){
           console.log("Las coordenadas y el element de la api")
           console.log(element.idAeropuertoOrigen)
-          console.log(airportsCoordinates[element.idAeropuertoOrigen - 1])
+          console.log(airportsCoordinates[element.idAeropuertoOrigen - 1].lat)
+          console.log(airportsCoordinates[element.idAeropuertoOrigen - 1].lng)
           array.push(
             {
               id: element.id,
