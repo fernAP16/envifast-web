@@ -43,6 +43,7 @@ const Simulacion5Dias = () => {
     const [startDateString, setStartDateString] = React.useState('dd/mm/aaaa');
     const [startDate, setStartDate] = React.useState(null);
     const [currentTime, setCurrentTime] = React.useState(null);
+    const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [currentTrack, setCurrentTrack] = React.useState({});
     const [flightsSchedule, setFlightsSchedule] = React.useState([]);
     const [stateButtons, setStateButtons] = React.useState(0);
@@ -143,10 +144,15 @@ const Simulacion5Dias = () => {
             }
           )
         };
-        console.log("Llego a hacer el set")
+        console.log("Llego a hacer el set");
         setFlightsSchedule(array);
-        console.log(array)
-        setCurrentTime("00:00:00")
+        console.log(array);
+        setCurrentTime("00:00:00");
+        let dateTime = new Date(startDate);
+        dateTime.setHours(0)
+        dateTime.setMinutes(0)
+        dateTime.setSeconds(0)
+        setCurrentDateTime(dateTime);
       })
     }, [startDateString])
 
