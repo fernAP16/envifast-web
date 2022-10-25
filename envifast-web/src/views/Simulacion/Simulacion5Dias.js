@@ -1,6 +1,6 @@
 import React from 'react';
 import './../../App';
-import { MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'; // objeto principal para los mapas
+import { MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet'; // objeto principal para los mapas
 import { getCoordenadasAeropuertos, getVuelosPorDia } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField } from '@mui/material';
 import L from "leaflet";
@@ -19,7 +19,7 @@ import { formatDate, formatDateTimeToString , formatDateToString} from '../../co
 import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
-import vuelos from './planes_vuelos.txt';
+import { Icon } from '@iconify/react';
 
 const dataStory = [
   {
@@ -37,7 +37,7 @@ let cursor = 0;
 
 const Simulacion5Dias = () => {
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
-    const [disableStart, setDisableStart] = React.useState(false);
+    const [disableStart, setDisableStart] = React.useState(true);
     const [disablePause, setDisablePause] = React.useState(true);
     const [disableStop, setDisableStop] = React.useState(true);
     const [startDateString, setStartDateString] = React.useState('dd/mm/aaaa');
@@ -45,8 +45,8 @@ const Simulacion5Dias = () => {
     const [currentTime, setCurrentTime] = React.useState(null);
     const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [currentTrack, setCurrentTrack] = React.useState({});
-    const [flightsSchedule, setFlightsSchedule] = React.useState([]);
-    const [stateButtons, setStateButtons] = React.useState(0);
+    const [flightsSchedule, setFlightsSchedule] = React.useState(null);
+    const [stateButtons, setStateButtons] = React.useState(5);
     const marker = new DriftMarker([10, 10]);
     const [formatoFecha, setFormatoFecha] = React.useState("");
     
@@ -84,23 +84,6 @@ const Simulacion5Dias = () => {
       },
     }));
 
-    function createData(name, calories) {
-      return { name, calories };
-    }
-
-    const rows = [
-      // createData('TAP011', 0),
-      createData('TAP012', 1),
-      createData('TAP013', 2),
-      createData('TAP014', 0),
-      createData('TAP015', 1),
-      createData('TAP016', 0),
-      createData('TAP017', 1),
-      createData('TAP018', 2),
-      createData('TAP019', 0),
-      createData('TAP020', 1),
-    ];
-
     React.useEffect(() => {
       getCoordenadasAeropuertos()
       .then(function (response) {
@@ -114,7 +97,6 @@ const Simulacion5Dias = () => {
           })
         };
         setAirportsCoordinates(arrayAirports);
-        // console.log(arrayAirports)
       })
       .catch(function (error) {
           console.log(error);
@@ -129,7 +111,6 @@ const Simulacion5Dias = () => {
       getVuelosPorDia(variables)
       .then((response) => {
         var array = [];
-        console.log(response.data);
         for (const element of response.data){
           array.push(
             {
@@ -140,15 +121,13 @@ const Simulacion5Dias = () => {
               horaLLegada: element.horaLLegada,
               duracion: element.duracion,
               coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
-              coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng]
+              coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
+              coordenadaActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+              estado: 0
             }
           )
         };
-        
         setFlightsSchedule(array);
-
-        // let dateTime = new Date(startDate);
-        // let dateTime = new Date(formatDateToString(startDate));
         let dateTime = new Date(startDate);
         dateTime.setHours(0)
         dateTime.setMinutes(0)
@@ -161,15 +140,7 @@ const Simulacion5Dias = () => {
 
     // PARA INICIAR LA SIMULACION
     React.useEffect(() => {
-      // console.log("Entro al use effect")
-      if(stateButtons === 1){       
-        
-        // if(currentDateTime !== null){
-        //   for(var i = 0 ; i < 10; i++){
-        //     show_interval(flightsSchedule[i])
-        //   } 
-        // }
-        
+      if(stateButtons === 1){
         const interval = setInterval(() => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
@@ -188,61 +159,39 @@ const Simulacion5Dias = () => {
       if(stateButtons === 1){
         if(currentDateTime !== null){
           const interval = setInterval(() => {
-            for(var i = 0 ; i < 10; i++){
+            for(var i = 0 ; i < 50; i++){
               show_interval(flightsSchedule[i])
             } 
           }, 1000 / 360)
-          
         }
       }
-    }, [stateButtons])
-
-    // React.useEffect(() => {
-    //   const interval = setInterval(() => {
-    //     const dateTime = currentDateTime;  
-    //     currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-    //     console.log("El tiempo de currentDateTimes es: " + currentDateTime)
-    //     setCurrentDateTime(dateTime)
-        
-    //   }, 1000 / 360)
-    // })
-
-
-    // React.useEffect(() => {
-    //   const interval = setInterval(() => {
-    //     const dateTime = currentDateTime;  
-    //     currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-    //     console.log("El tiempo de currentDateTimes es: " + currentDateTime)
-    //     setCurrentDateTime(dateTime)        
-    //   }, 1000 / 360)
-    // }, [stateButtons])
-    
-    
+    }, [stateButtons]) 
 
     const show_interval = (flightSchedule) => {
       // el current date time se mantiene constante aqui
-      let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20)// esto captura bien la hora. Ahora 
+      let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20);// esto captura bien la hora. Ahora 
+      let horaLLegada = JSON.stringify(flightSchedule.horaLLegada).slice(12,20);// esto captura bien la hora. Ahora 
       
-      let arrTiempo = horaSalida.split(":")
+      let arrTiempoSalida = horaSalida.split(":");
+      let arrTiempoLLegada = horaLLegada.split(":");
       let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600;
-      let tiempoSalida = parseInt(arrTiempo[2]) + parseInt(arrTiempo[1]) * 60 +  parseInt(arrTiempo[0]) * 3600;
-
+      let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
+      let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
       setCurrentTrack({
-          lat: flightSchedule.coordenadasOrigen[0],
-          lng: flightSchedule.coordenadasOrigen[1],
+          lat: flightSchedule.coordenadaActual[0],
+          lng: flightSchedule.coordenadaActual[1],
           duration_flight: flightSchedule.duracion
         }); 
-
-      console.log("Tiempo actual: " + tiempoActual)
-      console.log("Tiempo Salida: " + tiempoSalida)  
       if(tiempoActual >= tiempoSalida){
-        console.log("Entor al if, Entro al setCurrent Track, para llegar a su destino")
-        flightSchedule.coordenadasOrigen[0] = flightSchedule.coordenadasDestinos[0];
-        flightSchedule.coordenadasOrigen[1] = flightSchedule.coordenadasDestinos[1];
+        flightSchedule.coordenadaActual[0] = flightSchedule.coordenadasDestinos[0];
+        flightSchedule.coordenadaActual[1] = flightSchedule.coordenadasDestinos[1];
+        flightSchedule.estado = 1;
+      }
+      if(flightSchedule.estado === 1 && tiempoActual >= tiempoLLegada){
+        flightSchedule.estado = 2;
       }
       
     }
-
 
     const AirportMarket = () => {
       return (
@@ -279,14 +228,10 @@ const Simulacion5Dias = () => {
     }
 
     const handleDate = event => {
-      // console.log(startDate)
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
-      // console.log(typeof event.target.value)
-    }
-
-    function changeTime(timeValueFrom, dateValueFrom = null){
-  
+      setStateButtons(0);
+      setDisableStart(false);
     }
 
     return (
@@ -309,15 +254,21 @@ const Simulacion5Dias = () => {
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
                   {flightsSchedule &&
-                    flightsSchedule.slice(0,10).map((flight)=>(
+                    flightsSchedule.slice(0,50).map((flight)=>(
+                      <div>
                       <AirplaneMarker data={
-                        { lat: flight.coordenadasOrigen[0],
-                          lng: flight.coordenadasOrigen[1],
+                        { lat: flight.coordenadaActual[0],
+                          lng: flight.coordenadaActual[1],
                           duration_flight: flight.duracion
                         } ?? {}
                       }></AirplaneMarker>
+                      <Polyline
+                        color='#19D2A6'
+                        weight={3}
+                        positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
+                      ></Polyline>
+                  </div>
                   ))}
-                  {/* <AirplaneMarker data={currentTrack ?? {}} />                 */}
               </MapContainer>
             </Grid>
             <Box marginLeft="10px">
@@ -348,8 +299,8 @@ const Simulacion5Dias = () => {
                     <img src={AirplaneIcon} width="20px" height="20px" className='object-legend'></img>
                     <Typography>Avión</Typography>
                   </Grid>
-                  <Grid container>
-                    <img src={AirportIcon} width="20px" height="20px" className='object-legend'></img>
+                  <Grid container alignItems='center'>
+                    <Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/>
                     <Typography>Trayectos</Typography>
                   </Grid>
                 </Grid>
@@ -366,17 +317,28 @@ const Simulacion5Dias = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
-                        <StyledTableRow key={row.name}>
-                          <StyledTableCell className='table-flights-cell' align="center">{row.name}</StyledTableCell>
-                          <StyledTableCell className='table-flights-cell' align="center">{row.calories}</StyledTableCell>
-                          <StyledTableCell className='table-flights-cell' align="center">
-                            <Button className='button-flights' disabled={row.calories === 0}>
-                              <Typography fontSize="8px" color="white">Ver plan de vuelo</Typography>
-                            </Button>
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      ))}
+                      {(stateButtons === 1) && 
+                        flightsSchedule.slice(0,50).map((flight) => (
+                          <StyledTableRow key={flight.name}>
+                            <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">
+                                <div className='table-state'>
+                                    <Typography className='state-text'
+                                        border={flight.estado === 0 ? "1.5px solid #FFFA80" : flight.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
+                                        backgroundColor={flight.estado === 0 ? "#FFFA80" : flight.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
+                                    >
+                                      {flight.estado === 0 ? "Por volar" : flight.estado === 1 ? "En vuelo" : "Aterrizó"}
+                                    </Typography>    
+                                </div>
+                            </StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">
+                              <Button className={'button-flights' + (flight.estado === 0 ? ' button-disabled-a' : '')} disabled={flight.estado === 0}>
+                                <Typography fontSize="8px" color="white">Ver plan de vuelo</Typography>
+                              </Button>
+                            </StyledTableCell>
+                          </StyledTableRow>
+                        ))
+                      }
                     </TableBody>
                   </Table>
                 </TableContainer>
