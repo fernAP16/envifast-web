@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
-import { MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia } from '../../services/envios/EnviosServices';
+import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
+import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -20,20 +20,7 @@ import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
 import { Icon } from '@iconify/react';
-
-const dataStory = [
-  {
-      // Lima: -12.098056, -77.015278
-    lat: -12.098056,
-    lng: -77.015278
-  },
-  {   // Madrid: 40.472222, -3.560833
-    lat: 40.472222,
-    lng: -3.560833
-  }
-];
-
-let cursor = 0;
+import Popup from '../MapaVuelos/VerPlanVuelo';
 
 const Simulacion5Dias = () => {
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
@@ -50,6 +37,7 @@ const Simulacion5Dias = () => {
     const marker = new DriftMarker([10, 10]);
     const [formatoFecha, setFormatoFecha] = React.useState("");
     
+    const [openPopUp, setOpenPopUp] = React.useState(false);
 
     marker.slideTo([50, 50], {
       duration: 2000,
@@ -103,6 +91,8 @@ const Simulacion5Dias = () => {
       })
     },[])
 
+
+
     React.useEffect(() => {
       let variables = {
         fecha: startDate,
@@ -136,7 +126,20 @@ const Simulacion5Dias = () => {
       })
     }, [startDateString])
 
-
+    // PARA CARGAR LOS ENVIOS EN LA BD
+    React.useEffect(() => {
+      if(startDate !== null){
+        let variables = { fecha: startDate}
+        generarEnviosPorDia(variables)
+        .then((response) => {
+          console.log("El resultado de ejecutar la api fue")
+          console.log(response)
+        })
+        .catch(function(error) {
+          console.log(error);
+        })
+      }
+    }, [startDate])
 
     // PARA INICIAR LA SIMULACION
     React.useEffect(() => {
@@ -236,7 +239,12 @@ const Simulacion5Dias = () => {
       setDisableStart(false);
     }
 
+    const handleFlightDetail = () => {
+      // setOpenPopUp(true);
+      console.log("Click detalle")
+    }
     return (
+
         <div>
           <Grid display='flex'>
             <Grid item className='containerMapa'>
@@ -333,7 +341,7 @@ const Simulacion5Dias = () => {
                                 </div>
                             </StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">
-                              <Button className={'button-flights' + (flight.estado === 0 ? ' button-disabled-a' : '')} disabled={flight.estado === 0}>
+                              <Button className={'button-flights' + (flight.estado === 0 ? ' button-disabled-a' : '')} onClick={handleFlightDetail} disabled={flight.estado === 0}>
                                 <Typography fontSize="8px" color="white">Ver plan de vuelo</Typography>
                               </Button>
                             </StyledTableCell>
@@ -350,7 +358,12 @@ const Simulacion5Dias = () => {
             </Box> 
             
             
+            
           </Grid>
+
+          <Popup openPopUp = {openPopUp} setOpenPopUp = {setOpenPopUp}> 
+
+          </Popup>
         </div>
     )
 }

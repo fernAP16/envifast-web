@@ -18,3 +18,21 @@ export const getVuelosPorDia = (variables) => {
         API_URL.url + "flights/{fecha} {per}?fecha=" + obj.fecha + "&per=" + obj.periodo,
     );
 }
+
+export const generarEnviosPorDia = (variables) => {
+    const obj = {
+        fecha: variables.fecha
+    }
+    return axios.post(
+        API_URL.url + "orders/cargar?fecha=" + obj.fecha,
+    )
+}
+
+export const getPaquetesPorPlanVuelo = (variables) => {
+    const obj = {
+        id : variables.id
+    }
+    return axios.get(
+        API_URL.url + "flights/{id}?id=" + obj.id,
+    )
+}
