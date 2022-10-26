@@ -183,9 +183,11 @@ const Simulacion5Dias = () => {
           duration_flight: flightSchedule.duracion
         }); 
       if(tiempoActual >= tiempoSalida){
+        flightSchedule.estado = 1;
+      }
+      if(tiempoActual - 10 >= tiempoSalida){
         flightSchedule.coordenadaActual[0] = flightSchedule.coordenadasDestinos[0];
         flightSchedule.coordenadaActual[1] = flightSchedule.coordenadasDestinos[1];
-        flightSchedule.estado = 1;
       }
       if(flightSchedule.estado === 1 && tiempoActual >= tiempoLLegada){
         flightSchedule.estado = 2;
@@ -239,11 +241,7 @@ const Simulacion5Dias = () => {
           <Grid display='flex'>
             <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
-              {/* <Typography className='date-map'>{"Fecha y hora: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0] + " " + formatDateTimeToString(currentDateTime)[1]: 'dd/mm/aaaa  hh:mm:ss')}</Typography> */}
-              {/* <Typography className='date-map'>{formatoFecha}</Typography> */}
-              <Typography className='date-map'>{"Fecha: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0]: 'dd/mm/aaaa')}</Typography>
-              {/* <Typography className='date-map'>{"Hora: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[1]: 'hh:mm:ss')}</Typography> */}
-              {/* <Typography className='time-map'>{"Hora: " + (currentTime ? currentTime : 'hh:mm:ss')} </Typography> */}
+              <Typography className='date-map'>{"Fecha actual: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0]: 'dd/mm/aaaa')}</Typography>
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
@@ -255,20 +253,23 @@ const Simulacion5Dias = () => {
                   <AirportMarket/>
                   {flightsSchedule &&
                     flightsSchedule.slice(0,50).map((flight)=>(
+                      flight.estado == 1 ?
                       <div>
-                      <AirplaneMarker data={
-                        { lat: flight.coordenadaActual[0],
-                          lng: flight.coordenadaActual[1],
-                          duration_flight: flight.duracion
-                        } ?? {}
-                      }></AirplaneMarker>
-                      <Polyline
-                        color='#19D2A6'
-                        weight={3}
-                        positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
-                      ></Polyline>
-                  </div>
-                  ))}
+                          <AirplaneMarker data={
+                            { lat: flight.coordenadaActual[0],
+                              lng: flight.coordenadaActual[1],
+                              duration_flight: flight.duracion
+                            } ?? {}
+                          }></AirplaneMarker>
+                          <Polyline
+                            color='#19D2A6'
+                            weight={0.5}
+                            positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
+                          ></Polyline>
+                      </div>
+                      :
+                      <></>
+                    ))}
               </MapContainer>
             </Grid>
             <Box marginLeft="10px">
@@ -305,15 +306,15 @@ const Simulacion5Dias = () => {
                   </Grid>
                 </Grid>
               </Box> 
-              <Grid > 
+              <Grid> 
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
                 <TableContainer component={Paper} className="table-flights">
                   <Table stickyHeader  aria-label="customized table">
                     <TableHead>
                       <TableRow>
-                        <StyledTableCell className='table-flights-cell' align="center">Nombre del vuelo</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell' align="center">Estado</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell'align="center">Acciones</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-ID' align="center">ID</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-action'align="center">Acciones</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>

@@ -1,7 +1,7 @@
 .toolbar-main {
     background: #AFD6D6;
     justify-content: space-between;
-    height: 100px;
+    height: 80px;
 }
 
 .toolbar-main .MuiAppBar-paper{
