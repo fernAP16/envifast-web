@@ -42,7 +42,26 @@
     overflow-y: scroll;
 }
 
+.table-flights::-webkit-scrollbar {
+    width: 10px;
+}
+
+.table-flights::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+  /* Handle */
+.table-flights::-webkit-scrollbar-thumb {
+    background: #888;
+}
+  
+  /* Handle on hover */
+.table-flights::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 .table-flights-cell{
+    justify-content: center;
     padding: 8px;
 }
 
@@ -51,11 +70,11 @@
 }
 
 .cell-state{
-    width: 100px;
+    width: 80px;
 }
 
 .cell-action{
-    width: 100px;
+    width: 120px;
 }
 
 .button-flights{

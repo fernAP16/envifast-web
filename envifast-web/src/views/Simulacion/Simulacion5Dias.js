@@ -317,7 +317,7 @@ const Simulacion5Dias = () => {
               <Grid> 
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
                 <TableContainer component={Paper} className="table-flights">
-                  <Table stickyHeader  aria-label="customized table">
+                  <Table className='table-flights-body' stickyHeader aria-label="customized table">
                     <TableHead>
                       <TableRow>
                         <StyledTableCell className='table-flights-cell cell-ID' align="center">ID</StyledTableCell>
@@ -325,7 +325,7 @@ const Simulacion5Dias = () => {
                         <StyledTableCell className='table-flights-cell cell-action'align="center">Acciones</StyledTableCell>
                       </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody> 
                       {(stateButtons === 1) && 
                         flightsSchedule.slice(0,50).map((flight) => (
                           <StyledTableRow key={flight.name}>
