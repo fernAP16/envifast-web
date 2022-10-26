@@ -2,7 +2,7 @@
     background: #407070;
     color: #FFFFFF;
     height: 100px;
-    width: 280px;
+    width: 240px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,6 +19,7 @@
     text-align: left;
     font-size: 14px;
     color: #FFFFFF;
+    padding-left: 10px;
 }
 
 .menuIcon{

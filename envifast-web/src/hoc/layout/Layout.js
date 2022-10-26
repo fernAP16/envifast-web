@@ -36,7 +36,7 @@ const Layout = (props) => {
                 </Drawer>
                 <Box
                     component="main"
-                    style={{marginLeft:"300px", marginTop:"35px"}}
+                    style={{marginLeft:"260px", marginTop:"35px"}}
                 >
                     <Toolbar />
                     {props.children}
