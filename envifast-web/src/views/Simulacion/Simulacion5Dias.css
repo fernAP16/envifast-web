@@ -1,7 +1,7 @@
 @import './../MapaVuelos/MapaVuelos.css';
 
 .leaflet-left .leaflet-control {
-    margin-left: 855px;
+    margin-left: 895px;
 }
 
 .leaflet-bar a{
@@ -37,7 +37,7 @@
 }
 
 .table-flights{
-    height: 396px;
+    height: 426px;
     width: 355px;
     overflow-y: scroll;
 }

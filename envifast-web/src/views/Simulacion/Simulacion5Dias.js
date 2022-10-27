@@ -253,7 +253,7 @@ const Simulacion5Dias = () => {
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
-                  zoom = {2.8}
+                  zoom = {2.7}
                   minZoom = {2.0}
                   maxZoom = {18.0}
               >
@@ -320,9 +320,9 @@ const Simulacion5Dias = () => {
                   <Table className='table-flights-body' stickyHeader aria-label="customized table">
                     <TableHead>
                       <TableRow>
-                        <StyledTableCell className='table-flights-cell cell-ID' align="center">ID</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-ID' align="center">Nombre</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-action'align="center">Ruta</StyledTableCell>
                         <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell cell-action'align="center">Acciones</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody> 
@@ -330,6 +330,7 @@ const Simulacion5Dias = () => {
                         flightsSchedule.slice(0,50).map((flight) => (
                           <StyledTableRow key={flight.name}>
                             <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">
                                 <div className='table-state'>
                                     <Typography className='state-text'
@@ -340,11 +341,12 @@ const Simulacion5Dias = () => {
                                     </Typography>    
                                 </div>
                             </StyledTableCell>
-                            <StyledTableCell className='table-flights-cell' align="center">
+                            
+                            {/* <StyledTableCell className='table-flights-cell' align="center">
                               <Button className={'button-flights' + (flight.estado === 0 ? ' button-disabled-a' : '')} onClick={handleFlightDetail} disabled={flight.estado === 0}>
                                 <Typography fontSize="8px" color="white">Ver plan de vuelo</Typography>
                               </Button>
-                            </StyledTableCell>
+                            </StyledTableCell> */}
                           </StyledTableRow>
                         ))
                       }
