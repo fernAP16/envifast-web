@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -129,11 +129,20 @@ const Simulacion5Dias = () => {
     // PARA CARGAR LOS ENVIOS EN LA BD
     React.useEffect(() => {
       if(startDate !== null){
-        let variables = { fecha: startDate}
-        generarEnviosPorDia(variables)
+        let variables = { 
+          fecha: startDate
+        }
+        getAirportsDateTime(variables)
         .then((response) => {
-          console.log("El resultado de ejecutar la api fue")
-          console.log(response)
+
+          generarEnviosPorDia(variables)
+          .then((response) => {
+            console.log("El resultado de ejecutar la api fue")
+            console.log(response)
+          })
+          .catch(function(error) {
+            console.log(error);
+          })
         })
         .catch(function(error) {
           console.log(error);
@@ -149,7 +158,7 @@ const Simulacion5Dias = () => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
           
-        }, 1000 / 360)
+        }, 1000 / 720)
 
         return () => {
           clearInterval(interval);
@@ -162,10 +171,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 1){
         if(currentDateTime !== null){
           const interval = setInterval(() => {
-            for(var i = 0 ; i < 50; i++){
+            for(var i = 0 ; i < flightsSchedule.length; i++){
               show_interval(flightsSchedule[i])
             } 
-          }, 1000 / 360)
+          }, 1000 / 720)
         }
       }
     }, [stateButtons]) 
@@ -260,7 +269,7 @@ const Simulacion5Dias = () => {
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
                   {flightsSchedule &&
-                    flightsSchedule.slice(0,50).map((flight)=>(
+                    flightsSchedule.map((flight)=>(
                       flight.estado == 1 ?
                       <div>
                           <AirplaneMarker data={
@@ -327,7 +336,7 @@ const Simulacion5Dias = () => {
                     </TableHead>
                     <TableBody> 
                       {(stateButtons === 1) && 
-                        flightsSchedule.slice(0,50).map((flight) => (
+                        flightsSchedule.map((flight) => (
                           <StyledTableRow key={flight.name}>
                             <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
