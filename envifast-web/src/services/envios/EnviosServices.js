@@ -36,3 +36,14 @@ export const getPaquetesPorPlanVuelo = (variables) => {
         API_URL.url + "flights/{id}?id=" + obj.id,
     )
 }
+
+
+export const getAirportsDateTime = (variables) => {
+    const obj = {
+        fecha: variables.fecha,
+        dias : 7
+    }
+    return axios.get(
+        API_URL.url + "airports/datetimes?fecha=" + obj.fecha + "&dias=" + obj.dias,
+    )
+}
