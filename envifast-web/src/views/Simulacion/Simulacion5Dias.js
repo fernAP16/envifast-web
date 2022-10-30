@@ -157,7 +157,7 @@ const Simulacion5Dias = () => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
-          for(var i = 0 ; i < 200; i++){
+          for(var i = 0 ; i < flightsSchedule.length / 4; i++){
             show_interval(flightsSchedule[i])
           }
         }, 1000 / 360)
@@ -166,6 +166,55 @@ const Simulacion5Dias = () => {
         };
       }
     }, [stateButtons])
+
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          for(var i = flightsSchedule.length / 4; i < flightsSchedule.length / 4 + 100; i++){
+            show_interval(flightsSchedule[i])
+          }
+        }, 1000 / 360)
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }, [stateButtons])
+
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          for(var i = flightsSchedule.length / 4 + 100; i < flightsSchedule.length / 4 + 200; i++){
+            show_interval(flightsSchedule[i])
+          }
+        }, 1000 / 360)
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }, [stateButtons])
+
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          for(var i = flightsSchedule.length / 4 + 200; i < flightsSchedule.length / 4 + 300; i++){
+            show_interval(flightsSchedule[i])
+          }
+        }, 1000 / 360)
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }, [stateButtons])
+
 
     const show_interval = (flightSchedule) => {
       // el current date time se mantiene constante aqui
@@ -257,7 +306,7 @@ const Simulacion5Dias = () => {
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
                   {flightsSchedule &&
-                    flightsSchedule.slice(0,200).map((flight)=>(
+                    flightsSchedule.slice(0,400).map((flight)=>(
                       flight.estado === 1 ?
                       <div>
                           <AirplaneMarker data={
@@ -324,7 +373,7 @@ const Simulacion5Dias = () => {
                     </TableHead>
                     <TableBody> 
                       {(stateButtons === 1) && 
-                        flightsSchedule.slice(0,200).map((flight) => (
+                        flightsSchedule.slice(0,10).map((flight) => (
                           <StyledTableRow key={flight.name}>
                             <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
@@ -339,11 +388,7 @@ const Simulacion5Dias = () => {
                                 </div>
                             </StyledTableCell>
                             
-                            {/* <StyledTableCell className='table-flights-cell' align="center">
-                              <Button className={'button-flights' + (flight.estado === 0 ? ' button-disabled-a' : '')} onClick={handleFlightDetail} disabled={flight.estado === 0}>
-                                <Typography fontSize="8px" color="white">Ver plan de vuelo</Typography>
-                              </Button>
-                            </StyledTableCell> */}
+                           
                           </StyledTableRow>
                         ))
                       }
