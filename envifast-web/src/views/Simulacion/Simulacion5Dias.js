@@ -157,27 +157,15 @@ const Simulacion5Dias = () => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
-          
-        }, 1000 / 720)
-
+          for(var i = 0 ; i < 200; i++){
+            show_interval(flightsSchedule[i])
+          }
+        }, 1000 / 360)
         return () => {
           clearInterval(interval);
         };
-        
       }
     }, [stateButtons])
-
-    React.useEffect(() => {
-      if(stateButtons === 1){
-        if(currentDateTime !== null){
-          const interval = setInterval(() => {
-            for(var i = 0 ; i < flightsSchedule.length; i++){
-              show_interval(flightsSchedule[i])
-            } 
-          }, 1000 / 720)
-        }
-      }
-    }, [stateButtons]) 
 
     const show_interval = (flightSchedule) => {
       // el current date time se mantiene constante aqui
@@ -189,20 +177,20 @@ const Simulacion5Dias = () => {
       let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600;
       let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
       let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
+      console.log("Actual: " + tiempoActual + " - Id: " + flightSchedule.id + " - Salida: " + tiempoSalida + " - Llegada: " + tiempoLLegada);
       setCurrentTrack({
           lat: flightSchedule.coordenadaActual[0],
           lng: flightSchedule.coordenadaActual[1],
           duration_flight: flightSchedule.duracion
-        }); 
-      if(tiempoActual >= tiempoSalida){
-        flightSchedule.estado = 1;
-      }
-      if(tiempoActual - 10 >= tiempoSalida){
+      }); 
+
+      if(tiempoActual >= tiempoLLegada){
+        flightSchedule.estado = 2;
+      } else if(tiempoActual - 10 >= tiempoSalida){
         flightSchedule.coordenadaActual[0] = flightSchedule.coordenadasDestinos[0];
         flightSchedule.coordenadaActual[1] = flightSchedule.coordenadasDestinos[1];
-      }
-      if(flightSchedule.estado === 1 && tiempoActual >= tiempoLLegada){
-        flightSchedule.estado = 2;
+      } else if(tiempoActual >= tiempoSalida){
+        flightSchedule.estado = 1;
       }
       
     }
@@ -269,8 +257,8 @@ const Simulacion5Dias = () => {
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
                   {flightsSchedule &&
-                    flightsSchedule.map((flight)=>(
-                      flight.estado == 1 ?
+                    flightsSchedule.slice(0,200).map((flight)=>(
+                      flight.estado === 1 ?
                       <div>
                           <AirplaneMarker data={
                             { lat: flight.coordenadaActual[0],
@@ -278,11 +266,11 @@ const Simulacion5Dias = () => {
                               duration_flight: flight.duracion
                             } ?? {}
                           }></AirplaneMarker>
-                          <Polyline
+                          {/* <Polyline
                             color='#19D2A6'
                             weight={0.5}
                             positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
-                          ></Polyline>
+                          ></Polyline> */}
                       </div>
                       :
                       <></>
@@ -336,7 +324,7 @@ const Simulacion5Dias = () => {
                     </TableHead>
                     <TableBody> 
                       {(stateButtons === 1) && 
-                        flightsSchedule.map((flight) => (
+                        flightsSchedule.slice(0,200).map((flight) => (
                           <StyledTableRow key={flight.name}>
                             <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
@@ -362,14 +350,8 @@ const Simulacion5Dias = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
-              </Grid> 
-
-
-
-            </Box> 
-            
-            
-            
+              </Grid>
+            </Box>                         
           </Grid>
 
           <Popup openPopUp = {openPopUp} setOpenPopUp = {setOpenPopUp}> 
