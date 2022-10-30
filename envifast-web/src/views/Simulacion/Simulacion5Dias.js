@@ -36,6 +36,9 @@ const Simulacion5Dias = () => {
     const [stateButtons, setStateButtons] = React.useState(5);
     const marker = new DriftMarker([10, 10]);
     const [formatoFecha, setFormatoFecha] = React.useState("");
+    const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
+    const [segundaSeccion, setSegundaSeccion] = React.useState(1);
+    const [terceraSeccion, setTerceraSeccion] = React.useState(1);
     
     const [openPopUp, setOpenPopUp] = React.useState(false);
 
@@ -117,6 +120,9 @@ const Simulacion5Dias = () => {
             }
           )
         };
+        setPrimeraSeccion(array.length/4)
+        setSegundaSeccion(array.length/2)
+        setTerceraSeccion((array.length)*3/4)
         setFlightsSchedule(array);
         let dateTime = new Date(startDate);
         dateTime.setHours(0)
@@ -151,13 +157,15 @@ const Simulacion5Dias = () => {
     }, [startDate])
 
     // PARA INICIAR LA SIMULACION
+
+    // Primer cuarto
     React.useEffect(() => {
       if(stateButtons === 1){
         const interval = setInterval(() => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
-          for(var i = 0 ; i < flightsSchedule.length / 4; i++){
+          for(var i = 0 ; i < primeraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
         }, 1000 / 360)
@@ -167,13 +175,14 @@ const Simulacion5Dias = () => {
       }
     }, [stateButtons])
 
+    // Segundo cuarto
     React.useEffect(() => {
       if(stateButtons === 1){
         const interval = setInterval(() => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
-          for(var i = flightsSchedule.length / 4; i < flightsSchedule.length / 4 + 100; i++){
+          for(var i = primeraSeccion; i < segundaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
         }, 1000 / 360)
@@ -183,13 +192,15 @@ const Simulacion5Dias = () => {
       }
     }, [stateButtons])
 
+
+    // Tercer cuarto
     React.useEffect(() => {
       if(stateButtons === 1){
         const interval = setInterval(() => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
-          for(var i = flightsSchedule.length / 4 + 100; i < flightsSchedule.length / 4 + 200; i++){
+          for(var i = segundaSeccion; i < terceraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
         }, 1000 / 360)
@@ -199,13 +210,14 @@ const Simulacion5Dias = () => {
       }
     }, [stateButtons])
 
+    // Cuarto cuarto
     React.useEffect(() => {
       if(stateButtons === 1){
         const interval = setInterval(() => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
-          for(var i = flightsSchedule.length / 4 + 200; i < flightsSchedule.length / 4 + 300; i++){
+          for(var i = terceraSeccion; i < flightsSchedule.length; i++){
             show_interval(flightsSchedule[i])
           }
         }, 1000 / 360)
@@ -306,7 +318,7 @@ const Simulacion5Dias = () => {
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                   <AirportMarket/>
                   {flightsSchedule &&
-                    flightsSchedule.slice(0,400).map((flight)=>(
+                    flightsSchedule.map((flight)=>(
                       flight.estado === 1 ?
                       <div>
                           <AirplaneMarker data={
