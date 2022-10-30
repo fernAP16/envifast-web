@@ -133,28 +133,28 @@ const Simulacion5Dias = () => {
     }, [startDateString])
 
     // PARA CARGAR LOS ENVIOS EN LA BD
-    React.useEffect(() => {
-      if(startDate !== null){
-        let variables = { 
-          fecha: startDate
-        }
-        getAirportsDateTime(variables)
-        .then((response) => {
+    // React.useEffect(() => {
+    //   if(startDate !== null){
+    //     let variables = { 
+    //       fecha: startDate
+    //     }
+    //     getAirportsDateTime(variables)
+    //     .then((response) => {
 
-          generarEnviosPorDia(variables)
-          .then((response) => {
-            console.log("El resultado de ejecutar la api fue")
-            console.log(response)
-          })
-          .catch(function(error) {
-            console.log(error);
-          })
-        })
-        .catch(function(error) {
-          console.log(error);
-        })
-      }
-    }, [startDate])
+    //       generarEnviosPorDia(variables)
+    //       .then((response) => {
+    //         console.log("El resultado de ejecutar la api fue")
+    //         console.log(response)
+    //       })
+    //       .catch(function(error) {
+    //         console.log(error);
+    //       })
+    //     })
+    //     .catch(function(error) {
+    //       console.log(error);
+    //     })
+    //   }
+    // }, [startDate])
 
     // PARA INICIAR LA SIMULACION
 
@@ -168,7 +168,7 @@ const Simulacion5Dias = () => {
           for(var i = 0 ; i < primeraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
-        }, 1000 / 360)
+        }, 1.1)
         return () => {
           clearInterval(interval);
         };
@@ -185,7 +185,7 @@ const Simulacion5Dias = () => {
           for(var i = primeraSeccion; i < segundaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
-        }, 1000 / 360)
+        }, 1.1)
         return () => {
           clearInterval(interval);
         };
@@ -203,7 +203,7 @@ const Simulacion5Dias = () => {
           for(var i = segundaSeccion; i < terceraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
-        }, 1000 / 360)
+        }, 1.1)
         return () => {
           clearInterval(interval);
         };
@@ -220,7 +220,7 @@ const Simulacion5Dias = () => {
           for(var i = terceraSeccion; i < flightsSchedule.length; i++){
             show_interval(flightsSchedule[i])
           }
-        }, 1000 / 360)
+        }, 1.1)
         return () => {
           clearInterval(interval);
         };
@@ -238,7 +238,7 @@ const Simulacion5Dias = () => {
       let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600;
       let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
       let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
-      console.log("Actual: " + tiempoActual + " - Id: " + flightSchedule.id + " - Salida: " + tiempoSalida + " - Llegada: " + tiempoLLegada);
+      // console.log("Actual: " + tiempoActual + " - Id: " + flightSchedule.id + " - Salida: " + tiempoSalida + " - Llegada: " + tiempoLLegada);
       setCurrentTrack({
           lat: flightSchedule.coordenadaActual[0],
           lng: flightSchedule.coordenadaActual[1],
