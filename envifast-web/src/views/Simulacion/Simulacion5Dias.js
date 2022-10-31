@@ -41,8 +41,11 @@ const Simulacion5Dias = () => {
     const [terceraSeccion, setTerceraSeccion] = React.useState(1);
     const [cuartaSeccion, setCuartaSeccion] = React.useState(1);
     const [quintaSeccion, setQuintaSeccion] = React.useState(1);
-
-
+    const [sextaSeccion, setSextaSeccion] = React.useState(1);
+    const [septimaSeccion, setSeptimaSeccion] = React.useState(1);
+    const [octavaSeccion, setOctavaSeccion] = React.useState(1);
+    const [novenaSeccion, setNovenaSeccion] = React.useState(1);
+    
     const [openPopUp, setOpenPopUp] = React.useState(false);
 
     marker.slideTo([50, 50], {
@@ -123,11 +126,17 @@ const Simulacion5Dias = () => {
             }
           )
         };
-        setPrimeraSeccion(array.length/6)
-        setSegundaSeccion(array.length/3)
-        setTerceraSeccion(array.length/2)
-        setCuartaSeccion((2/3) * array.length)
-        setQuintaSeccion(array.length - array.length/6)
+        var k = array.length;
+        setPrimeraSeccion(Math.floor(k/10))
+        setSegundaSeccion(Math.floor(k/5))
+        setTerceraSeccion(Math.floor((3/10) * k))
+        setCuartaSeccion(Math.floor((4/10) * k))
+        setQuintaSeccion(Math.floor( k / 2))
+        setSextaSeccion(Math.floor((6/10) * k))
+        setSeptimaSeccion(Math.floor((7/10) * k))
+        setOctavaSeccion(Math.floor((8/10) * k))
+        setNovenaSeccion(Math.floor((9/10) * k))
+
         setFlightsSchedule(array);
         let dateTime = new Date(startDate);
         dateTime.setHours(0)
@@ -137,29 +146,6 @@ const Simulacion5Dias = () => {
       })
     }, [startDateString])
 
-    // PARA CARGAR LOS ENVIOS EN LA BD
-    // React.useEffect(() => {
-    //   if(startDate !== null){
-    //     let variables = { 
-    //       fecha: startDate
-    //     }
-    //     getAirportsDateTime(variables)
-    //     .then((response) => {
-
-    //       generarEnviosPorDia(variables)
-    //       .then((response) => {
-    //         console.log("El resultado de ejecutar la api fue")
-    //         console.log(response)
-    //       })
-    //       .catch(function(error) {
-    //         console.log(error);
-    //       })
-    //     })
-    //     .catch(function(error) {
-    //       console.log(error);
-    //     })
-    //   }
-    // }, [startDate])
 
     // PARA INICIAR LA SIMULACION
 
@@ -171,7 +157,8 @@ const Simulacion5Dias = () => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
           for(var i = 0 ; i < primeraSeccion; i++){
-            show_interval(flightsSchedule[i])
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
+              show_interval(flightsSchedule[i])
           }
         }, 1.1)
         return () => {
@@ -188,7 +175,8 @@ const Simulacion5Dias = () => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
           for(var i = primeraSeccion; i < segundaSeccion; i++){
-            show_interval(flightsSchedule[i])
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
+              show_interval(flightsSchedule[i])
           }
         }, 1.1)
         return () => {
@@ -206,6 +194,7 @@ const Simulacion5Dias = () => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
           for(var i = segundaSeccion; i < terceraSeccion; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -223,6 +212,7 @@ const Simulacion5Dias = () => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
           for(var i = terceraSeccion; i < cuartaSeccion; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -240,6 +230,7 @@ const Simulacion5Dias = () => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
           for(var i = cuartaSeccion; i < quintaSeccion; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -249,6 +240,7 @@ const Simulacion5Dias = () => {
       }
     }, [stateButtons])
 
+
     // Sexta Seccion
     React.useEffect(() => {
       if(stateButtons === 1){
@@ -256,7 +248,8 @@ const Simulacion5Dias = () => {
           const dateTime = currentDateTime;  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(dateTime)
-          for(var i = cuartaSeccion; i < flightsSchedule.length; i++){
+          for(var i = quintaSeccion; i < sextaSeccion; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -265,6 +258,80 @@ const Simulacion5Dias = () => {
         };
       }
     }, [stateButtons])
+
+
+    // Septima Seccion
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          for(var i = sextaSeccion; i < septimaSeccion; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
+            show_interval(flightsSchedule[i])
+          }
+        }, 1.1)
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }, [stateButtons])
+
+    // Octava Seccion
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          for(var i = septimaSeccion; i < octavaSeccion; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
+            show_interval(flightsSchedule[i])
+          }
+        }, 1.1)
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }, [stateButtons])
+
+    // Novena Seccion
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          for(var i = octavaSeccion; i < novenaSeccion; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
+            show_interval(flightsSchedule[i])
+          }
+        }, 1.1)
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }, [stateButtons])
+
+    // Decima Seccion
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        const interval = setInterval(() => {
+          const dateTime = currentDateTime;  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(dateTime)
+          for(var i = novenaSeccion; i < flightsSchedule.length; i++){
+            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
+            show_interval(flightsSchedule[i])
+          }
+        }, 1.1)
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }, [stateButtons])
+
 
     const show_interval = (flightSchedule) => {
       // el current date time se mantiene constante aqui
