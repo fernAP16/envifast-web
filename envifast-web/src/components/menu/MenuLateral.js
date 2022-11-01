@@ -46,7 +46,7 @@ const MenuLateral = (props) => {
                             <ListItemIcon>
                                 <Icon className="menuIcon" icon={icons[index]} color="white" width="30px" />
                             </ListItemIcon>
-                            <ListItemText primary={text} />
+                            <ListItemText primary={text} style={index >= 3 ? {marginLeft: "5px"} : {}}/>
                         </ListItemButton>
                     </ListItem>
                 ))}

@@ -5,7 +5,7 @@ import L from "leaflet";
 import airplaneIcon from "../../assets/icons/avion.png";
 
 const icon = L.icon({
-  iconSize: [45, 45],
+  iconSize: [25, 25],
   popupAnchor: [2, -20],
   iconUrl: airplaneIcon
 });
@@ -27,7 +27,8 @@ export default function AirplaneMarker({ data }) {
       icon={icon}
       position={[lat, lng]}
       previousPosition={prevPos}
-      duration={1000 * duration_flight  / 360}// poner el factor de transformacion
+      // duration={(1000 * 60 * duration_flight) / 360}// 7.1seg
+      duration={(1000 * duration_flight ) / (360 * 32)}// 7.1seg
     />
   );
 }
