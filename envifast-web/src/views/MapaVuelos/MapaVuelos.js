@@ -19,12 +19,12 @@ const dataStory = [
         // Lima: -12.098056, -77.015278
       lat: -12.098056,
       lng: -77.015278,
-      duration_flight: 43
+      duration_flight: 200
     },
     {   // Madrid: 40.472222, -3.560833
       lat: 40.472222,
       lng: -3.560833,
-      duration_flight: 43
+      duration_flight: 200
     }
   ];
 
@@ -38,7 +38,7 @@ const dataStory = [
       // LA POSICION INICIAL
       lat: -12.098056,
       lng: -77.015278,
-      duration_flight: 43
+      duration_flight: 200
     });
 
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
@@ -56,11 +56,9 @@ const dataStory = [
     const show_interval = () => {
         setCurrentTrack(dataStory[cursor]);
         console.log("entra al set interval") 
-        if (cursor === dataStory.length - 1) {
-            
+        if (cursor === dataStory.length - 1) {            
             return;
         }
-    
         // ENTRA AQUI PARA IR A SU DESTINO
         console.log("Entro al setCurrent Track, para llegar a su destino")
         cursor += 1;
@@ -68,7 +66,6 @@ const dataStory = [
     }
 
     React.useEffect(() => {
-
         show_interval()
     })
 
