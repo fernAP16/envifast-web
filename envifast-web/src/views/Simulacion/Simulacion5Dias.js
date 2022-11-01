@@ -48,6 +48,8 @@ const Simulacion5Dias = () => {
     const [periodo, setPeriodo] = React.useState(1);
     const [isLoading, setIsLoading] = React.useState(false);
     const [openPopUp, setOpenPopUp] = React.useState(false);
+    const [dia, setDiaSimulacion] = React.useState(0);
+    const [dateSimulation, setDateSimulation] = React.useState(null)
 
     marker.slideTo([50, 50], {
       duration: 2000,
@@ -142,14 +144,17 @@ const Simulacion5Dias = () => {
       }
     }, [stateButtons])
 
-    // Cuando se cambia la fecha se setea el currentDateTime
+    // INICIAR SIMULACION
     React.useEffect(() => {
       if(stateButtons === 1){
         let dateTime = new Date(startDate);
+        let dateSimulation = new Date('2022/01/01')
         dateTime.setHours(0)
         dateTime.setMinutes(0)
-        dateTime.setSeconds(0)        
+        dateTime.setSeconds(0)
+        console.log(dateSimulation.getDate())        
         setCurrentDateTime(dateTime);
+        setDateSimulation(dateSimulation)
       }
     }, [stateButtons])
 
@@ -161,7 +166,6 @@ const Simulacion5Dias = () => {
           }
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
         }, 1.1)
         return () => {
           clearInterval(interval);
@@ -176,8 +180,7 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-          setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)        
+          setCurrentDateTime(currentDateTime)      
           for(var i = 0 ; i < primeraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -194,7 +197,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           for(var i = primeraSeccion; i < segundaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -212,7 +214,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           for(var i = segundaSeccion; i < terceraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -229,7 +230,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           for(var i = terceraSeccion; i < cuartaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -246,7 +246,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           for(var i = cuartaSeccion; i < quintaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -263,7 +262,6 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
         setCurrentDateTime(currentDateTime)
-        console.log(currentDateTime)
         const interval = setInterval(() => {
           for(var i = quintaSeccion; i < sextaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -282,7 +280,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           for(var i = sextaSeccion; i < septimaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -299,7 +296,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           for(var i = septimaSeccion; i < octavaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -316,7 +312,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           for(var i = octavaSeccion; i < novenaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -333,7 +328,6 @@ const Simulacion5Dias = () => {
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
           if(flightsSchedule !== null){
             for(var i = novenaSeccion; i < flightsSchedule.length; i++){
               show_interval(flightsSchedule[i])
@@ -347,7 +341,7 @@ const Simulacion5Dias = () => {
     }, [flightsSchedule])
 
 
-    const show_interval = (flightSchedule) => {
+    const show_interval = (flightSchedule) => {      
       // Quitamos el loading
       if(isLoading === true)setIsLoading(false);
       // el current date time se mantiene constante aqui
@@ -356,22 +350,29 @@ const Simulacion5Dias = () => {
       
       let arrTiempoSalida = horaSalida.split(":");
       let arrTiempoLLegada = horaLLegada.split(":");
-      let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600;
+      let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600 + 
+      (dateSimulation.getDate() - 1) * 86400;
       let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
       let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
       
+      // console.log("El tiempo actual es: " + tiempoActual + " El tiempo de salida es: " + tiempoSalida)
+      if(tiempoActual >= tiempoLLegada){
+        flightSchedule.estado = 2;
+        return;
+      }
+
       setCurrentTrack({
           lat: flightSchedule.coordenadaActual[0],
           lng: flightSchedule.coordenadaActual[1],
           duration_flight: flightSchedule.duracion
       }); 
 
-      if(tiempoActual >= tiempoLLegada){
-        flightSchedule.estado = 2;
-      } else if(tiempoActual - 10 >= tiempoSalida){
+      if(tiempoActual - 10 >= tiempoSalida){
         flightSchedule.coordenadaActual[0] = flightSchedule.coordenadasDestinos[0];
         flightSchedule.coordenadaActual[1] = flightSchedule.coordenadasDestinos[1];
+        return;
       } else if(tiempoActual >= tiempoSalida){
+        
         flightSchedule.estado = 1;
       }
     }
@@ -393,8 +394,6 @@ const Simulacion5Dias = () => {
       }
       else setStateButtons(3)
       setDisableStart(true);
-      // setDisablePause(false);
-      // setDisableStop(false);
     }
 
     const handlePause = () => {
