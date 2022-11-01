@@ -2,7 +2,7 @@ import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
 import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime } from '../../services/envios/EnviosServices';
-import { Grid, Button, Typography, Box, TextField } from '@mui/material';
+import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
 import AirplaneIcon from '../../assets/icons/avion.png';
@@ -33,7 +33,7 @@ const Simulacion5Dias = () => {
     const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [currentTrack, setCurrentTrack] = React.useState({});
     const [flightsSchedule, setFlightsSchedule] = React.useState(null);
-    const [stateButtons, setStateButtons] = React.useState(5);
+    const [stateButtons, setStateButtons] = React.useState(0);
     const marker = new DriftMarker([10, 10]);
     const [formatoFecha, setFormatoFecha] = React.useState("");
     const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
@@ -82,7 +82,7 @@ const Simulacion5Dias = () => {
       },
     }));
 
-    
+    // Inicio
     React.useEffect(() => {
       getCoordenadasAeropuertos()
       .then(function (response) {
@@ -102,24 +102,8 @@ const Simulacion5Dias = () => {
       })
     },[])
 
-
-    // Para manejar el tiempo
     React.useEffect(() => {
-      let dateTime = new Date(startDate);
-      dateTime.setHours(0)
-      dateTime.setMinutes(0)
-      dateTime.setSeconds(0)        
-      setCurrentDateTime(dateTime);
-           
-    }, [stateButtons])
-
-    
-
-    React.useEffect(() => {
-      if(stateButtons === 1){  
-        console.log("Entro a la api de get vuelos por dia") 
-        console.log(startDate)   
-        console.log(periodo)   
+      if(stateButtons === 2){
         let variables = {
           fecha: startDate,
           periodo: periodo
@@ -144,8 +128,6 @@ const Simulacion5Dias = () => {
             )
           };
           var k = array.length;
-          console.log(array)
-          setFlightsSchedule(array);
           setPrimeraSeccion(Math.floor(k/10))
           setSegundaSeccion(Math.floor(k/5))
           setTerceraSeccion(Math.floor((3/10) * k))
@@ -155,68 +137,83 @@ const Simulacion5Dias = () => {
           setSeptimaSeccion(Math.floor((7/10) * k))
           setOctavaSeccion(Math.floor((8/10) * k))
           setNovenaSeccion(Math.floor((9/10) * k))
-
-          
-          
+          setFlightsSchedule(array);
         })
       }
-    }, [stateButtons, periodo])
-  
+    }, [stateButtons])
+
+    // Cuando se cambia la fecha se setea el currentDateTime
+    React.useEffect(() => {
+      if(stateButtons === 1){
+        let dateTime = new Date(startDate);
+        dateTime.setHours(0)
+        dateTime.setMinutes(0)
+        dateTime.setSeconds(0)        
+        setCurrentDateTime(dateTime);
+      }
+    }, [stateButtons])
 
     React.useEffect(() => {
-      const interval = setInterval(() => {
-        if(currentDateTime.getSeconds()  % 21600 === 0){
-          setPeriodo(periodo + 1)
-        }
-        currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-        setCurrentDateTime(currentDateTime)        
-      }, 1.1)
-      return () => {
-        clearInterval(interval);
-      }; 
-    })
+      if(stateButtons === 2){
+        const interval = setInterval(() => {
+          if(currentDateTime.getSeconds()  % 21600 === 0){
+            setPeriodo(periodo + 1)
+          }
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
+        }, 1.1)
+        return () => {
+          clearInterval(interval);
+        }; 
+      }
+    }, [flightsSchedule])
 
-    // PARA INICIAR LA SIMULACION
+    ////////////////////////////////////
 
     // Primera Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
-        const interval = setInterval(() => {          
+      if(stateButtons === 2){
+        const interval = setInterval(() => {  
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)        
           for(var i = 0 ; i < primeraSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
-              show_interval(flightsSchedule[i])
+            show_interval(flightsSchedule[i])
           }
         }, 1.1)
         return () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
     // Segunda seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
-          
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           for(var i = primeraSeccion; i < segundaSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
-              show_interval(flightsSchedule[i])
+            show_interval(flightsSchedule[i])
           }
         }, 1.1)
         return () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
 
     // Tercera Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
-          
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           for(var i = segundaSeccion; i < terceraSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -224,15 +221,16 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
     // Cuarta Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
-          
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           for(var i = terceraSeccion; i < cuartaSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -240,15 +238,16 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
     // Quinta Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
-          
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           for(var i = cuartaSeccion; i < quintaSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -256,16 +255,17 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
 
     // Sexta Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
+        currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+        setCurrentDateTime(currentDateTime)
+        console.log(currentDateTime)
         const interval = setInterval(() => {
-          
           for(var i = quintaSeccion; i < sextaSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -273,16 +273,17 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
 
     // Septima Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
-          
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           for(var i = sextaSeccion; i < septimaSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -290,15 +291,16 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
     // Octava Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
-          
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           for(var i = septimaSeccion; i < octavaSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -306,15 +308,16 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
     // Novena Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
-          
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           for(var i = octavaSeccion; i < novenaSeccion; i++){
-            if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
             show_interval(flightsSchedule[i])
           }
         }, 1.1)
@@ -322,15 +325,17 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
     // Decima Seccion
     React.useEffect(() => {
-      if(stateButtons === 1){
+      if(stateButtons === 2){
         const interval = setInterval(() => {
+          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
           if(flightsSchedule !== null){
             for(var i = novenaSeccion; i < flightsSchedule.length; i++){
-              if(flightsSchedule[i] != null && flightsSchedule[i] != undefined)
               show_interval(flightsSchedule[i])
             }
           }
@@ -339,10 +344,12 @@ const Simulacion5Dias = () => {
           clearInterval(interval);
         };
       }
-    }, [stateButtons], [flightsSchedule])
+    }, [flightsSchedule])
 
 
     const show_interval = (flightSchedule) => {
+      // Quitamos el loading
+      if(isLoading === true)setIsLoading(false);
       // el current date time se mantiene constante aqui
       let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20);// esto captura bien la hora. Ahora 
       let horaLLegada = JSON.stringify(flightSchedule.horaLLegada).slice(12,20);// esto captura bien la hora. Ahora 
@@ -352,7 +359,7 @@ const Simulacion5Dias = () => {
       let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600;
       let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
       let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
-      // console.log("Actual: " + tiempoActual + " - Id: " + flightSchedule.id + " - Salida: " + tiempoSalida + " - Llegada: " + tiempoLLegada);
+      
       setCurrentTrack({
           lat: flightSchedule.coordenadaActual[0],
           lng: flightSchedule.coordenadaActual[1],
@@ -367,7 +374,6 @@ const Simulacion5Dias = () => {
       } else if(tiempoActual >= tiempoSalida){
         flightSchedule.estado = 1;
       }
-      
     }
 
     const AirportMarket = () => {
@@ -381,17 +387,18 @@ const Simulacion5Dias = () => {
     }
 
     const handleStart = () => {
-      if(stateButtons === 0){
-        setStateButtons(1);
+      if(stateButtons === 1){
+        setIsLoading(true);
+        setStateButtons(2);
       }
       else setStateButtons(3)
-      // setDisableStart(true);
+      setDisableStart(true);
       // setDisablePause(false);
       // setDisableStop(false);
     }
 
     const handlePause = () => {
-      setStateButtons(2);
+      setStateButtons(3);
       setDisableStart(false);
       setDisablePause(true);
       setDisableStop(false);
@@ -407,7 +414,7 @@ const Simulacion5Dias = () => {
     const handleDate = event => {
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
-      setStateButtons(0);
+      setStateButtons(1);
       setDisableStart(false);
     }
 
@@ -421,7 +428,7 @@ const Simulacion5Dias = () => {
           <Grid display='flex'>
             <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
-              <Typography className='date-map'>{"Fecha actual: " + (currentDateTime ? formatDateTimeToString(currentDateTime)[0]: 'dd/mm/aaaa')}</Typography>
+              <Typography className='date-map'>{"Fecha actual: " + (startDateString ? startDateString: 'dd/mm/aaaa')}</Typography>
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
@@ -488,7 +495,7 @@ const Simulacion5Dias = () => {
               </Box> 
               <Grid> 
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
-                {/* <TableContainer component={Paper} className="table-flights">
+                <TableContainer component={Paper} className="table-flights">
                   <Table className='table-flights-body' stickyHeader aria-label="customized table">
                     <TableHead>
                       <TableRow>
@@ -498,7 +505,7 @@ const Simulacion5Dias = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody> 
-                      {(stateButtons === 1) && 
+                      {(flightsSchedule) && 
                         flightsSchedule.slice(0,10).map((flight) => (
                           <StyledTableRow key={flight.name}>
                             <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
@@ -520,11 +527,20 @@ const Simulacion5Dias = () => {
                       }
                     </TableBody>
                   </Table>
-                </TableContainer> */}
+                </TableContainer>
               </Grid>
             </Box>                         
           </Grid>
-
+          <Dialog open={isLoading}>
+          <DialogTitle>
+            Cargando...
+          </DialogTitle>
+          <DialogContent>
+            <Grid item container justifyContent='center'>
+              <CircularProgress className='loading-comp'/>
+            </Grid>
+          </DialogContent>
+        </Dialog>
           <Popup openPopUp = {openPopUp} setOpenPopUp = {setOpenPopUp}> 
 
           </Popup>
