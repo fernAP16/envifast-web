@@ -125,7 +125,7 @@ const Simulacion5Dias = () => {
                 duracion: element.duracion,
                 coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
                 coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
-                coordenadaActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+                coordenadasActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
                 estado: 0
               }
             )
@@ -140,22 +140,9 @@ const Simulacion5Dias = () => {
           setSeptimaSeccion(Math.floor((7/10) * k))
           setOctavaSeccion(Math.floor((8/10) * k))
           setNovenaSeccion(Math.floor((9/10) * k))
+          if(isLoading === true)setIsLoading(false);
           setFlightsSchedule(array);
         })
-      }
-    }, [stateButtons])
-
-    // INICIAR SIMULACION
-    React.useEffect(() => {
-      if(stateButtons === 1){
-        let dateTime = new Date(startDate);
-        let dateSimulation = new Date('2022/01/01')
-        dateTime.setHours(0)
-        dateTime.setMinutes(0)
-        dateTime.setSeconds(0)
-        console.log(dateSimulation.getDate())        
-        setCurrentDateTime(dateTime);
-        setDateSimulation(dateSimulation)
       }
     }, [stateButtons])
 
@@ -346,56 +333,31 @@ const Simulacion5Dias = () => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    const show_interval = (flightSchedule) => {      
-      // Quitamos el loading
-      console.log("Entro al show interval")
-      if(isLoading === true)setIsLoading(false);
-      // el current date time se mantiene constante aqui
-      // let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20);// esto captura bien la hora. Ahora 
-      // let horaLLegada = JSON.stringify(flightSchedule.horaLLegada).slice(12,20);// esto captura bien la hora. Ahora 
-      
-      // let arrTiempoSalida = horaSalida.split(":");
-      // let arrTiempoLLegada = horaLLegada.split(":");
-      // let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600 + 
-      // (dateSimulation.getDate() - 1) * 86400;
-      // let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
-      // let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
-
-      // fecha 
-      // let json = "\"2022-11-03T21:26:42.070Z\""
+    const show_interval = (flightSchedule) => {
       let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
       let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
       let dateInicioSTR = JSON.parse(jsonSalida)
       let dateInicio = new Date(dateInicioSTR)
       let dateFinSTR = JSON.parse(jsonLlegada)
       let dateFin = new Date(dateFinSTR)
-      // console.log(dateInicio)
-      // console.log(dateFin)
       
-      // console.log("El tiempo actual es: " + tiempoActual + " El tiempo de salida es: " + tiempoSalida)
-      // if(tiempoActual >= tiempoLLegada){
-      console.log(currentDateTime);
-
       setCurrentTrack({
-          lat: flightSchedule.coordenadaActual[0],
-          lng: flightSchedule.coordenadaActual[1],
+          lat: flightSchedule.coordenadasActual[0],
+          lng: flightSchedule.coordenadasActual[1],
           duration_flight: flightSchedule.duracion
-      }); 
-      console.log(currentDateTime <= dateInicio)
-      console.log(flightSchedule.estado)
-      if(flightSchedule.estado === 0 && currentDateTime <= dateInicio ){
-        console.log("En espera")
-        flightSchedule.coordenadaActual[0] = flightSchedule.coordenadasDestinos[0];
-        flightSchedule.coordenadaActual[1] = flightSchedule.coordenadasDestinos[1];
-      }else if(flightSchedule.estado === 0 && currentDateTime >= dateInicio){
-        flightSchedule.estado = 1;
-      }else if(flightSchedule.estado === 1 && currentDateTime >= dateFin){
-        flightSchedule.estado = 2;
-      }
+      });
 
-      
-      
-      
+      let date = new Date(currentDateTime);
+      date.setSeconds(date.getSeconds() - 50);
+
+      if(currentDateTime > dateFin){
+        flightSchedule.estado = 2;
+      } else if(date >= dateInicio){
+        flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasDestinos[0];
+        flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasDestinos[1];
+      } else if(currentDateTime > dateInicio){
+        flightSchedule.estado = 1;
+      }
     }
 
     const AirportMarket = () => {
@@ -432,8 +394,10 @@ const Simulacion5Dias = () => {
     }
 
     const handleDate = event => {
+      console.log(event.target.value)
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
+      setCurrentDateTime(new Date(event.target.value + ' 00:00:00'));
       setStateButtons(1);
       setDisableStart(false);
     }
@@ -463,8 +427,8 @@ const Simulacion5Dias = () => {
                       flight.estado === 1 ?
                       <div>
                           <AirplaneMarker data={
-                            { lat: flight.coordenadaActual[0],
-                              lng: flight.coordenadaActual[1],
+                            { lat: flight.coordenadasActual[0],
+                              lng: flight.coordenadasActual[1],
                               duration_flight: flight.duracion
                             } ?? {}
                           }></AirplaneMarker>
@@ -493,6 +457,7 @@ const Simulacion5Dias = () => {
                 <Grid container xs={6}>
                   <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate}/>
                 </Grid>
+                
               </Grid>
               <Box height="80px"> 
                 <Grid container>
