@@ -336,10 +336,8 @@ const Simulacion5Dias = () => {
     const show_interval = (flightSchedule) => {
       let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
       let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
-      let dateInicioSTR = JSON.parse(jsonSalida)
-      let dateInicio = new Date(dateInicioSTR)
-      let dateFinSTR = JSON.parse(jsonLlegada)
-      let dateFin = new Date(dateFinSTR)
+      let dateInicio = new Date(JSON.parse(jsonSalida))
+      let dateFin = new Date(JSON.parse(jsonLlegada))
       
       setCurrentTrack({
           lat: flightSchedule.coordenadasActual[0],
@@ -505,8 +503,6 @@ const Simulacion5Dias = () => {
                                     </Typography>    
                                 </div>
                             </StyledTableCell>
-                            
-                           
                           </StyledTableRow>
                         ))
                       }
