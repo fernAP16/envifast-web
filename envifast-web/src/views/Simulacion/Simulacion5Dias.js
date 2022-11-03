@@ -21,6 +21,7 @@ import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
 import { Icon } from '@iconify/react';
 import Popup from '../MapaVuelos/VerPlanVuelo';
+import { isCompositeComponent } from 'react-dom/test-utils';
 
 const Simulacion5Dias = () => {
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
@@ -341,40 +342,60 @@ const Simulacion5Dias = () => {
     }, [flightsSchedule])
 
 
+    async  function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     const show_interval = (flightSchedule) => {      
       // Quitamos el loading
+      console.log("Entro al show interval")
       if(isLoading === true)setIsLoading(false);
       // el current date time se mantiene constante aqui
-      let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20);// esto captura bien la hora. Ahora 
-      let horaLLegada = JSON.stringify(flightSchedule.horaLLegada).slice(12,20);// esto captura bien la hora. Ahora 
+      // let horaSalida = JSON.stringify(flightSchedule.horaSalida).slice(12,20);// esto captura bien la hora. Ahora 
+      // let horaLLegada = JSON.stringify(flightSchedule.horaLLegada).slice(12,20);// esto captura bien la hora. Ahora 
       
-      let arrTiempoSalida = horaSalida.split(":");
-      let arrTiempoLLegada = horaLLegada.split(":");
-      let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600 + 
-      (dateSimulation.getDate() - 1) * 86400;
-      let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
-      let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
+      // let arrTiempoSalida = horaSalida.split(":");
+      // let arrTiempoLLegada = horaLLegada.split(":");
+      // let tiempoActual = currentDateTime.getSeconds() + currentDateTime.getMinutes() * 60 + currentDateTime.getHours() * 3600 + 
+      // (dateSimulation.getDate() - 1) * 86400;
+      // let tiempoSalida = parseInt(arrTiempoSalida[2]) + parseInt(arrTiempoSalida[1]) * 60 +  parseInt(arrTiempoSalida[0]) * 3600;
+      // let tiempoLLegada = parseInt(arrTiempoLLegada[2]) + parseInt(arrTiempoLLegada[1]) * 60 +  parseInt(arrTiempoLLegada[0]) * 3600;
+
+      // fecha 
+      // let json = "\"2022-11-03T21:26:42.070Z\""
+      let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
+      let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
+      let dateInicioSTR = JSON.parse(jsonSalida)
+      let dateInicio = new Date(dateInicioSTR)
+      let dateFinSTR = JSON.parse(jsonLlegada)
+      let dateFin = new Date(dateFinSTR)
+      // console.log(dateInicio)
+      // console.log(dateFin)
       
       // console.log("El tiempo actual es: " + tiempoActual + " El tiempo de salida es: " + tiempoSalida)
-      if(tiempoActual >= tiempoLLegada){
-        flightSchedule.estado = 2;
-        return;
-      }
+      // if(tiempoActual >= tiempoLLegada){
+      console.log(currentDateTime);
 
       setCurrentTrack({
           lat: flightSchedule.coordenadaActual[0],
           lng: flightSchedule.coordenadaActual[1],
           duration_flight: flightSchedule.duracion
       }); 
-
-      if(tiempoActual - 10 >= tiempoSalida){
+      console.log(currentDateTime <= dateInicio)
+      console.log(flightSchedule.estado)
+      if(flightSchedule.estado === 0 && currentDateTime <= dateInicio ){
+        console.log("En espera")
         flightSchedule.coordenadaActual[0] = flightSchedule.coordenadasDestinos[0];
         flightSchedule.coordenadaActual[1] = flightSchedule.coordenadasDestinos[1];
-        return;
-      } else if(tiempoActual >= tiempoSalida){
-        
+      }else if(flightSchedule.estado === 0 && currentDateTime >= dateInicio){
         flightSchedule.estado = 1;
+      }else if(flightSchedule.estado === 1 && currentDateTime >= dateFin){
+        flightSchedule.estado = 2;
       }
+
+      
+      
+      
     }
 
     const AirportMarket = () => {
