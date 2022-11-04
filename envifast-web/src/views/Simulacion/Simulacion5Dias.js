@@ -102,6 +102,7 @@ const Simulacion5Dias = () => {
     },[])
 
     React.useEffect(() => {
+      console.log("El periodo es: " + periodo)
       if(stateButtons === 2){
         let variables = {
           fecha: startDate,
@@ -140,16 +141,18 @@ const Simulacion5Dias = () => {
           setFlightsSchedule(array);
         })
       }
-    }, [stateButtons])
+    }, [stateButtons], periodo)
 
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          if(currentDateTime.getSeconds()  % 21600 === 0){
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
             setPeriodo(periodo + 1)
+            
           }
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           setCurrentDateTime(currentDateTime)
+          console.log(currentDateTime)
         }, 1.1)
         return () => {
           clearInterval(interval);
@@ -164,6 +167,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {  
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+            
+          }
           setCurrentDateTime(currentDateTime)      
           for(var i = 0 ; i < primeraSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -180,6 +187,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+
+          }
           setCurrentDateTime(currentDateTime)
           for(var i = primeraSeccion; i < segundaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -197,6 +208,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+            
+          }
           setCurrentDateTime(currentDateTime)
           for(var i = segundaSeccion; i < terceraSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -213,6 +228,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+            
+          }
           setCurrentDateTime(currentDateTime)
           for(var i = terceraSeccion; i < cuartaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -229,6 +248,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+            
+          }
           setCurrentDateTime(currentDateTime)
           for(var i = cuartaSeccion; i < quintaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -245,6 +268,10 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+        if(currentDateTime.getHours() % 6 === 0){
+          setPeriodo(periodo + 1)
+          
+        }
         setCurrentDateTime(currentDateTime)
         const interval = setInterval(() => {
           for(var i = quintaSeccion; i < sextaSeccion; i++){
@@ -263,6 +290,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+            
+          }
           setCurrentDateTime(currentDateTime)
           for(var i = sextaSeccion; i < septimaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -279,6 +310,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+            
+          }
           setCurrentDateTime(currentDateTime)
           for(var i = septimaSeccion; i < octavaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -295,6 +330,10 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+            
+          }
           setCurrentDateTime(currentDateTime)
           for(var i = octavaSeccion; i < novenaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -311,6 +350,9 @@ const Simulacion5Dias = () => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
+          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+            setPeriodo(periodo + 1)
+          }
           setCurrentDateTime(currentDateTime)
           if(flightsSchedule !== null){
             for(var i = novenaSeccion; i < flightsSchedule.length; i++){
@@ -324,11 +366,10 @@ const Simulacion5Dias = () => {
       }
     }, [flightsSchedule])
 
-
-    async  function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
+    React.useEffect(() => {
+      console.log("El periodo es: " + periodo)
+    }, [periodo])
+    
     const show_interval = (flightSchedule) => {
       if(flightSchedule.estado === 2) return;
       let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
