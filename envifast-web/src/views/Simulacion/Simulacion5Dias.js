@@ -30,13 +30,11 @@ const Simulacion5Dias = () => {
     const [disableStop, setDisableStop] = React.useState(true);
     const [startDateString, setStartDateString] = React.useState('dd/mm/aaaa');
     const [startDate, setStartDate] = React.useState(null);
-    const [currentTime, setCurrentTime] = React.useState(null);
     const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [currentTrack, setCurrentTrack] = React.useState({});
     const [flightsSchedule, setFlightsSchedule] = React.useState(null);
     const [stateButtons, setStateButtons] = React.useState(0);
     const marker = new DriftMarker([10, 10]);
-    const [formatoFecha, setFormatoFecha] = React.useState("");
     const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
     const [segundaSeccion, setSegundaSeccion] = React.useState(1);
     const [terceraSeccion, setTerceraSeccion] = React.useState(1);
@@ -49,8 +47,6 @@ const Simulacion5Dias = () => {
     const [periodo, setPeriodo] = React.useState(1);
     const [isLoading, setIsLoading] = React.useState(false);
     const [openPopUp, setOpenPopUp] = React.useState(false);
-    const [dia, setDiaSimulacion] = React.useState(0);
-    const [dateSimulation, setDateSimulation] = React.useState(null)
 
     marker.slideTo([50, 50], {
       duration: 2000,
@@ -334,6 +330,7 @@ const Simulacion5Dias = () => {
     }
 
     const show_interval = (flightSchedule) => {
+      if(flightSchedule.estado === 2) return;
       let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
       let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
       let dateInicio = new Date(JSON.parse(jsonSalida))
@@ -346,7 +343,7 @@ const Simulacion5Dias = () => {
       });
 
       let date = new Date(currentDateTime);
-      date.setSeconds(date.getSeconds() - 50);
+      date.setSeconds(date.getSeconds() - 100);
 
       if(currentDateTime > dateFin){
         flightSchedule.estado = 2;
@@ -513,15 +510,15 @@ const Simulacion5Dias = () => {
             </Box>                         
           </Grid>
           <Dialog open={isLoading}>
-          <DialogTitle>
-            Cargando...
-          </DialogTitle>
-          <DialogContent>
-            <Grid item container justifyContent='center'>
-              <CircularProgress className='loading-comp'/>
-            </Grid>
-          </DialogContent>
-        </Dialog>
+            <DialogTitle>
+              Cargando...
+            </DialogTitle>
+            <DialogContent>
+              <Grid item container justifyContent='center'>
+                <CircularProgress className='loading-comp'/>
+              </Grid>
+            </DialogContent>
+          </Dialog>
           <Popup openPopUp = {openPopUp} setOpenPopUp = {setOpenPopUp}> 
 
           </Popup>
