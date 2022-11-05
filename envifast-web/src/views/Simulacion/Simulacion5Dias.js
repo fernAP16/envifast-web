@@ -146,13 +146,12 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
+          if(currentDateTime.getHours()%6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
             setPeriodo(periodo + 1)
-            
           }
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-          setCurrentDateTime(currentDateTime)
-          console.log(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
         }, 1.1)
         return () => {
           clearInterval(interval);
@@ -166,12 +165,13 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {  
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
             setPeriodo(periodo + 1)
             
           }
-          setCurrentDateTime(currentDateTime)      
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)      
           for(var i = 0 ; i < primeraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -186,12 +186,13 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
             setPeriodo(periodo + 1)
 
           }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = primeraSeccion; i < segundaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -207,12 +208,13 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
             setPeriodo(periodo + 1)
             
           }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = segundaSeccion; i < terceraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -227,12 +229,12 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-            
+            setPeriodo(periodo + 1) 
           }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = terceraSeccion; i < cuartaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -247,12 +249,13 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
             setPeriodo(periodo + 1)
             
           }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = cuartaSeccion; i < quintaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -267,12 +270,13 @@ const Simulacion5Dias = () => {
     // Sexta Seccion
     React.useEffect(() => {
       if(stateButtons === 2){
-        currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
         if(currentDateTime.getHours() % 6 === 0){
           setPeriodo(periodo + 1)
           
         }
-        setCurrentDateTime(currentDateTime)
+        let temp = currentDateTime;
+        temp.setSeconds(temp.getSeconds() + 1)
+        setCurrentDateTime(temp)
         const interval = setInterval(() => {
           for(var i = quintaSeccion; i < sextaSeccion; i++){
             show_interval(flightsSchedule[i])
@@ -292,7 +296,6 @@ const Simulacion5Dias = () => {
           currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
           if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
             setPeriodo(periodo + 1)
-            
           }
           setCurrentDateTime(currentDateTime)
           for(var i = sextaSeccion; i < septimaSeccion; i++){
@@ -365,6 +368,10 @@ const Simulacion5Dias = () => {
         };
       }
     }, [flightsSchedule])
+
+    React.useEffect(() => {
+      console.log(currentDateTime)
+    }, [currentDateTime])
 
     React.useEffect(() => {
       console.log("El periodo es: " + periodo)
@@ -448,7 +455,7 @@ const Simulacion5Dias = () => {
           <Grid display='flex'>
             <Grid item className='containerMapa'>
               <Typography className='title'>Simulación de 5 días</Typography>
-              <Typography className='date-map'>{"Fecha actual: " + (startDateString ? startDateString: 'dd/mm/aaaa')}</Typography>
+              <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm:ss')}</Typography>
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
