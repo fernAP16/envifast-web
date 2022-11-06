@@ -1,39 +1,62 @@
 import React from 'react';
-import { Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import './Envios.css'
 
 const Envios  = (props) => {  
+    const [shipments, setShipments] = React.useState([]);
+    const [isRegistering, setIsRegistering] = React.useState(false);
+    const [countryFrom, setCountryFrom] = React.useState('');
+    const [countryTo, setCountryTo] = React.useState('');
 
-    
-    
-    function createData(id, emisor, destinatario, estado, origen, destino, cantPaquetes, fechaEnvio) {
-        return { id, emisor, destinatario, estado, origen, destino, cantPaquetes, fechaEnvio};
+    React.useEffect(() => {
+        setShipments([{
+            id: 1,
+            emisor: 'Esther Campos Bolivar',
+            destinatario: 'Salvador Banda',
+            estado: 2,
+            origen: 'Lima',
+            destino: 'Montevideo',
+            cantPaquetes: 1,
+            fechaEnvio: new Date().toLocaleDateString()
+        },{
+            id: 2,
+            emisor: 'Esther Campos Bolivar',
+            destinatario: 'Salvador Banda',
+            estado: 1,
+            origen: 'Lima',
+            destino: 'Montevideo',
+            cantPaquetes: 1,
+            fechaEnvio: new Date().toLocaleDateString()
+        }])
+    },[])
+
+    const handleCountryFrom = (e) => {
+        setCountryFrom(e.target.value);
     }
-      
-    const rows = [
-        createData(1, 'Esther Campos Bolivar', 'Salvador Banda', 2, 'Lima', 'Montevideo', 1, new Date().toLocaleDateString()),
-        createData(2, 'Emilio Coyama', 'Josep Tirado', 0, 'Brasilia', 'Praga', 2, new Date().toLocaleDateString()),
-        createData(3, 'Francisco Bolognesi', 'Iván Solano', 0, 'La Paz', 'Buenos Aires', 1, new Date().toLocaleDateString()),
-        createData(4, 'Rony Cave', 'Ángel Pantoja', 2, 'Santiago de Chile', 'Lima', 1, new Date().toLocaleDateString()),
-        createData(5, 'Judith de la Cruz Lazo', 'Jordi Gastélum', 1, 'Bogota', 'Brasilia', 5, new Date().toLocaleDateString()),
-        createData(6, 'Esther Campos Bolivar', 'Salvador Banda', 2, 'Lima', 'Montevideo', 1, new Date().toLocaleDateString()),
-        createData(7, 'Emilio Coyama', 'Josep Tirado', 0, 'Brasilia', 'Praga', 2, new Date().toLocaleDateString()),
-        createData(8, 'Francisco Bolognesi', 'Iván Solano', 0, 'La Paz', 'Buenos Aires', 1, new Date().toLocaleDateString()),
-        createData(9, 'Rony Cave', 'Ángel Pantoja', 2, 'Santiago de Chile', 'Lima', 1, new Date().toLocaleDateString()),
-        createData(10, 'Judith de la Cruz Lazo', 'Jordi Gastélum', 1, 'Bogota', 'Brasilia', 5, new Date().toLocaleDateString()),
-        createData(11, 'Esther Campos Bolivar', 'Salvador Banda', 2, 'Lima', 'Montevideo', 1, new Date().toLocaleDateString()),
-        createData(12, 'Emilio Coyama', 'Josep Tirado', 0, 'Brasilia', 'Praga', 2, new Date().toLocaleDateString()),
-        createData(13, 'Francisco Bolognesi', 'Iván Solano', 0, 'La Paz', 'Buenos Aires', 1, new Date().toLocaleDateString()),
-        createData(14, 'Rony Cave', 'Ángel Pantoja', 2, 'Santiago de Chile', 'Lima', 1, new Date().toLocaleDateString()),
-        createData(15, 'Judith de la Cruz Lazo', 'Jordi Gastélum', 1, 'Bogota', 'Brasilia', 5, new Date().toLocaleDateString())
-    ];
 
-    /*
-    <TableCell >{row.origen}</TableCell>
-    <TableCell >{row.destino}</TableCell>
-    <TableCell >{row.cantPaquetes}</TableCell>
-    <TableCell >{row.fechaEnvio}</TableCell>
-    */
+    const handleCountryTo = (e) => {
+        setCountryTo(e.target.value);
+    }
+
+    const handleRegister = () => {
+        setIsRegistering(true);
+    }
+
+    const handleRegisterShipment = () => {
+        setIsRegistering(false);
+    }
+
+    const handleReturn = () => {
+        setCountryFrom('');
+        setCountryTo('');
+        setIsRegistering(false);
+    }
+
+    const handleClose = (event, reason) => {
+        if (reason && reason === "backdropClick") 
+            return;
+        handleReturn();
+    }
 
     return (
         <div>
@@ -41,12 +64,12 @@ const Envios  = (props) => {
                 <Typography className='title-shipment'>Envíos</Typography>
                 <Grid container className='search-actions'>
                     <Grid item xs={4}>
-                        <TextField fullWidth label='Buscar'></TextField>
+                        <TextField size='small' fullWidth label='Buscar'></TextField>
                     </Grid>
                     <Grid item xs={4} className='group-buttons'>
                         <Button className='buttons-actions'>Buscar</Button>
                         <Button className='buttons-actions'>Subir envíos</Button>
-                        <Button className='buttons-actions'>Registrar envíos</Button>
+                        <Button className='buttons-actions' onClick={handleRegister}>Registrar envíos</Button>
                     </Grid>
                 </Grid>
                 <Grid container xs={12} >
@@ -66,28 +89,28 @@ const Envios  = (props) => {
                             </TableRow>
                             </TableHead>
                             <TableBody>
-                            {rows.map((row) => (
+                            {shipments.map((shipment) => (
                                 <TableRow
-                                    key={row.name}
+                                    key={shipment.name}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell component="th" scope="row">{row.id}</TableCell>
-                                    <TableCell>{row.emisor}</TableCell>
-                                    <TableCell>{row.destinatario}</TableCell>
+                                    <TableCell component="th" scope="row">{shipment.id}</TableCell>
+                                    <TableCell>{shipment.emisor}</TableCell>
+                                    <TableCell>{shipment.destinatario}</TableCell>
                                     <TableCell align='center'>
                                         <Grid justifyContent='center'>
                                             <Typography className='table-state'
-                                                border={row.estado === 0 ? "1.5px solid #FFFA80" : row.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
-                                                backgroundColor={row.estado === 0 ? "#FFFA80" : row.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
+                                                border={shipment.estado === 0 ? "1.5px solid #FFFA80" : shipment.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
+                                                backgroundColor={shipment.estado === 0 ? "#FFFA80" : shipment.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
                                             >
-                                                {row.estado === 0 ? "Por enviar" : row.estado === 1 ? "Enviándose" : "Enviado"}
+                                                {shipment.estado === 0 ? "Por enviar" : shipment.estado === 1 ? "Enviándose" : "Enviado"}
                                             </Typography>  
                                         </Grid> 
                                     </TableCell>
-                                    <TableCell>{row.origen}</TableCell>
-                                    <TableCell>{row.destino}</TableCell>
-                                    <TableCell align='center'>{row.cantPaquetes}</TableCell>
-                                    <TableCell align='center'>{row.fechaEnvio}</TableCell>
+                                    <TableCell>{shipment.origen}</TableCell>
+                                    <TableCell>{shipment.destino}</TableCell>
+                                    <TableCell align='center'>{shipment.cantPaquetes}</TableCell>
+                                    <TableCell align='center'>{shipment.fechaEnvio}</TableCell>
                                     <TableCell align='center'><Button className='buttons-actions'>Ver detalle</Button></TableCell>
                                 </TableRow>
                             ))}
@@ -96,6 +119,87 @@ const Envios  = (props) => {
                     </TableContainer>
                 </Grid>
             </Grid>
+            <Dialog
+                open={isRegistering}
+                onClose={handleClose}
+            >
+                <DialogTitle className='dialog-title'>
+                    <Typography className='register-title'>REGISTRAR ENVÍO:</Typography>
+                    <hr className='dialog-line'/>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="register-dialog-description">
+                        <Grid>
+                            <Typography className='register-label'>Emisor:</Typography>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' label='Nombre' fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <FormControl fullWidth>
+                                        <InputLabel size='small'>Origen</InputLabel>
+                                        <Select
+                                            size='small'
+                                            value={countryFrom}
+                                            label='Origen'
+                                            onChange={handleCountryFrom}
+                                        >
+                                            <MenuItem value={10}>Ten</MenuItem>
+                                            <MenuItem value={20}>Twenty</MenuItem>
+                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' className='' label='Correo electrónico' fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField size='small' className='' label='Número de celular'></TextField>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid>
+                            <Typography className='register-label'>Destinatario:</Typography>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' label='Nombre' fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <FormControl fullWidth>
+                                        <InputLabel size='small'>Destino</InputLabel>
+                                        <Select
+                                            size='small'
+                                            value={countryTo}
+                                            label='Origen'
+                                            onChange={handleCountryTo}
+                                        >
+                                            <MenuItem value={10}>Ten</MenuItem>
+                                            <MenuItem value={20}>Twenty</MenuItem>
+                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' className='' label='Correo electrónico' fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField size='small' className='' label='Número de celular'></TextField>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Typography className='register-label'>Cantidad de paquetes:</Typography>
+                        <TextField size='small' className='' label='N° de paquetes'></TextField>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button className='button-cancel' variant='outlined' onClick={handleReturn}>Cancelar</Button>
+                    <Button className='button-register' onClick={handleRegisterShipment} autoFocus>Registrar</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     
     );

@@ -28,13 +28,13 @@ const MenuLateral = (props) => {
       };
 
     return (
-        <div >
+        <div className='menuLateralContainer' >
             <div className='logoContainer'>
-                <Icon icon="carbon:content-delivery-network" color="white" width="40px"/>
+                <Icon icon="carbon:content-delivery-network" color="white" width="35px"/>
                 <Typography className='logoText'>EnviFast</Typography>
             </div>
             <Divider/>
-            <List className='menuLateralContainer'>
+            <List>
                 {['Mapa de vuelos','Envios','Simulacion','De 5 dias','Colapso logístico'].map((text,index) => (
                     <ListItem key={text} disablePadding>
                         <ListItemButton 
@@ -44,7 +44,7 @@ const MenuLateral = (props) => {
                             disabled={(index > 2 ? enableSimulacion : false)}
                             >
                             <ListItemIcon>
-                                <Icon className="menuIcon" icon={icons[index]} color="white" width="30px" />
+                                <Icon className="menuIcon" icon={icons[index]} color="white" width="25px" />
                             </ListItemIcon>
                             <ListItemText primary={text} style={index >= 3 ? {marginLeft: "5px"} : {}}/>
                         </ListItemButton>
