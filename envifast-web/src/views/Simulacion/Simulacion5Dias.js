@@ -48,6 +48,8 @@ const Simulacion5Dias = () => {
     const [isLoading, setIsLoading] = React.useState(false);
     const [openPopUp, setOpenPopUp] = React.useState(false);
     const [flagPeriodo, setFlagPeriodo] = React.useState(true);
+    const [flagPeriodo3, setFlagPeriodo3] = React.useState(false);
+    const [flagPeriodo4, setFlagPeriodo4] = React.useState(false);
 
     marker.slideTo([50, 50], {
       duration: 2000,
@@ -186,11 +188,41 @@ const Simulacion5Dias = () => {
       }
     }, [periodo])
 
+    // Periodo 3
+    React.useEffect(() => {
+      const interval = setInterval(() => {
+        if(currentDateTime.getHours() === 7){
+          setFlagPeriodo3(true)
+        }
+        if(currentDateTime.getHours() === 12 && flagPeriodo3 === true){
+            setPeriodo(periodo + 1)
+            setFlagPeriodo3(false)
+          }
+      }, 1.1)
+      return () => {
+        clearInterval(interval);
+      }; 
+    })
+
+    React.useEffect(() => {
+      const interval = setInterval(() => {
+        if(currentDateTime.getHours() === 14){
+          setFlagPeriodo4(true)
+        }
+        if(currentDateTime.getHours() === 18 && flagPeriodo4 === true){
+            setPeriodo(periodo + 1)
+            setFlagPeriodo4(false)
+          }
+      }, 1.1)
+      return () => {
+        clearInterval(interval);
+      }; 
+    })
+
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          console.log("La bandera tiene el valor de: " + flagPeriodo)
-          console.log("Las horas de getHours son: " + currentDateTime.getHours())
+          
           if(currentDateTime.getHours() !== 0 && currentDateTime.getHours()%6 === 0 && flagPeriodo === true){ // 
             if(periodo !== 4){
                setPeriodo(periodo + 1)
@@ -198,10 +230,7 @@ const Simulacion5Dias = () => {
               setPeriodo(1)
             }
             setFlagPeriodo(false)
-          }else if(currentDateTime.getHours() > 6){
-            setFlagPeriodo(true)
           }
-          
           
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
@@ -217,9 +246,6 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          if(currentDateTime.getHours() > 6){
-            setFlagPeriodo(true)
-          }
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
           setCurrentDateTime(temp)      
