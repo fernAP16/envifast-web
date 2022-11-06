@@ -32,7 +32,7 @@ const Simulacion5Dias = () => {
     const [startDate, setStartDate] = React.useState(null);
     const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [currentTrack, setCurrentTrack] = React.useState({});
-    const [flightsSchedule, setFlightsSchedule] = React.useState(null);
+    const [flightsSchedule, setFlightsSchedule] = React.useState([]);
     const [stateButtons, setStateButtons] = React.useState(0);
     const marker = new DriftMarker([10, 10]);
     const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
@@ -44,10 +44,11 @@ const Simulacion5Dias = () => {
     const [septimaSeccion, setSeptimaSeccion] = React.useState(1);
     const [octavaSeccion, setOctavaSeccion] = React.useState(1);
     const [novenaSeccion, setNovenaSeccion] = React.useState(1);
-    const [periodo, setPeriodo] = React.useState(1);
+    const [periodo, setPeriodo] = React.useState(0);
     const [isLoading, setIsLoading] = React.useState(false);
     const [openPopUp, setOpenPopUp] = React.useState(false);
-    const [flagPeriodo, setFlagPeriodo] = React.useState(true);
+    const [flagPeriodo, setFlagPeriodo] = React.useState(false);
+    const [flagPeriodo2, setFlagPeriodo2] = React.useState(true);
     const [flagPeriodo3, setFlagPeriodo3] = React.useState(false);
     const [flagPeriodo4, setFlagPeriodo4] = React.useState(false);
     const [flightsPeriodo, setFlightsPeriodo] = React.useState(null);
@@ -105,56 +106,15 @@ const Simulacion5Dias = () => {
       })
     },[])
 
-    React.useEffect(() => {
-      console.log("Entro al use effect para cargar vuelos, segun statebuttons: " + periodo)
-      
-      if(stateButtons === 2){
-        let variables = {
-          fecha: startDate,
-          periodo: periodo
-        }
-        getVuelosPorDia(variables)
-        .then((response) => {
-          var array = [];
-          for (const element of response.data){
-            array.push(
-              {
-                id: element.id,
-                idAeropuertoOrigen: element.idAeropuertoOrigen,
-                idAeropuertoDestino: element.idAeropuertoDestino,
-                horaSalida: element.horaSalida,
-                horaLLegada: element.horaLLegada,
-                duracion: element.duracion,
-                coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
-                coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
-                coordenadasActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
-                estado: 0
-              }
-            )
-          };
-          var k = array.length;
-          setPrimeraSeccion(Math.floor(k/10))
-          setSegundaSeccion(Math.floor(k/5))
-          setTerceraSeccion(Math.floor((3/10) * k))
-          setCuartaSeccion(Math.floor((4/10) * k))
-          setQuintaSeccion(Math.floor( k / 2))
-          setSextaSeccion(Math.floor((6/10) * k))
-          setSeptimaSeccion(Math.floor((7/10) * k))
-          setOctavaSeccion(Math.floor((8/10) * k))
-          setNovenaSeccion(Math.floor((9/10) * k))
-          if(isLoading === true)setIsLoading(false);
-          setFlightsSchedule(array);
-        })
-      }
-    }, [stateButtons])
 
     React.useEffect(() => {
       console.log("Entro al use effect para cargar vuelos, segun periodo: " + periodo)
-      if(stateButtons === 2){
+      if(periodo !== 0){
         let variables = {
           fecha: currentDateTime.toISOString().slice(0, 10),//startDate, // 2022-10-29
           periodo: periodo
         }
+        console.log(variables)
         getVuelosPorDia(variables)
         .then((response) => {
           var array = [];
@@ -192,59 +152,79 @@ const Simulacion5Dias = () => {
       }
     }, [periodo])
 
-    // Periodo 3
-    React.useEffect(() => {
-      const interval = setInterval(() => {
-        if(currentDateTime.getHours() === 7){
-          setFlagPeriodo3(true)
-        }
-        if(currentDateTime.getHours() === 12 && flagPeriodo3 === true){
-            setPeriodo(periodo + 1)
-            setFlagPeriodo3(false)
-          }
-      }, 1.1)
-      return () => {
-        clearInterval(interval);
-      }; 
-    })
+    
 
-    React.useEffect(() => {
-      const interval = setInterval(() => {
-        if(currentDateTime.getHours() === 14){
-          setFlagPeriodo4(true)
-        }
-        if(currentDateTime.getHours() === 18 && flagPeriodo4 === true){
-            setPeriodo(periodo + 1)
-            setFlagPeriodo4(false)
-          }
-      }, 1.1)
-      return () => {
-        clearInterval(interval);
-      }; 
-    })
+    
 
+    //  Primer Periodo
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          
-          if(currentDateTime.getHours() !== 0 && currentDateTime.getHours()%6 === 0 && flagPeriodo === true){ // 
-            if(periodo !== 4){
-               setPeriodo(periodo + 1)
-            }else{
-              setPeriodo(1)
-            }
+          if(currentDateTime.getHours()  === 0 && flagPeriodo === true){ // 12 % 6 = 0, 10 % 6 = 4
+            setPeriodo(1)
             setFlagPeriodo(false)
+            setFlagPeriodo2(true)
           }
-          
-          let temp = currentDateTime;
-          temp.setSeconds(temp.getSeconds() + 1)
-          setCurrentDateTime(temp)
+          // let temp = currentDateTime;
+          // temp.setSeconds(temp.getSeconds() + 1)
+          // setCurrentDateTime(temp)
         }, 1.1)
         return () => {
           clearInterval(interval);
         }; 
       }
     }, [flightsSchedule])
+
+    // Segundo periodo
+    React.useEffect(() => {
+      if(stateButtons === 2){
+        const interval = setInterval(() => {
+          if(currentDateTime.getHours()  === 6 && flagPeriodo2 === true){ // 12 % 6 = 0, 10 % 6 = 4
+            setPeriodo(2)
+            setFlagPeriodo2(false)
+            setFlagPeriodo3(true)
+          }
+          // let temp = currentDateTime;
+          // temp.setSeconds(temp.getSeconds() + 1)
+          // setCurrentDateTime(temp)
+        }, 1.1)
+        return () => {
+          clearInterval(interval);
+        }; 
+      }
+    }, [flightsSchedule])
+
+    // Tercer Periodo
+    React.useEffect(() => {
+      const interval = setInterval(() => {
+        if(currentDateTime.getHours()  === 12 && flagPeriodo3 === true){ // 12 % 6 = 0, 10 % 6 = 4
+          setPeriodo(3)
+          setFlagPeriodo3(false)
+          setFlagPeriodo4(true)
+        }
+        // let temp = currentDateTime;
+        // temp.setSeconds(temp.getSeconds() + 1)
+        // setCurrentDateTime(temp)
+      }, 1.1)
+      return () => {
+        clearInterval(interval);
+      }; 
+    })
+
+    // Cuarto periodo
+    React.useEffect(() => {
+      const interval = setInterval(() => {
+        if(currentDateTime.getHours()  === 18 && flagPeriodo4 === true){ // 12 % 6 = 0, 10 % 6 = 4
+          setPeriodo(4)
+          setFlagPeriodo4(false)
+          setFlagPeriodo(true)
+        }
+      }, 1.1)
+      return () => {
+        clearInterval(interval);
+      }; 
+    })
+
 
     // Primera Seccion
     React.useEffect(() => {
@@ -470,6 +450,7 @@ const Simulacion5Dias = () => {
       if(stateButtons === 1){
         setIsLoading(true);
         setStateButtons(2);
+        setPeriodo(periodo + 1);
       }
       else setStateButtons(3)
       setDisableStart(true);
