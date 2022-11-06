@@ -36,3 +36,8 @@
     display: flex;
     margin-top: 20px;
 }
+
+.legend-item{
+    flex-wrap: nowrap;
+    margin-right: 10px;
+}
