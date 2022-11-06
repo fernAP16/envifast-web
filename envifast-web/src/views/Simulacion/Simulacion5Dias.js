@@ -50,6 +50,7 @@ const Simulacion5Dias = () => {
     const [flagPeriodo, setFlagPeriodo] = React.useState(true);
     const [flagPeriodo3, setFlagPeriodo3] = React.useState(false);
     const [flagPeriodo4, setFlagPeriodo4] = React.useState(false);
+    const [flightsPeriodo, setFlightsPeriodo] = React.useState(null);
 
     marker.slideTo([50, 50], {
       duration: 2000,
@@ -106,6 +107,7 @@ const Simulacion5Dias = () => {
 
     React.useEffect(() => {
       console.log("Entro al use effect para cargar vuelos, segun statebuttons: " + periodo)
+      
       if(stateButtons === 2){
         let variables = {
           fecha: startDate,
@@ -150,7 +152,7 @@ const Simulacion5Dias = () => {
       console.log("Entro al use effect para cargar vuelos, segun periodo: " + periodo)
       if(stateButtons === 2){
         let variables = {
-          fecha: startDate,
+          fecha: currentDateTime.toISOString().slice(0, 10),//startDate, // 2022-10-29
           periodo: periodo
         }
         getVuelosPorDia(variables)
@@ -183,7 +185,9 @@ const Simulacion5Dias = () => {
           setOctavaSeccion(Math.floor((8/10) * k))
           setNovenaSeccion(Math.floor((9/10) * k))
           if(isLoading === true)setIsLoading(false);
-          setFlightsSchedule(array);
+          var merge = [...flightsSchedule, ...array]
+          // setFlightsPeriodo(array)
+          setFlightsSchedule(merge)
         })
       }
     }, [periodo])
@@ -245,6 +249,7 @@ const Simulacion5Dias = () => {
     // Primera Seccion
     React.useEffect(() => {
       if(stateButtons === 2){
+        // console.log("La fecha de current time es: " + currentDateTime.toISOString().slice(0, 10))
         const interval = setInterval(() => {
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
