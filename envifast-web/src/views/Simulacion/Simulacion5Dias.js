@@ -47,6 +47,7 @@ const Simulacion5Dias = () => {
     const [periodo, setPeriodo] = React.useState(1);
     const [isLoading, setIsLoading] = React.useState(false);
     const [openPopUp, setOpenPopUp] = React.useState(false);
+    const [flagPeriodo, setFlagPeriodo] = React.useState(true);
 
     marker.slideTo([50, 50], {
       duration: 2000,
@@ -102,7 +103,7 @@ const Simulacion5Dias = () => {
     },[])
 
     React.useEffect(() => {
-      console.log("El periodo es: " + periodo)
+      console.log("Entro al use effect para cargar vuelos, segun statebuttons: " + periodo)
       if(stateButtons === 2){
         let variables = {
           fecha: startDate,
@@ -141,14 +142,67 @@ const Simulacion5Dias = () => {
           setFlightsSchedule(array);
         })
       }
-    }, [stateButtons], periodo)
+    }, [stateButtons])
+
+    React.useEffect(() => {
+      console.log("Entro al use effect para cargar vuelos, segun periodo: " + periodo)
+      if(stateButtons === 2){
+        let variables = {
+          fecha: startDate,
+          periodo: periodo
+        }
+        getVuelosPorDia(variables)
+        .then((response) => {
+          var array = [];
+          for (const element of response.data){
+            array.push(
+              {
+                id: element.id,
+                idAeropuertoOrigen: element.idAeropuertoOrigen,
+                idAeropuertoDestino: element.idAeropuertoDestino,
+                horaSalida: element.horaSalida,
+                horaLLegada: element.horaLLegada,
+                duracion: element.duracion,
+                coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+                coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
+                coordenadasActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+                estado: 0
+              }
+            )
+          };
+          var k = array.length;
+          setPrimeraSeccion(Math.floor(k/10))
+          setSegundaSeccion(Math.floor(k/5))
+          setTerceraSeccion(Math.floor((3/10) * k))
+          setCuartaSeccion(Math.floor((4/10) * k))
+          setQuintaSeccion(Math.floor( k / 2))
+          setSextaSeccion(Math.floor((6/10) * k))
+          setSeptimaSeccion(Math.floor((7/10) * k))
+          setOctavaSeccion(Math.floor((8/10) * k))
+          setNovenaSeccion(Math.floor((9/10) * k))
+          if(isLoading === true)setIsLoading(false);
+          setFlightsSchedule(array);
+        })
+      }
+    }, [periodo])
 
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          if(currentDateTime.getHours()%6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
+          console.log("La bandera tiene el valor de: " + flagPeriodo)
+          console.log("Las horas de getHours son: " + currentDateTime.getHours())
+          if(currentDateTime.getHours() !== 0 && currentDateTime.getHours()%6 === 0 && flagPeriodo === true){ // 
+            if(periodo !== 4){
+               setPeriodo(periodo + 1)
+            }else{
+              setPeriodo(1)
+            }
+            setFlagPeriodo(false)
+          }else if(currentDateTime.getHours() > 6){
+            setFlagPeriodo(true)
           }
+          
+          
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
           setCurrentDateTime(temp)
@@ -159,15 +213,12 @@ const Simulacion5Dias = () => {
       }
     }, [flightsSchedule])
 
-    ////////////////////////////////////
-
     // Primera Seccion
     React.useEffect(() => {
       if(stateButtons === 2){
-        const interval = setInterval(() => {  
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-            
+        const interval = setInterval(() => {
+          if(currentDateTime.getHours() > 6){
+            setFlagPeriodo(true)
           }
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
@@ -186,10 +237,6 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-
-          }
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
           setCurrentDateTime(temp)
@@ -208,10 +255,6 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-            
-          }
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
           setCurrentDateTime(temp)
@@ -228,10 +271,7 @@ const Simulacion5Dias = () => {
     // Cuarta Seccion
     React.useEffect(() => {
       if(stateButtons === 2){
-        const interval = setInterval(() => {
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1) 
-          }
+        const interval = setInterval(() => {          
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
           setCurrentDateTime(temp)
@@ -249,10 +289,6 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-            
-          }
           let temp = currentDateTime;
           temp.setSeconds(temp.getSeconds() + 1)
           setCurrentDateTime(temp)
@@ -270,14 +306,10 @@ const Simulacion5Dias = () => {
     // Sexta Seccion
     React.useEffect(() => {
       if(stateButtons === 2){
-        if(currentDateTime.getHours() % 6 === 0){
-          setPeriodo(periodo + 1)
-          
-        }
-        let temp = currentDateTime;
-        temp.setSeconds(temp.getSeconds() + 1)
-        setCurrentDateTime(temp)
         const interval = setInterval(() => {
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = quintaSeccion; i < sextaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -293,11 +325,9 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-          }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = sextaSeccion; i < septimaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -312,12 +342,9 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-            
-          }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = septimaSeccion; i < octavaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -332,12 +359,9 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-            
-          }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           for(var i = octavaSeccion; i < novenaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -352,11 +376,9 @@ const Simulacion5Dias = () => {
     React.useEffect(() => {
       if(stateButtons === 2){
         const interval = setInterval(() => {
-          currentDateTime.setSeconds(currentDateTime.getSeconds() + 1)
-          if(currentDateTime.getHours()  % 6 === 0 && currentDateTime.getMinutes() === 0 && currentDateTime.getSeconds() === 0){
-            setPeriodo(periodo + 1)
-          }
-          setCurrentDateTime(currentDateTime)
+          let temp = currentDateTime;
+          temp.setSeconds(temp.getSeconds() + 1)
+          setCurrentDateTime(temp)
           if(flightsSchedule !== null){
             for(var i = novenaSeccion; i < flightsSchedule.length; i++){
               show_interval(flightsSchedule[i])
@@ -369,9 +391,9 @@ const Simulacion5Dias = () => {
       }
     }, [flightsSchedule])
 
-    React.useEffect(() => {
-      console.log(currentDateTime)
-    }, [currentDateTime])
+    // React.useEffect(() => {
+    //   console.log(currentDateTime)
+    // }, [currentDateTime])
 
     React.useEffect(() => {
       console.log("El periodo es: " + periodo)
