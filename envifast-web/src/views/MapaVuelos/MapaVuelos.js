@@ -13,6 +13,10 @@ import AirplaneMarker from "./AirplaneMarker";
 import {useState} from 'react'
 import { Grid, Typography } from '@mui/material';
 import { isElementOfType } from 'react-dom/test-utils';
+import { Box } from '@mui/system';
+import { Icon } from '@iconify/react';
+import AirplaneIcon from '../../assets/icons/avion.png';
+import AirportIcon from '../../assets/icons/aeropuerto.png';
 
 const dataStory = [
     {
@@ -42,8 +46,8 @@ const dataStory = [
     });
 
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
-
     const [flightsSchedule, setFlightsSchedule] = React.useState([])
+    const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
 
     const getIcon = () => {
         return L.icon({
@@ -66,7 +70,8 @@ const dataStory = [
     }
 
     React.useEffect(() => {
-        show_interval()
+        show_interval();
+        setCurrentDateTime(new Date());
     })
 
     
@@ -133,19 +138,41 @@ const dataStory = [
 
     return (
         <div>
-            <Grid item container className='containerMapa'>
-                <Typography className='title'>Mapa de vuelos</Typography>
-                <MapContainer
-                    className="mapa-vuelo"
-                    center = {{lat: '28.058522', lng: '-20.591226'}}
-                    zoom = {2.8}
-                    minZoom = {2.0}
-                    maxZoom = {18.0}
-                >
-                    <AirportMarket/>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
-                    <AirplaneMarker data={ currentTrack ?? {}} />
-                </MapContainer>
+            <Grid display='flex'>
+                <Grid className='containerMapa'>
+                    <Typography className='title'>Mapa de vuelos</Typography>
+                    <Typography className='date-map'>{"Tiempo actual: " + currentDateTime.toLocaleString()}</Typography>
+                    <MapContainer
+                        className="mapa-vuelo"
+                        center = {{lat: '28.058522', lng: '-20.591226'}}
+                        zoom = {2.8}
+                        minZoom = {2.0}
+                        maxZoom = {18.0}
+                    >
+                        <AirportMarket/>
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
+                        <AirplaneMarker data={ currentTrack ?? {}} />
+                    </MapContainer>
+                </Grid>
+                <Box height="80px" marginLeft='15px' marginTop='20px'> 
+                    <Grid container>
+                        <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
+                    </Grid>
+                    <Grid display="flex">
+                    <Grid container className='legend-item'>
+                        <img src={AirportIcon} width="20px" height="20px"></img>
+                        <Typography>Aeropuerto</Typography>
+                    </Grid>
+                    <Grid container className='legend-item'>
+                        <img src={AirplaneIcon} width="20px" height="20px" className='object-legend'></img>
+                        <Typography>Avión</Typography>
+                    </Grid>
+                    <Grid container className='legend-item'>
+                        <Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/>
+                        <Typography>Trayectos</Typography>
+                    </Grid>
+                    </Grid>
+                </Box> 
             </Grid>
         </div>
     )
