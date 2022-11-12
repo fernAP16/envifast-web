@@ -1,12 +1,28 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import './Envios.css'
+import { getAeropuertos, registerShipment } from '../../services/envios/EnviosServices';
 
 const Envios  = (props) => {  
-    const [shipments, setShipments] = React.useState([]);
-    const [isRegistering, setIsRegistering] = React.useState(false);
+    const [shipments, setShipments] = React.useState([]);    
+    const [airportsCities, setAirportsCities] = React.useState([])
+    const [nameFrom, setNameFrom] = React.useState('');
+    const [paternalNameFrom, setPaternalNameFrom] = React.useState('');
+    const [maternalNameFrom, setMaternalNameFrom] = React.useState('');
     const [countryFrom, setCountryFrom] = React.useState('');
+    const [emailFrom, setEmailFrom] = React.useState('');
+    const [numberFrom, setNumberFrom] = React.useState('');
+    const [nameTo, setNameTo] = React.useState('');
+    const [paternalNameTo, setPaternalNameTo] = React.useState('');
+    const [maternalNameTo, setMaternalNameTo] = React.useState('');
     const [countryTo, setCountryTo] = React.useState('');
+    const [emailTo, setEmailTo] = React.useState('');
+    const [numberTo, setNumberTo] = React.useState('');
+    const [numberPackages, setNumberPackages] = React.useState('');
+    const [isRegistering, setIsRegistering] = React.useState(false);
+    const [confirmRegister, setConfirmRegister] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [shipmentRegistered, setShipmentRegistered] = React.useState(false);
 
     React.useEffect(() => {
         setShipments([{
@@ -28,27 +44,66 @@ const Envios  = (props) => {
             cantPaquetes: 1,
             fechaEnvio: new Date().toLocaleDateString()
         }])
+        getAeropuertos()
+        .then(function (response) {
+            var arrayAirports = [];
+            for (const element of response.data) {
+            arrayAirports.push({
+                id: element.id,
+                label: element.ciudad.nombre,
+            })
+            };
+            setAirportsCities(arrayAirports);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     },[])
-
-    const handleCountryFrom = (e) => {
-        setCountryFrom(e.target.value);
-    }
-
-    const handleCountryTo = (e) => {
-        setCountryTo(e.target.value);
-    }
 
     const handleRegister = () => {
         setIsRegistering(true);
     }
 
-    const handleRegisterShipment = () => {
+    const handleRegisterDialog = () => {
         setIsRegistering(false);
+        setConfirmRegister(true);
+    }
+
+    const handleConfirmRegister = () => {
+        setConfirmRegister(false);
+        // setIsLoading(true);
+        let date = new Date();
+        date.setHours(date.getHours() - 5);
+        let variables = {
+            emisorNombres: nameFrom,
+            emisorApellidoP: paternalNameFrom,
+            emisorApellidoM: maternalNameFrom,
+            emisorCorreo: emailFrom,
+            emisorTelefonoNumero: numberFrom,
+            destinatarioNombres: nameTo,
+            destinatarioApellidoP: paternalNameTo,
+            destinatarioApellidoM: maternalNameTo,
+            destinatarioCorreo: emailTo,
+            destinatarioTelefonoNumero: numberTo,
+            cantidadPaquetes: parseInt(numberPackages),
+            origen: countryFrom.id,
+            destino: countryTo.id,
+            fechaEnvio: date
+        }
+        console.log(variables);
+        registerShipment(variables)
+        .then(function (response) {
+            setIsLoading(false);
+            setShipmentRegistered(true);
+        })
+        .catch(function (error) {
+            console.log(error);
+            setIsLoading(false);
+        })
     }
 
     const handleReturn = () => {
-        setCountryFrom('');
-        setCountryTo('');
+        eraseRegisterInfo()
         setIsRegistering(false);
     }
 
@@ -56,6 +111,33 @@ const Envios  = (props) => {
         if (reason && reason === "backdropClick") 
             return;
         handleReturn();
+    }
+
+    const handleReturnConfirm = () => {
+        setConfirmRegister(false);
+        setIsRegistering(true);
+    }
+
+    const handleCloseConfirm = (event, reason) => {
+        if (reason && reason === "backdropClick") 
+            return;
+        handleReturn();
+    }
+
+    const eraseRegisterInfo = () => {
+        setNameFrom('');
+        setPaternalNameFrom('');
+        setMaternalNameFrom('');
+        setCountryFrom('');
+        setEmailFrom('');
+        setNumberFrom('');
+        setNameTo('');
+        setPaternalNameTo('');
+        setMaternalNameTo('');
+        setCountryTo('');
+        setEmailTo('');
+        setNumberTo('');
+        setNumberPackages('');
     }
 
     return (
@@ -120,6 +202,7 @@ const Envios  = (props) => {
                 </Grid>
             </Grid>
             <Dialog
+                className='dialog-register'
                 open={isRegistering}
                 onClose={handleClose}
             >
@@ -132,72 +215,137 @@ const Envios  = (props) => {
                         <Grid>
                             <Typography className='register-label'>Emisor:</Typography>
                             <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' label='Nombre' fullWidth></TextField>
+                                <Grid item xs={5}>
+                                    <TextField size='small' label='Nombres' fullWidth value={nameFrom} onChange={(e) => setNameFrom(e.target.value)}></TextField>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido paterno' fullWidth value={paternalNameFrom} onChange={(e) => setPaternalNameFrom(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido materno' fullWidth value={maternalNameFrom} onChange={(e) => setMaternalNameFrom(e.target.value)}></TextField>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                
+                                <Grid item xs={5}>
+                                    <TextField size='small' className='' label='Correo electrónico' value={emailFrom} onChange={(e) => setEmailFrom(e.target.value)} fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' className='' label='Número de celular' value={numberFrom} onChange={(e) => setNumberFrom(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
                                     <FormControl fullWidth>
                                         <InputLabel size='small'>Origen</InputLabel>
                                         <Select
                                             size='small'
                                             value={countryFrom}
                                             label='Origen'
-                                            onChange={handleCountryFrom}
+                                            onChange={(e) => setCountryFrom(e.target.value)}
                                         >
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        {airportsCities.map((airportCity) => (
+                                            <MenuItem
+                                                key={airportCity.label}
+                                                value={airportCity}
+                                            >
+                                                <Typography size="small">{airportCity.label}</Typography>
+                                            </MenuItem>
+                                        ))}
                                         </Select>
                                     </FormControl>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' className='' label='Correo electrónico' fullWidth></TextField>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField size='small' className='' label='Número de celular'></TextField>
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid>
                             <Typography className='register-label'>Destinatario:</Typography>
                             <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' label='Nombre' fullWidth></TextField>
+                                <Grid item xs={5}>
+                                    <TextField size='small' label='Nombres' fullWidth value={nameTo} onChange={(e) => setNameTo(e.target.value)}></TextField>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido paterno' fullWidth value={paternalNameTo} onChange={(e) => setPaternalNameTo(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido materno' fullWidth value={maternalNameTo} onChange={(e) => setMaternalNameTo(e.target.value)}></TextField>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={5}>
+                                    <TextField size='small' className='' label='Correo electrónico' value={emailTo} onChange={(e) => setEmailTo(e.target.value)} fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' className='' label='Número de celular' value={numberTo} onChange={(e) => setNumberTo(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
                                     <FormControl fullWidth>
                                         <InputLabel size='small'>Destino</InputLabel>
                                         <Select
                                             size='small'
                                             value={countryTo}
                                             label='Origen'
-                                            onChange={handleCountryTo}
+                                            onChange={(e) => setCountryTo(e.target.value)}
                                         >
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        {airportsCities.map((airportCity) => (
+                                            <MenuItem
+                                                key={airportCity.label}
+                                                value={airportCity}
+                                            >
+                                                <Typography size="small">{airportCity.label}</Typography>
+                                            </MenuItem>
+                                        ))}
                                         </Select>
                                     </FormControl>
                                 </Grid>
                             </Grid>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' className='' label='Correo electrónico' fullWidth></TextField>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField size='small' className='' label='Número de celular'></TextField>
-                                </Grid>
+                        </Grid>
+                        <Grid container spacing={1} className='container-textfields'>
+                            <Grid item xs={3.5}>
+                                <Typography className='register-label'>Cantidad de paquetes:</Typography>
+                            </Grid>
+                            <Grid item xs={1.5}>
+                                <TextField size='small' className='' label='Cant.' value={numberPackages} onChange={(e) => setNumberPackages(e.target.value)}></TextField>
                             </Grid>
                         </Grid>
-                        <Typography className='register-label'>Cantidad de paquetes:</Typography>
-                        <TextField size='small' className='' label='N° de paquetes'></TextField>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button className='button-cancel' variant='outlined' onClick={handleReturn}>Cancelar</Button>
-                    <Button className='button-register' onClick={handleRegisterShipment} autoFocus>Registrar</Button>
+                    <Button className='button-register' onClick={handleRegisterDialog} autoFocus>Registrar</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                className='dialog-register'
+                open={confirmRegister}
+                onClose={handleCloseConfirm}
+            >
+                <DialogContent className='content-confirm'>
+                    <Typography className='register-label'>¿Está seguro de confirmar el registro?</Typography>
+                </DialogContent>
+                <DialogActions className='actions-confirm'>
+                    <Button className='button-cancel' variant='outlined' onClick={handleReturnConfirm}>Volver</Button>
+                    <Button className='button-register confirm' onClick={handleConfirmRegister} autoFocus>Confirmar</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog 
+                open={isLoading}
+                >
+                <DialogTitle>
+                    Cargando...
+                </DialogTitle>
+                <DialogContent>
+                    <Grid item container justifyContent='center'>
+                        <CircularProgress className='loading-comp'/>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
+            <Dialog
+                className='dialog-register'
+                open={shipmentRegistered}
+            >
+                <DialogContent className='content-confirm'>
+                    <Typography className='register-label'>El envío se registró correctamente</Typography>
+                </DialogContent>
+                <DialogActions className='actions-confirm'>
+                    <Button className='button-register' onClick={() => {setShipmentRegistered(false)}} autoFocus>Volver a envíos</Button>
                 </DialogActions>
             </Dialog>
         </div>
