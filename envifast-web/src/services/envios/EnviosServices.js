@@ -87,3 +87,14 @@ export const registerShipment = (variables) => {
         obj,
     )
 }
+
+export const getShipmentsByInput = (input) => {
+    const obj = {
+        input: input
+    }
+    console.log(obj);
+    return axios.get(
+        API_URL.url + "orders?input=" + obj.input,
+        obj,
+    )
+}

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import './Envios.css'
-import { getAeropuertos, registerShipment } from '../../services/envios/EnviosServices';
+import { getAeropuertos, getShipmentsByInput, registerShipment } from '../../services/envios/EnviosServices';
 
 const Envios  = (props) => {  
     const [shipments, setShipments] = React.useState([]);    
-    const [airportsCities, setAirportsCities] = React.useState([])
+    const [airportsCities, setAirportsCities] = React.useState([]);
+    const [input, setInput] = React.useState('');
     const [nameFrom, setNameFrom] = React.useState('');
     const [paternalNameFrom, setPaternalNameFrom] = React.useState('');
     const [maternalNameFrom, setMaternalNameFrom] = React.useState('');
@@ -25,25 +26,6 @@ const Envios  = (props) => {
     const [shipmentRegistered, setShipmentRegistered] = React.useState(false);
 
     React.useEffect(() => {
-        setShipments([{
-            id: 1,
-            emisor: 'Esther Campos Bolivar',
-            destinatario: 'Salvador Banda',
-            estado: 2,
-            origen: 'Lima',
-            destino: 'Montevideo',
-            cantPaquetes: 1,
-            fechaEnvio: new Date().toLocaleDateString()
-        },{
-            id: 2,
-            emisor: 'Esther Campos Bolivar',
-            destinatario: 'Salvador Banda',
-            estado: 1,
-            origen: 'Lima',
-            destino: 'Montevideo',
-            cantPaquetes: 1,
-            fechaEnvio: new Date().toLocaleDateString()
-        }])
         getAeropuertos()
         .then(function (response) {
             var arrayAirports = [];
@@ -54,11 +36,39 @@ const Envios  = (props) => {
             })
             };
             setAirportsCities(arrayAirports);
+            getShipments()
         })
         .catch(function (error) {
             console.log(error);
         })
     },[])
+
+    const getShipments = () => {
+        console.log(input);
+        setShipments([]);
+        getShipmentsByInput(input)
+        .then(function (response) {
+            console.log(response);
+            var arrayShipments = [];
+            for (const element of response.data) {
+                arrayShipments.push({
+                id: element.id,
+                emisor: element.emisorNombres + ' ' + element.emisorApellidoP + ' ' + element.emisorApellidoM,
+                destinatario: element.destinatarioNombres + ' ' + element.destinatarioApellidoP + ' ' + element.destinatarioApellidoM,
+                estado: 0,
+                origen: element.origen.ciudad.nombre,
+                destino: element.destino.ciudad.nombre,
+                cantPaquetes: element.paquetes.length,
+                fechaEnvio: new Date(element.fechaEnvio).toLocaleDateString()
+            })
+            };
+            console.log(arrayShipments)
+            setShipments(arrayShipments);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+    }
 
     const handleRegister = () => {
         setIsRegistering(true);
@@ -146,15 +156,15 @@ const Envios  = (props) => {
                 <Typography className='title-shipment'>Envíos</Typography>
                 <Grid container className='search-actions'>
                     <Grid item xs={4}>
-                        <TextField size='small' fullWidth label='Buscar'></TextField>
+                        <TextField size='small' label='Buscar' fullWidth value={input} onChange={(e) => setInput(e.target.value)}></TextField>
                     </Grid>
                     <Grid item xs={4} className='group-buttons'>
-                        <Button className='buttons-actions'>Buscar</Button>
+                        <Button className='buttons-actions' onClick={getShipments}>Buscar</Button>
                         <Button className='buttons-actions'>Subir envíos</Button>
                         <Button className='buttons-actions' onClick={handleRegister}>Registrar envíos</Button>
                     </Grid>
                 </Grid>
-                <Grid container xs={12} >
+                <Grid container xs={12} width='1250px'>
                     <TableContainer component={Paper} className='table-shipment'>
                         <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table" size='medium'>
                             <TableHead>
@@ -167,7 +177,7 @@ const Envios  = (props) => {
                                 <TableCell className='table-shipment-header'>Ciudad de destino</TableCell>
                                 <TableCell className='table-shipment-header'>N° de paquetes</TableCell>
                                 <TableCell className='table-shipment-header'>Fecha de envío</TableCell>
-                                <TableCell className='table-shipment-header' align='center'>Acciones</TableCell>
+                                <TableCell className='table-shipment-header' align='center' width='150px'>Acciones</TableCell>
                             </TableRow>
                             </TableHead>
                             <TableBody>
@@ -191,8 +201,8 @@ const Envios  = (props) => {
                                     </TableCell>
                                     <TableCell>{shipment.origen}</TableCell>
                                     <TableCell>{shipment.destino}</TableCell>
-                                    <TableCell align='center'>{shipment.cantPaquetes}</TableCell>
-                                    <TableCell align='center'>{shipment.fechaEnvio}</TableCell>
+                                    <TableCell>{shipment.cantPaquetes}</TableCell>
+                                    <TableCell>{shipment.fechaEnvio}</TableCell>
                                     <TableCell align='center'><Button className='buttons-actions'>Ver detalle</Button></TableCell>
                                 </TableRow>
                             ))}
