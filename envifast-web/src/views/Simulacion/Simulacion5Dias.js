@@ -53,11 +53,7 @@ const Simulacion5Dias = () => {
     const [flagPeriodo4, setFlagPeriodo4] = React.useState(false);
     const [flightsPeriodo, setFlightsPeriodo] = React.useState(null);
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
-
-    marker.slideTo([50, 50], {
-      duration: 2000,
-      keepAtCenter: true,
-    });
+    const [initialDate, setInitialDate] = React.useState(null)
 
     const getIcon = () => {
         return L.icon({
@@ -108,6 +104,7 @@ const Simulacion5Dias = () => {
     },[])
 
 
+    // Llamamos para cargar los vuelos, solo se llama una vez.
     React.useEffect(() => {
       if(periodo !== 0){
         let variables = {
@@ -157,66 +154,66 @@ const Simulacion5Dias = () => {
 
     
 
-    //  Primer Periodo
-    React.useEffect(() => {
-      if(stateButtons === 2){
-        const interval = setInterval(() => {
-          if(currentDateTime.getHours()  === 0 && flagPeriodo === true){ // 12 % 6 = 0, 10 % 6 = 4
-            setPeriodo(1)
-            setFlagPeriodo(false)
-            setFlagPeriodo2(true)
-          }
-        }, 1.1)
-        return () => {
-          clearInterval(interval);
-        }; 
-      }
-    }, [flightsSchedule])
+    // //  Primer Periodo
+    // React.useEffect(() => {
+    //   if(stateButtons === 2){
+    //     const interval = setInterval(() => {
+    //       if(currentDateTime.getHours()  === 0 && flagPeriodo === true){ // 12 % 6 = 0, 10 % 6 = 4
+    //         setPeriodo(1)
+    //         setFlagPeriodo(false)
+    //         setFlagPeriodo2(true)
+    //       }
+    //     }, 1.1)
+    //     return () => {
+    //       clearInterval(interval);
+    //     }; 
+    //   }
+    // }, [flightsSchedule])
 
-    // Segundo periodo
-    React.useEffect(() => {
-      if(stateButtons === 2){
-        const interval = setInterval(() => {
-          if(currentDateTime.getHours()  === 6 && flagPeriodo2 === true){ // 12 % 6 = 0, 10 % 6 = 4
-            setPeriodo(2)
-            setFlagPeriodo2(false)
-            setFlagPeriodo3(true)
-          }
-        }, 1.1)
-        return () => {
-          clearInterval(interval);
-        }; 
-      }
-    }, [flightsSchedule])
+    // // Segundo periodo
+    // React.useEffect(() => {
+    //   if(stateButtons === 2){
+    //     const interval = setInterval(() => {
+    //       if(currentDateTime.getHours()  === 6 && flagPeriodo2 === true){ // 12 % 6 = 0, 10 % 6 = 4
+    //         setPeriodo(2)
+    //         setFlagPeriodo2(false)
+    //         setFlagPeriodo3(true)
+    //       }
+    //     }, 1.1)
+    //     return () => {
+    //       clearInterval(interval);
+    //     }; 
+    //   }
+    // }, [flightsSchedule])
 
-    // Tercer Periodo
-    React.useEffect(() => {
-      const interval = setInterval(() => {
-        if(currentDateTime.getHours()  === 12 && flagPeriodo3 === true){ // 12 % 6 = 0, 10 % 6 = 4
-          setPeriodo(3)
-          setFlagPeriodo3(false)
-          setFlagPeriodo4(true)
-        }
+    // // Tercer Periodo
+    // React.useEffect(() => {
+    //   const interval = setInterval(() => {
+    //     if(currentDateTime.getHours()  === 12 && flagPeriodo3 === true){ // 12 % 6 = 0, 10 % 6 = 4
+    //       setPeriodo(3)
+    //       setFlagPeriodo3(false)
+    //       setFlagPeriodo4(true)
+    //     }
         
-      }, 1.1)
-      return () => {
-        clearInterval(interval);
-      }; 
-    })
+    //   }, 1.1)
+    //   return () => {
+    //     clearInterval(interval);
+    //   }; 
+    // })
 
-    // Cuarto periodo
-    React.useEffect(() => {
-      const interval = setInterval(() => {
-        if(currentDateTime.getHours()  === 18 && flagPeriodo4 === true){ // 12 % 6 = 0, 10 % 6 = 4
-          setPeriodo(4)
-          setFlagPeriodo4(false)
-          setFlagPeriodo(true)
-        }
-      }, 1.1)
-      return () => {
-        clearInterval(interval);
-      }; 
-    })
+    // // Cuarto periodo
+    // React.useEffect(() => {
+    //   const interval = setInterval(() => {
+    //     if(currentDateTime.getHours()  === 18 && flagPeriodo4 === true){ // 12 % 6 = 0, 10 % 6 = 4
+    //       setPeriodo(4)
+    //       setFlagPeriodo4(false)
+    //       setFlagPeriodo(true)
+    //     }
+    //   }, 1.1)
+    //   return () => {
+    //     clearInterval(interval);
+    //   }; 
+    // })
 
 
     // Contador que modificara el tiempo:
@@ -376,7 +373,14 @@ const Simulacion5Dias = () => {
 
     
     const show_interval = (flightSchedule) => {
-      if(flightSchedule.estado === 2) return;
+      if(flightSchedule.estado === 2) {
+        // AL PARECER ESTA CONDICIONAL NO FUNCIONA
+        // if(currentDateTime.getDate() > initialDate.getDate()){
+        //   flightSchedule.estado = 0
+        // }
+        return;
+      }
+
       let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
       let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
       let dateInicio = new Date(JSON.parse(jsonSalida))
@@ -421,25 +425,12 @@ const Simulacion5Dias = () => {
       setDisableStart(true);
     }
 
-    const handlePause = () => {
-      setStateButtons(3);
-      setDisableStart(false);
-      setDisablePause(true);
-      setDisableStop(false);
-    }
-
-    const handleStop = () => {
-      setStateButtons(4);
-      setDisableStart(false);
-      setDisablePause(true);
-      setDisableStop(true);
-    }
-
     const handleDate = event => {
       console.log(event.target.value)
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
       setCurrentDateTime(new Date(event.target.value + ' 00:00:00'));
+      setInitialDate(new Date(event.target.value))
       setStateButtons(1);
       setDisableStart(false);
     }
@@ -453,8 +444,8 @@ const Simulacion5Dias = () => {
         <div>
           <Grid display='flex'>
             <Grid item className='containerMapa'>
-              <Typography className='title'>Simulación de 5 días</Typography>
-              <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm:ss')}</Typography>
+              {/* <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm')}</Typography> */}
+              <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm')}</Typography>
               <MapContainer
                   className="mapa-vuelo"
                   center = {{lat: '28.058522', lng: '-20.591226'}}
@@ -489,8 +480,8 @@ const Simulacion5Dias = () => {
               <Grid className='container-buttons' display='flex' alignItems='center'> 
                 <Typography fontWeight="bold" position='relative'>Controles</Typography>
                 <Button className={'button-control button-play ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>INICIAR</Button>
-                <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause} onClick={handlePause}>PAUSAR</Button>
-                <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop} onClick={handleStop}>DETENER</Button>
+                {/* <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause} onClick={handlePause}>PAUSAR</Button>
+                <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop} onClick={handleStop}>DETENER</Button> */}
               </Grid> 
               <Grid container xs={12} alignItems='center'>
                 <Grid container xs={5}>
