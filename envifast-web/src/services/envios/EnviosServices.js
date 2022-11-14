@@ -9,13 +9,14 @@ export const getCoordenadasAeropuertos = () => {
     );
 }
 
+// tiene la siguiente forma: http://localhost:8081/flights/dayFlightsFive/{fecha} {paraSim}?fecha=2022-11-10&paraSim=1
 export const getVuelosPorDia = (variables) => {
     const obj = {
         fecha: variables.fecha,
-        periodo: variables.periodo
+        paraSim: variables.paraSim
     }
     return axios.get(
-        API_URL.url + "flights/{fecha} {per}?fecha=" + obj.fecha + "&per=" + obj.periodo,
+        API_URL.url + "flights/dayFlightsFive/{fecha} {paraSim}?fecha=" + obj.fecha + "&paraSim=" + obj.paraSim,
     );
 }
 
