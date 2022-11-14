@@ -444,7 +444,7 @@ const Simulacion5Dias = () => {
         <div>
           <Grid display='flex'>
             <Grid item className='containerMapa'>
-              {/* <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm')}</Typography> */}
+              <Typography className='title'>Simulación de 5 días</Typography>
               <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm')}</Typography>
               <MapContainer
                   className="mapa-vuelo"
