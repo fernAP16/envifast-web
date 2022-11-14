@@ -41,3 +41,32 @@
     flex-wrap: nowrap;
     margin-right: 10px;
 }
+
+.table-flights-now{
+    height: 547px;
+    width: 355px;
+    overflow-y: scroll;
+}
+
+.table-flights-now::-webkit-scrollbar {
+    width: 10px;
+}
+
+.table-flights-now::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+  /* Handle */
+.table-flights-now::-webkit-scrollbar-thumb {
+    background: #888;
+}
+  
+  /* Handle on hover */
+.table-flights-now::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.table-flights-now-cell{
+    justify-content: center;
+    padding: 8px;
+}

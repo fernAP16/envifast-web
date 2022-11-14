@@ -1,54 +1,119 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import './Envios.css'
+import { getAeropuertos, getShipmentsByInput, registerShipment } from '../../services/envios/EnviosServices';
 
 const Envios  = (props) => {  
-    const [shipments, setShipments] = React.useState([]);
-    const [isRegistering, setIsRegistering] = React.useState(false);
+    const [shipments, setShipments] = React.useState([]);    
+    const [airportsCities, setAirportsCities] = React.useState([]);
+    const [input, setInput] = React.useState('');
+    const [nameFrom, setNameFrom] = React.useState('');
+    const [paternalNameFrom, setPaternalNameFrom] = React.useState('');
+    const [maternalNameFrom, setMaternalNameFrom] = React.useState('');
     const [countryFrom, setCountryFrom] = React.useState('');
+    const [emailFrom, setEmailFrom] = React.useState('');
+    const [numberFrom, setNumberFrom] = React.useState('');
+    const [nameTo, setNameTo] = React.useState('');
+    const [paternalNameTo, setPaternalNameTo] = React.useState('');
+    const [maternalNameTo, setMaternalNameTo] = React.useState('');
     const [countryTo, setCountryTo] = React.useState('');
+    const [emailTo, setEmailTo] = React.useState('');
+    const [numberTo, setNumberTo] = React.useState('');
+    const [numberPackages, setNumberPackages] = React.useState('');
+    const [isRegistering, setIsRegistering] = React.useState(false);
+    const [confirmRegister, setConfirmRegister] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [shipmentRegistered, setShipmentRegistered] = React.useState(false);
 
     React.useEffect(() => {
-        setShipments([{
-            id: 1,
-            emisor: 'Esther Campos Bolivar',
-            destinatario: 'Salvador Banda',
-            estado: 2,
-            origen: 'Lima',
-            destino: 'Montevideo',
-            cantPaquetes: 1,
-            fechaEnvio: new Date().toLocaleDateString()
-        },{
-            id: 2,
-            emisor: 'Esther Campos Bolivar',
-            destinatario: 'Salvador Banda',
-            estado: 1,
-            origen: 'Lima',
-            destino: 'Montevideo',
-            cantPaquetes: 1,
-            fechaEnvio: new Date().toLocaleDateString()
-        }])
+        getAeropuertos()
+        .then(function (response) {
+            var arrayAirports = [];
+            for (const element of response.data) {
+            arrayAirports.push({
+                id: element.id,
+                label: element.ciudad.nombre,
+            })
+            };
+            setAirportsCities(arrayAirports);
+            getShipments()
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     },[])
 
-    const handleCountryFrom = (e) => {
-        setCountryFrom(e.target.value);
-    }
-
-    const handleCountryTo = (e) => {
-        setCountryTo(e.target.value);
+    const getShipments = () => {
+        console.log(input);
+        setShipments([]);
+        getShipmentsByInput(input)
+        .then(function (response) {
+            console.log(response);
+            var arrayShipments = [];
+            for (const element of response.data) {
+                arrayShipments.push({
+                id: element.id,
+                emisor: element.emisorNombres + ' ' + element.emisorApellidoP + ' ' + element.emisorApellidoM,
+                destinatario: element.destinatarioNombres + ' ' + element.destinatarioApellidoP + ' ' + element.destinatarioApellidoM,
+                estado: 0,
+                origen: element.origen.ciudad.nombre,
+                destino: element.destino.ciudad.nombre,
+                cantPaquetes: element.paquetes.length,
+                fechaEnvio: new Date(element.fechaEnvio).toLocaleDateString()
+            })
+            };
+            console.log(arrayShipments)
+            setShipments(arrayShipments);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     }
 
     const handleRegister = () => {
         setIsRegistering(true);
     }
 
-    const handleRegisterShipment = () => {
+    const handleRegisterDialog = () => {
         setIsRegistering(false);
+        setConfirmRegister(true);
+    }
+
+    const handleConfirmRegister = () => {
+        setConfirmRegister(false);
+        // setIsLoading(true);
+        let date = new Date();
+        date.setHours(date.getHours() - 5);
+        let variables = {
+            emisorNombres: nameFrom,
+            emisorApellidoP: paternalNameFrom,
+            emisorApellidoM: maternalNameFrom,
+            emisorCorreo: emailFrom,
+            emisorTelefonoNumero: numberFrom,
+            destinatarioNombres: nameTo,
+            destinatarioApellidoP: paternalNameTo,
+            destinatarioApellidoM: maternalNameTo,
+            destinatarioCorreo: emailTo,
+            destinatarioTelefonoNumero: numberTo,
+            cantidadPaquetes: parseInt(numberPackages),
+            origen: countryFrom.id,
+            destino: countryTo.id,
+            fechaEnvio: date
+        }
+        console.log(variables);
+        registerShipment(variables)
+        .then(function (response) {
+            setIsLoading(false);
+            setShipmentRegistered(true);
+        })
+        .catch(function (error) {
+            console.log(error);
+            setIsLoading(false);
+        })
     }
 
     const handleReturn = () => {
-        setCountryFrom('');
-        setCountryTo('');
+        eraseRegisterInfo()
         setIsRegistering(false);
     }
 
@@ -58,21 +123,48 @@ const Envios  = (props) => {
         handleReturn();
     }
 
+    const handleReturnConfirm = () => {
+        setConfirmRegister(false);
+        setIsRegistering(true);
+    }
+
+    const handleCloseConfirm = (event, reason) => {
+        if (reason && reason === "backdropClick") 
+            return;
+        handleReturn();
+    }
+
+    const eraseRegisterInfo = () => {
+        setNameFrom('');
+        setPaternalNameFrom('');
+        setMaternalNameFrom('');
+        setCountryFrom('');
+        setEmailFrom('');
+        setNumberFrom('');
+        setNameTo('');
+        setPaternalNameTo('');
+        setMaternalNameTo('');
+        setCountryTo('');
+        setEmailTo('');
+        setNumberTo('');
+        setNumberPackages('');
+    }
+
     return (
         <div>
             <Grid className='container-shipment'>
                 <Typography className='title-shipment'>Envíos</Typography>
                 <Grid container className='search-actions'>
                     <Grid item xs={4}>
-                        <TextField size='small' fullWidth label='Buscar'></TextField>
+                        <TextField size='small' label='Buscar' fullWidth value={input} onChange={(e) => setInput(e.target.value)}></TextField>
                     </Grid>
                     <Grid item xs={4} className='group-buttons'>
-                        <Button className='buttons-actions'>Buscar</Button>
+                        <Button className='buttons-actions' onClick={getShipments}>Buscar</Button>
                         <Button className='buttons-actions'>Subir envíos</Button>
                         <Button className='buttons-actions' onClick={handleRegister}>Registrar envíos</Button>
                     </Grid>
                 </Grid>
-                <Grid container xs={12} >
+                <Grid container xs={12} width='1250px'>
                     <TableContainer component={Paper} className='table-shipment'>
                         <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table" size='medium'>
                             <TableHead>
@@ -85,7 +177,7 @@ const Envios  = (props) => {
                                 <TableCell className='table-shipment-header'>Ciudad de destino</TableCell>
                                 <TableCell className='table-shipment-header'>N° de paquetes</TableCell>
                                 <TableCell className='table-shipment-header'>Fecha de envío</TableCell>
-                                <TableCell className='table-shipment-header' align='center'>Acciones</TableCell>
+                                <TableCell className='table-shipment-header' align='center' width='150px'>Acciones</TableCell>
                             </TableRow>
                             </TableHead>
                             <TableBody>
@@ -109,8 +201,8 @@ const Envios  = (props) => {
                                     </TableCell>
                                     <TableCell>{shipment.origen}</TableCell>
                                     <TableCell>{shipment.destino}</TableCell>
-                                    <TableCell align='center'>{shipment.cantPaquetes}</TableCell>
-                                    <TableCell align='center'>{shipment.fechaEnvio}</TableCell>
+                                    <TableCell>{shipment.cantPaquetes}</TableCell>
+                                    <TableCell>{shipment.fechaEnvio}</TableCell>
                                     <TableCell align='center'><Button className='buttons-actions'>Ver detalle</Button></TableCell>
                                 </TableRow>
                             ))}
@@ -120,6 +212,7 @@ const Envios  = (props) => {
                 </Grid>
             </Grid>
             <Dialog
+                className='dialog-register'
                 open={isRegistering}
                 onClose={handleClose}
             >
@@ -132,72 +225,137 @@ const Envios  = (props) => {
                         <Grid>
                             <Typography className='register-label'>Emisor:</Typography>
                             <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' label='Nombre' fullWidth></TextField>
+                                <Grid item xs={5}>
+                                    <TextField size='small' label='Nombres' fullWidth value={nameFrom} onChange={(e) => setNameFrom(e.target.value)}></TextField>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido paterno' fullWidth value={paternalNameFrom} onChange={(e) => setPaternalNameFrom(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido materno' fullWidth value={maternalNameFrom} onChange={(e) => setMaternalNameFrom(e.target.value)}></TextField>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                
+                                <Grid item xs={5}>
+                                    <TextField size='small' className='' label='Correo electrónico' value={emailFrom} onChange={(e) => setEmailFrom(e.target.value)} fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' className='' label='Número de celular' value={numberFrom} onChange={(e) => setNumberFrom(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
                                     <FormControl fullWidth>
                                         <InputLabel size='small'>Origen</InputLabel>
                                         <Select
                                             size='small'
                                             value={countryFrom}
                                             label='Origen'
-                                            onChange={handleCountryFrom}
+                                            onChange={(e) => setCountryFrom(e.target.value)}
                                         >
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        {airportsCities.map((airportCity) => (
+                                            <MenuItem
+                                                key={airportCity.label}
+                                                value={airportCity}
+                                            >
+                                                <Typography size="small">{airportCity.label}</Typography>
+                                            </MenuItem>
+                                        ))}
                                         </Select>
                                     </FormControl>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' className='' label='Correo electrónico' fullWidth></TextField>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField size='small' className='' label='Número de celular'></TextField>
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid>
                             <Typography className='register-label'>Destinatario:</Typography>
                             <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' label='Nombre' fullWidth></TextField>
+                                <Grid item xs={5}>
+                                    <TextField size='small' label='Nombres' fullWidth value={nameTo} onChange={(e) => setNameTo(e.target.value)}></TextField>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido paterno' fullWidth value={paternalNameTo} onChange={(e) => setPaternalNameTo(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' label='Apellido materno' fullWidth value={maternalNameTo} onChange={(e) => setMaternalNameTo(e.target.value)}></TextField>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={5}>
+                                    <TextField size='small' className='' label='Correo electrónico' value={emailTo} onChange={(e) => setEmailTo(e.target.value)} fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
+                                    <TextField size='small' className='' label='Número de celular' value={numberTo} onChange={(e) => setNumberTo(e.target.value)}></TextField>
+                                </Grid>
+                                <Grid item xs={3.5}>
                                     <FormControl fullWidth>
                                         <InputLabel size='small'>Destino</InputLabel>
                                         <Select
                                             size='small'
                                             value={countryTo}
                                             label='Origen'
-                                            onChange={handleCountryTo}
+                                            onChange={(e) => setCountryTo(e.target.value)}
                                         >
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        {airportsCities.map((airportCity) => (
+                                            <MenuItem
+                                                key={airportCity.label}
+                                                value={airportCity}
+                                            >
+                                                <Typography size="small">{airportCity.label}</Typography>
+                                            </MenuItem>
+                                        ))}
                                         </Select>
                                     </FormControl>
                                 </Grid>
                             </Grid>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' className='' label='Correo electrónico' fullWidth></TextField>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField size='small' className='' label='Número de celular'></TextField>
-                                </Grid>
+                        </Grid>
+                        <Grid container spacing={1} className='container-textfields'>
+                            <Grid item xs={3.5}>
+                                <Typography className='register-label'>Cantidad de paquetes:</Typography>
+                            </Grid>
+                            <Grid item xs={1.5}>
+                                <TextField size='small' className='' label='Cant.' value={numberPackages} onChange={(e) => setNumberPackages(e.target.value)}></TextField>
                             </Grid>
                         </Grid>
-                        <Typography className='register-label'>Cantidad de paquetes:</Typography>
-                        <TextField size='small' className='' label='N° de paquetes'></TextField>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button className='button-cancel' variant='outlined' onClick={handleReturn}>Cancelar</Button>
-                    <Button className='button-register' onClick={handleRegisterShipment} autoFocus>Registrar</Button>
+                    <Button className='button-register' onClick={handleRegisterDialog} autoFocus>Registrar</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                className='dialog-register'
+                open={confirmRegister}
+                onClose={handleCloseConfirm}
+            >
+                <DialogContent className='content-confirm'>
+                    <Typography className='register-label'>¿Está seguro de confirmar el registro?</Typography>
+                </DialogContent>
+                <DialogActions className='actions-confirm'>
+                    <Button className='button-cancel' variant='outlined' onClick={handleReturnConfirm}>Volver</Button>
+                    <Button className='button-register confirm' onClick={handleConfirmRegister} autoFocus>Confirmar</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog 
+                open={isLoading}
+                >
+                <DialogTitle>
+                    Cargando...
+                </DialogTitle>
+                <DialogContent>
+                    <Grid item container justifyContent='center'>
+                        <CircularProgress className='loading-comp'/>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
+            <Dialog
+                className='dialog-register'
+                open={shipmentRegistered}
+            >
+                <DialogContent className='content-confirm'>
+                    <Typography className='register-label'>El envío se registró correctamente</Typography>
+                </DialogContent>
+                <DialogActions className='actions-confirm'>
+                    <Button className='button-register' onClick={() => {setShipmentRegistered(false)}} autoFocus>Volver a envíos</Button>
                 </DialogActions>
             </Dialog>
         </div>
