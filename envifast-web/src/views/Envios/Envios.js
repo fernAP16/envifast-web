@@ -4,7 +4,7 @@ import './Envios.css'
 import { getAeropuertos, getShipmentsByInput, registerShipment } from '../../services/envios/EnviosServices';
 
 const Envios  = (props) => {  
-    const [shipments, setShipments] = React.useState([]);    
+    const [shipments, setShipments] = React.useState([]);
     const [airportsCities, setAirportsCities] = React.useState([]);
     const [input, setInput] = React.useState('');
     const [nameFrom, setNameFrom] = React.useState('');
@@ -20,10 +20,12 @@ const Envios  = (props) => {
     const [emailTo, setEmailTo] = React.useState('');
     const [numberTo, setNumberTo] = React.useState('');
     const [numberPackages, setNumberPackages] = React.useState('');
+    const [shipmentDetail, setShipmentDetail] = React.useState(null);
     const [isRegistering, setIsRegistering] = React.useState(false);
     const [confirmRegister, setConfirmRegister] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [shipmentRegistered, setShipmentRegistered] = React.useState(false);
+    const [isDetail, setIsDetail] = React.useState(false);
 
     React.useEffect(() => {
         getAeropuertos()
@@ -52,15 +54,22 @@ const Envios  = (props) => {
             var arrayShipments = [];
             for (const element of response.data) {
                 arrayShipments.push({
-                id: element.id,
-                emisor: element.emisorNombres + ' ' + element.emisorApellidoP + ' ' + element.emisorApellidoM,
-                destinatario: element.destinatarioNombres + ' ' + element.destinatarioApellidoP + ' ' + element.destinatarioApellidoM,
-                estado: 0,
-                origen: element.origen.ciudad.nombre,
-                destino: element.destino.ciudad.nombre,
-                cantPaquetes: element.paquetes.length,
-                fechaEnvio: new Date(element.fechaEnvio).toLocaleDateString()
-            })
+                    id: element.id,
+                    codigo: element.codigo,
+                    nombreEmisor: element.emisorNombres + ' ' + element.emisorApellidoP + ' ' + element.emisorApellidoM,
+                    correoEmisor: element.emisorCorreo,
+                    numeroEmisor: element.emisorTelefonoNumero,
+                    nombreDestinatario: element.destinatarioNombres + ' ' + element.destinatarioApellidoP + ' ' + element.destinatarioApellidoM,
+                    correoDestinatario: element.destinatarioCorreo,
+                    telefonoDestinatario: element.destinatarioTelefonoNumero,
+                    paquetes: element.paquetes,
+                    estado: 0, // Cambiar para que tenga sentido
+                    origen: element.origen,
+                    destino: element.destino,
+                    cantPaquetes: element.paquetes.length,
+                    fechaEnvio: new Date(element.fechaEnvio).toLocaleDateString(),
+                    tiempoTotal: element.tiempoTotal
+                })
             };
             console.log(arrayShipments)
             setShipments(arrayShipments);
@@ -150,6 +159,11 @@ const Envios  = (props) => {
         setNumberPackages('');
     }
 
+    const handleVerDetalle = (shipment) => {
+        setShipmentDetail(shipment);
+        setIsDetail(true);
+    }
+
     return (
         <div>
             <Grid className='container-shipment'>
@@ -169,7 +183,7 @@ const Envios  = (props) => {
                         <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table" size='medium'>
                             <TableHead>
                             <TableRow>
-                                <TableCell className='table-shipment-header' >ID</TableCell>
+                                <TableCell className='table-shipment-header'>N°</TableCell>
                                 <TableCell className='table-shipment-header'>Emisor</TableCell>
                                 <TableCell className='table-shipment-header'>Destinatario</TableCell>
                                 <TableCell className='table-shipment-header'>Estado del envío</TableCell>
@@ -181,14 +195,14 @@ const Envios  = (props) => {
                             </TableRow>
                             </TableHead>
                             <TableBody>
-                            {shipments.map((shipment) => (
+                            {shipments.map((shipment, index) => (
                                 <TableRow
                                     key={shipment.name}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell component="th" scope="row">{shipment.id}</TableCell>
-                                    <TableCell>{shipment.emisor}</TableCell>
-                                    <TableCell>{shipment.destinatario}</TableCell>
+                                    <TableCell component="th" scope="row">{index+1}</TableCell>
+                                    <TableCell>{shipment.nombreEmisor}</TableCell>
+                                    <TableCell>{shipment.nombreDestinatario}</TableCell>
                                     <TableCell align='center'>
                                         <Grid justifyContent='center'>
                                             <Typography className='table-state'
@@ -199,11 +213,11 @@ const Envios  = (props) => {
                                             </Typography>  
                                         </Grid> 
                                     </TableCell>
-                                    <TableCell>{shipment.origen}</TableCell>
-                                    <TableCell>{shipment.destino}</TableCell>
+                                    <TableCell>{shipment.origen.ciudad.nombre}</TableCell>
+                                    <TableCell>{shipment.destino.ciudad.nombre}</TableCell>
                                     <TableCell>{shipment.cantPaquetes}</TableCell>
                                     <TableCell>{shipment.fechaEnvio}</TableCell>
-                                    <TableCell align='center'><Button className='buttons-actions'>Ver detalle</Button></TableCell>
+                                    <TableCell align='center'><Button className='buttons-actions' onClick={() => handleVerDetalle(shipment)}>Ver detalle</Button></TableCell>
                                 </TableRow>
                             ))}
                             </TableBody>
@@ -355,11 +369,72 @@ const Envios  = (props) => {
                     <Typography className='register-label'>El envío se registró correctamente</Typography>
                 </DialogContent>
                 <DialogActions className='actions-confirm'>
-                    <Button className='button-register' onClick={() => {setShipmentRegistered(false)}} autoFocus>Volver a envíos</Button>
+                    <Button className='button-register' onClick={() => {setShipmentRegistered(false);getShipments()}} autoFocus>Volver a envíos</Button>
                 </DialogActions>
             </Dialog>
+            {shipmentDetail &&
+            <Dialog 
+                open={isDetail}
+                >
+                <DialogTitle>
+                    {'Detalle del envío ' + shipmentDetail.codigo}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="register-dialog-description">
+                        <Grid>
+                            <Typography className='register-label'>Emisor:</Typography>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' className='input-' label='Nombre completo' fullWidth value={shipmentDetail.nombreEmisor} disabled={true}></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField size='small' label='Ciudad' fullWidth value={shipmentDetail.origen.ciudad.nombre}  disabled={true}></TextField>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' className='' label='Correo electrónico' value={shipmentDetail.correoEmisor} disabled={true} fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField size='small' className='' label='Número de celular' value={shipmentDetail.numeroEmisor} disabled={true} fullWidth></TextField>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid>
+                            <Typography className='register-label'>Destinatario:</Typography>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' label='Nombre completo' fullWidth value={shipmentDetail.nombreDestinatario} disabled={true}></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField size='small' label='Ciudad' fullWidth value={shipmentDetail.destino.ciudad.nombre}  disabled={true}></TextField>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={1} className='container-textfields'>
+                                <Grid item xs={8}>
+                                    <TextField size='small' className='' label='Correo electrónico' value={shipmentDetail.correoDestinatario} disabled={true} fullWidth></TextField>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField size='small' className='' label='Número de celular' value={shipmentDetail.telefonoDestinatario} disabled={true} fullWidth></TextField>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid container spacing={1} className='container-textfields'>
+                            <Grid item xs={4}>
+                                <Typography className='register-label'>N° de paquetes:</Typography>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <TextField size='small' className='' label='Cant.' value={shipmentDetail.cantPaquetes} disabled={true}></TextField>
+                            </Grid>
+                        </Grid>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions className='actions-confirm'>
+                    <Button className='button-register' onClick={() => setIsDetail(false)} autoFocus>Volver</Button>
+                </DialogActions>
+            </Dialog>
+            }
         </div>
-    
     );
 }
 export default Envios;
