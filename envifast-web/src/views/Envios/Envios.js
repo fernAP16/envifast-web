@@ -26,6 +26,7 @@ const Envios  = (props) => {
     const [isLoading, setIsLoading] = React.useState(false);
     const [shipmentRegistered, setShipmentRegistered] = React.useState(false);
     const [isDetail, setIsDetail] = React.useState(false);
+    const [isLoadingInit, setIsLoadingInit] = React.useState(true);
 
     React.useEffect(() => {
         getAeropuertos()
@@ -73,6 +74,7 @@ const Envios  = (props) => {
             };
             console.log(arrayShipments)
             setShipments(arrayShipments);
+            setIsLoadingInit(false);
         })
         .catch(function (error) {
             console.log(error);
@@ -434,6 +436,16 @@ const Envios  = (props) => {
                 </DialogActions>
             </Dialog>
             }
+            <Dialog open={isLoadingInit}>
+                <DialogTitle>
+                    Cargando...
+                </DialogTitle>
+                <DialogContent>
+                    <Grid item container justifyContent='center'>
+                        <CircularProgress className='loading-comp'/>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
