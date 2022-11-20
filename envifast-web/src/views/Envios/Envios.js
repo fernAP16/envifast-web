@@ -186,8 +186,8 @@ const Envios  = (props) => {
                             <TableHead>
                             <TableRow>
                                 <TableCell className='table-shipment-header'>N°</TableCell>
-                                <TableCell className='table-shipment-header'>Emisor</TableCell>
-                                <TableCell className='table-shipment-header'>Destinatario</TableCell>
+                                <TableCell className='table-shipment-header' width='150px'>Emisor</TableCell>
+                                <TableCell className='table-shipment-header' width='150px'>Destinatario</TableCell>
                                 <TableCell className='table-shipment-header'>Estado del envío</TableCell>
                                 <TableCell className='table-shipment-header'>Ciudad de origen</TableCell>
                                 <TableCell className='table-shipment-header'>Ciudad de destino</TableCell>
