@@ -54,6 +54,7 @@ const Simulacion5Dias = () => {
     const [flightsPeriodo, setFlightsPeriodo] = React.useState(null);
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
     const [initialDate, setInitialDate] = React.useState(null)
+    const [diferenciaDias, setDiferenciaDias] = React.useState(1)
 
     const getIcon = () => {
         return L.icon({
@@ -216,11 +217,12 @@ const Simulacion5Dias = () => {
     // })
 
 
+
     // Contador que modificara el tiempo:
     React.useEffect(() => {
       const interval = setInterval(() => {
         let temp = currentDateTime;
-        temp.setMinutes(temp.getMinutes() + 1)
+        temp.setMinutes(temp.getMinutes() + 2)
         setCurrentDateTime(temp)
       }, 200) 
       return () => {
@@ -371,13 +373,34 @@ const Simulacion5Dias = () => {
       }
     })
 
-    
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    }
     const show_interval = (flightSchedule) => {
       if(flightSchedule.estado === 2) {
+        
         // AL PARECER ESTA CONDICIONAL NO FUNCIONA
-        // if(currentDateTime.getDate() > initialDate.getDate()){
-        //   flightSchedule.estado = 0
-        // }
+        if(currentDateTime.getDate() > initialDate.getDate()){
+          console.log("Entro a este if")
+          flightSchedule.estado = 0
+          flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
+          flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
+          // HORA SALIDA ES UN STRING NO UN DATE
+          let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
+          let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
+          diaSalida += 1
+          diaLlegada += 1
+          let stringSalida = diaSalida.toString()
+          let stringLlegada = diaLlegada.toString()
+          flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
+          flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
+          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
+          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
+          // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
+          // // flightSchedule.horaSalida.setDate(flightSchedule.horaSalida.getDate() + 1)
+          // // flightSchedule.horaLLegada.setDate(flightSchedule.horaLLegada.getDate() + 1)
+          console.log("La hora de salida es: " + flightSchedule.horaSalida)
+        }
         return;
       }
 
@@ -430,7 +453,7 @@ const Simulacion5Dias = () => {
       setStartDate(event.target.value);
       setStartDateString(formatDate(event.target.value));
       setCurrentDateTime(new Date(event.target.value + ' 00:00:00'));
-      setInitialDate(new Date(event.target.value))
+      setInitialDate(new Date(event.target.value + ' 00:00:00'))
       setStateButtons(1);
       setDisableStart(false);
     }
