@@ -405,7 +405,7 @@ const Simulacion5Dias = () => {
       let filtered = flightsSchedule.filter(function (flight) { 
         return airportsCoordinates[flight.idAeropuertoOrigen-1].cityName.indexOf(value) !== -1 
           || airportsCoordinates[flight.idAeropuertoDestino-1].cityName.indexOf(value) !== -1 ; 
-      }).slice(0,10);
+      }).slice(0,20);
       setSearchTable(filtered);
     }
 
