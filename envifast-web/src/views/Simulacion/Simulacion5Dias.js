@@ -55,6 +55,7 @@ const Simulacion5Dias = () => {
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
     const [initialDate, setInitialDate] = React.useState(null)
     const [diferenciaDias, setDiferenciaDias] = React.useState(1)
+    const [lapsoPlanificador, setLapsoPlanificador] = React.useState(0)
 
     const getIcon = () => {
         return L.icon({
@@ -216,7 +217,39 @@ const Simulacion5Dias = () => {
     //   }; 
     // })
 
+    // Como hacemos el codigo para ejecutar la api cada cierto tiempo?
+    // api para el planificador
+    // fecha: 2022-11-21
+    // horaInicio: 09:54
+    // horaFin: 09:54
+    // paraSIm: 1
 
+    // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
+    React.useEffect(() => {
+
+      if(currentDateTime != null){
+        let fecha = currentDateTime.toISOString().split('T')[0]
+        // let horaInicio = currentDateTime.toISOString().split('T')[1].substring(0, 5) // substr si es inclusivo, si incluye el ultimo indice
+        let horaInicioDate = new Date(fecha)
+        horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
+        // para la hora final tenemos que hacer una serie de calculos
+        
+        // lapso planificador sera el que nos dara la hora limite del rango
+        let horaFinDate =  new Date(fecha)
+        horaFinDate.setHours(lapsoPlanificador * 4 - 5)
+
+        let horaFin = horaFinDate.toISOString().split('T')[1].substring(0, 5)
+        let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
+        // ahora imprimimos todos los atributos para ver si estan bien
+        // console.log("Hora en ISO: " + currentDateTime.toISOString().split('T')[1])
+        console.log(fecha)
+        console.log(horaInicio)
+        console.log(horaFin)
+        // NO SE ESTA EJECC
+
+      }
+      
+    }, [lapsoPlanificador])
 
     // Contador que modificara el tiempo:
     React.useEffect(() => {
@@ -224,11 +257,21 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         temp.setMinutes(temp.getMinutes() + 2)
         setCurrentDateTime(temp)
+        if(temp.getHours() % 4 === 0){ //
+          console.log("La hora en que entra a este if" + temp.getHours()) // solo entra cuando es 0, Porque?s
+          if(lapsoPlanificador === 6){
+            setLapsoPlanificador(1) // para el siguiente dia
+          }else{
+            setLapsoPlanificador(lapsoPlanificador + 1)
+          }
+        }
       }, 200) 
       return () => {
         clearInterval(interval);
       };
     }, [flagInicioContador])
+
+    
 
     // Primera Seccion
     React.useEffect(() => {
