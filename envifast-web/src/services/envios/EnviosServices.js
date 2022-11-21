@@ -99,3 +99,15 @@ export const getShipmentsByInput = (input) => {
         obj,
     )
 }
+
+export const registerFlights = (variables) => {
+    return axios.post(
+        API_URL.url + "flights/generate?fecha=" + variables.date + "&dias=" + variables.days + "&paraSim=" + variables.paraSim
+    )
+}
+
+export const registerDateTimes = (variables) => {
+    return axios.get(
+        API_URL.url + "airports/dateTimes?fecha=" + variables.date + "&dias=" + variables.days + "&paraSim=" + variables.paraSim
+    )
+}
