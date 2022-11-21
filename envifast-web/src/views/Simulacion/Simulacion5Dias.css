@@ -94,3 +94,9 @@
 .loading-comp{
     color: #19D2A6;
 }
+
+.table-collapse-flights{
+    height: 425px;
+    width: 355px;
+    overflow-y: scroll;
+}
