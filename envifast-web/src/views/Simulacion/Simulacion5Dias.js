@@ -153,82 +153,7 @@ const Simulacion5Dias = () => {
           console.log(error);
       })
       }
-    }, [stateButtons])
-
-    
-
-    
-
-    // //  Primer Periodo
-    // React.useEffect(() => {
-    //   if(stateButtons === 2){
-    //     const interval = setInterval(() => {
-    //       if(currentDateTime.getHours()  === 0 && flagPeriodo === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //         setPeriodo(1)
-    //         setFlagPeriodo(false)
-    //         setFlagPeriodo2(true)
-    //       }
-    //     }, 1.1)
-    //     return () => {
-    //       clearInterval(interval);
-    //     }; 
-    //   }
-    // }, [flightsSchedule])
-
-    // // Segundo periodo
-    // React.useEffect(() => {
-    //   if(stateButtons === 2){
-    //     const interval = setInterval(() => {
-    //       if(currentDateTime.getHours()  === 6 && flagPeriodo2 === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //         setPeriodo(2)
-    //         setFlagPeriodo2(false)
-    //         setFlagPeriodo3(true)
-    //       }
-    //     }, 1.1)
-    //     return () => {
-    //       clearInterval(interval);
-    //     }; 
-    //   }
-    // }, [flightsSchedule])
-
-    // // Tercer Periodo
-    // React.useEffect(() => {
-    //   const interval = setInterval(() => {
-    //     if(currentDateTime.getHours()  === 12 && flagPeriodo3 === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //       setPeriodo(3)
-    //       setFlagPeriodo3(false)
-    //       setFlagPeriodo4(true)
-    //     }
-        
-    //   }, 1.1)
-    //   return () => {
-    //     clearInterval(interval);
-    //   }; 
-    // })
-
-    // // Cuarto periodo
-    // React.useEffect(() => {
-    //   const interval = setInterval(() => {
-    //     if(currentDateTime.getHours()  === 18 && flagPeriodo4 === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //       setPeriodo(4)
-    //       setFlagPeriodo4(false)
-    //       setFlagPeriodo(true)
-    //     }
-    //   }, 1.1)
-    //   return () => {
-    //     clearInterval(interval);
-    //   }; 
-    // })
-
-    // Como hacemos el codigo para ejecutar la api cada cierto tiempo?
-    // api para el planificador
-    // fecha: 2022-11-21
-    // horaInicio: 09:54
-    // horaFin: 09:54
-    // paraSIm: 1
-
-    // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
-   
+    }, [stateButtons]) 
 
     const enviarPlanificador = (horaActual) => {
       if(currentDateTime != null){
@@ -262,17 +187,17 @@ const Simulacion5Dias = () => {
           paraSim: 1
         }
 
-        planShipmentsSimulation(variables)
-        .then(function(response){
-          if(response === 1){
-            console.log("Se ejecute correctamente")
-          }
-        }
-        )
-        .catch(function (error){
-          console.log(error);
-          console.log("NO SE LOGRO PLANIFICAR")
-        })
+        // planShipmentsSimulation(variables)
+        // .then(function(response){
+        //   if(response === 1){
+        //     console.log("Se ejecute correctamente")
+        //   }
+        // }
+        // )
+        // .catch(function (error){
+        //   console.log(error);
+        //   console.log("NO SE LOGRO PLANIFICAR")
+        // })
       }
     }
 
