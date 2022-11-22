@@ -89,6 +89,24 @@ export const registerShipment = (variables) => {
     )
 }
 
+// api para el planificador
+    // fecha: 2022-11-21
+    // horaInicio: 09:54
+    // horaFin: 09:54
+    // paraSIm: 1
+export const planShipmentsSimulation = (variables) =>{
+    const obj = {
+        fecha: variables.fecha,
+        timeInf: variables.timeInf,
+        timeSup: variables.timeSup,
+        paraSim: 1
+    }
+    // el link tiene que tener la siguiente forma:
+    // http://localhost:8081/orders/cargarEnviosSim?fecha=2022-11-24&timeInf=23%3A17&timeSup=23%3A17&paraSim=5 no es necesario enviar los minutos
+    return axios.post(
+        API_URL.url + "orders/cargar?fecha=" + obj.fecha + "&timeInf=" + obj.timeInf + "&timeSup=" + obj.timeSup + "&paraSim="+ obj.paraSim,
+    )
+}
 export const getShipmentsByInput = (input) => {
     const obj = {
         input: input
