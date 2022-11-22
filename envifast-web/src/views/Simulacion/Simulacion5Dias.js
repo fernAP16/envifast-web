@@ -56,6 +56,8 @@ const Simulacion5Dias = () => {
     const [initialDate, setInitialDate] = React.useState(null)
     const [diferenciaDias, setDiferenciaDias] = React.useState(1)
     const [lapsoPlanificador, setLapsoPlanificador] = React.useState(0)
+    const [valueSearch, setValueSearch] = React.useState('')
+    const [searchTable, setSearchTable] = React.useState([]);
 
     const getIcon = () => {
         return L.icon({
@@ -143,6 +145,7 @@ const Simulacion5Dias = () => {
           setOctavaSeccion(Math.floor((8/10) * k))
           setNovenaSeccion(Math.floor((9/10) * k))         
           setFlightsSchedule(array)
+          setSearchTable(array.slice(0,10));
           setIsLoading(false);
           setFlagInicioContador(true);
         })
@@ -505,6 +508,18 @@ const Simulacion5Dias = () => {
       // setOpenPopUp(true);
       console.log("Click detalle")
     }
+
+    const onChangeSearchTable = (value) => {
+      setValueSearch(value);
+      console.log(value);
+      let filtered = flightsSchedule.filter(function (flight) { 
+        return airportsCoordinates[flight.idAeropuertoOrigen-1].cityName.indexOf(value) !== -1 
+          || airportsCoordinates[flight.idAeropuertoDestino-1].cityName.indexOf(value) !== -1
+          || flight.id.toString().indexOf(value) !== -1; 
+      }).slice(0,20);
+      setSearchTable(filtered);
+    }
+
     return (
 
         <div>
@@ -544,58 +559,62 @@ const Simulacion5Dias = () => {
                     ))}
               </MapContainer>
             </Grid>
-            <Box marginLeft="10px">
-              <Grid className='container-buttons' display='flex' alignItems='center'> 
-                <Typography fontWeight="bold" position='relative'>Controles</Typography>
-                <Button className={'button-control button-play ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>INICIAR</Button>
-                {/* <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause} onClick={handlePause}>PAUSAR</Button>
-                <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop} onClick={handleStop}>DETENER</Button> */}
-              </Grid> 
-              <Grid container xs={12} alignItems='center'>
-                <Grid container xs={5}>
-                  <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
-                </Grid>
-                <Grid container xs={6}>
-                  <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate}/>
-                </Grid>
-                
-              </Grid>
-              <Box height="80px"> 
+            <Box marginLeft="20px" marginTop="10px"> 
+              <Box className='box-legend'> 
                 <Grid container>
                   <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
                 </Grid>
                 <Grid display="flex">
                   <Grid container>
-                    <img src={AirportIcon} width="20px" height="20px"></img>
-                    <Typography>Aeropuerto</Typography>
-                  </Grid>
-                  <Grid container width="70%">
-                    <img src={AirplaneIcon} width="20px" height="20px" className='object-legend'></img>
-                    <Typography>Avión</Typography>
-                  </Grid>
-                  <Grid container alignItems='center'>
-                    <Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/>
-                    <Typography>Trayectos</Typography>
+                    <Grid item xs={1}><img src={AirportIcon} width="20px" height="20px"></img></Grid>
+                    <Grid item xs={4}><Typography>Aeropuerto</Typography></Grid>
+                    <Grid item xs={1}><img src={AirplaneIcon} width="20px" height="20px"></img></Grid>
+                    <Grid item xs={2}><Typography>Avión</Typography></Grid>
+                    <Grid item xs={1}><Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/></Grid>
+                    <Grid item xs={3}><Typography>Trayectos</Typography></Grid>
                   </Grid>
                 </Grid>
               </Box> 
-              <Grid> 
+              <Grid container alignItems='center'>
+                <Grid item xs={5}>
+                  <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
+                </Grid>
+                <Grid item xs={5}>
+                  <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate} inputProps={{ min: "2022-08-02", max: "2023-05-24" }}/>
+                </Grid>
+                <Grid item xs={2} align='right'>
+                  <Button className={'button-control ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>
+                    <Icon icon="material-symbols:play-arrow-rounded" width='30px' />
+                  </Button>
+                </Grid>
+              </Grid>
+              <Grid container alignItems='center' marginTop='10px' marginBottom='10px'>
+                  <Grid item xs={5}>
+                    <Typography fontWeight="bold">Filtrar vuelo(s): </Typography>
+                  </Grid>
+                  <Grid item xs={7}>
+                    <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
+                  </Grid>
+                </Grid>
+              <Grid>
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
-                <TableContainer component={Paper} className="table-flights">
+                <TableContainer component={Paper} className="table-collapse-flights">
                   <Table className='table-flights-body' stickyHeader aria-label="customized table">
                     <TableHead>
                       <TableRow>
                         <StyledTableCell className='table-flights-cell cell-ID' align="center">Nombre</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell cell-action'align="center">Ruta</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Origen</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Destino</StyledTableCell>
                         <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody> 
-                      {(flightsSchedule) && 
-                        flightsSchedule.slice(0,10).map((flight) => (
+                      {(searchTable) && 
+                        searchTable.map((flight) => (
                           <StyledTableRow key={flight.name}>
                             <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">
                                 <div className='table-state'>
                                     <Typography className='state-text'
