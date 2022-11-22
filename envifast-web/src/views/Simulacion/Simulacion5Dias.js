@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime, planShipmentsSimulation } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -228,45 +228,64 @@ const Simulacion5Dias = () => {
     // paraSIm: 1
 
     // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
-    React.useEffect(() => {
+   
 
+    const enviarPlanificador = (horaActual) => {
       if(currentDateTime != null){
-        let fecha = currentDateTime.toISOString().split('T')[0]
+        let fechaPlanificacon = currentDateTime.toISOString().split('T')[0]
         // let horaInicio = currentDateTime.toISOString().split('T')[1].substring(0, 5) // substr si es inclusivo, si incluye el ultimo indice
-        let horaInicioDate = new Date(fecha)
-        horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
+        let horaInicioDate = new Date(fechaPlanificacon)
+        // horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
+        horaInicioDate.setHours(horaActual - 5) // 0 - 5, 
         // para la hora final tenemos que hacer una serie de calculos
         
         // lapso planificador sera el que nos dara la hora limite del rango
-        let horaFinDate =  new Date(fecha)
-        horaFinDate.setHours(lapsoPlanificador * 4 - 5)
+        let horaFinDate =  new Date(fechaPlanificacon)
+        horaFinDate.setHours(horaActual - 1)// horaActual - 5 + 4
 
         let horaFin = horaFinDate.toISOString().split('T')[1].substring(0, 5)
         let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
         // ahora imprimimos todos los atributos para ver si estan bien
         // console.log("Hora en ISO: " + currentDateTime.toISOString().split('T')[1])
-        console.log(fecha)
+        console.log("Atributos para mandar al post")
+        console.log(fechaPlanificacon)
         console.log(horaInicio)
         console.log(horaFin)
-        // NO SE ESTA EJECC
+        console.log("---------------------------")
+        // FUNCIONA PERFECTO
 
+        // Ahora solo mandamos los datos para hacer el post del planificador
+        let variables = {
+          fecha: fechaPlanificacon,
+          timeInf: horaInicio,
+          timeSup: horaFin,
+          paraSim: 1
+        }
+
+        planShipmentsSimulation(variables)
+        .then(function(response){
+          if(response === 1){
+            console.log("Se ejecute correctamente")
+          }
+        }
+        )
+        .catch(function (error){
+          console.log(error);
+          console.log("NO SE LOGRO PLANIFICAR")
+        })
       }
-      
-    }, [lapsoPlanificador])
+    }
 
     // Contador que modificara el tiempo:
     React.useEffect(() => {
       const interval = setInterval(() => {
         let temp = currentDateTime;
-        temp.setMinutes(temp.getMinutes() + 2)
+        let horas = temp.getHours()
+        let minutos = temp.getMinutes()
+        temp.setMinutes(temp.getMinutes() + 1)
         setCurrentDateTime(temp)
-        if(temp.getHours() % 4 === 0){ //
-          console.log("La hora en que entra a este if" + temp.getHours()) // solo entra cuando es 0, Porque?s
-          if(lapsoPlanificador === 6){
-            setLapsoPlanificador(1) // para el siguiente dia
-          }else{
-            setLapsoPlanificador(lapsoPlanificador + 1)
-          }
+        if(horas % 4 === 0  && minutos == 0){ 
+          enviarPlanificador(horas)
         }
       }, 200) 
       return () => {
@@ -441,11 +460,7 @@ const Simulacion5Dias = () => {
           flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
           flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
           flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
-          // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
-          // // flightSchedule.horaSalida.setDate(flightSchedule.horaSalida.getDate() + 1)
-          // // flightSchedule.horaLLegada.setDate(flightSchedule.horaLLegada.getDate() + 1)
-          console.log("La hora de salida es: " + flightSchedule.horaSalida)
+          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])          
         }
         return;
       }
