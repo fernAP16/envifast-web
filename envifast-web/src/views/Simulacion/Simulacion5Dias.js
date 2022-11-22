@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime, planShipmentsSimulation } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -56,6 +56,8 @@ const Simulacion5Dias = () => {
     const [initialDate, setInitialDate] = React.useState(null)
     const [diferenciaDias, setDiferenciaDias] = React.useState(1)
     const [lapsoPlanificador, setLapsoPlanificador] = React.useState(0)
+    const [valueSearch, setValueSearch] = React.useState('')
+    const [searchTable, setSearchTable] = React.useState([]);
 
     const getIcon = () => {
         return L.icon({
@@ -143,6 +145,7 @@ const Simulacion5Dias = () => {
           setOctavaSeccion(Math.floor((8/10) * k))
           setNovenaSeccion(Math.floor((9/10) * k))         
           setFlightsSchedule(array)
+          setSearchTable(array.slice(0,10));
           setIsLoading(false);
           setFlagInicioContador(true);
         })
@@ -150,120 +153,64 @@ const Simulacion5Dias = () => {
           console.log(error);
       })
       }
-    }, [stateButtons])
+    }, [stateButtons]) 
 
-    
-
-    
-
-    // //  Primer Periodo
-    // React.useEffect(() => {
-    //   if(stateButtons === 2){
-    //     const interval = setInterval(() => {
-    //       if(currentDateTime.getHours()  === 0 && flagPeriodo === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //         setPeriodo(1)
-    //         setFlagPeriodo(false)
-    //         setFlagPeriodo2(true)
-    //       }
-    //     }, 1.1)
-    //     return () => {
-    //       clearInterval(interval);
-    //     }; 
-    //   }
-    // }, [flightsSchedule])
-
-    // // Segundo periodo
-    // React.useEffect(() => {
-    //   if(stateButtons === 2){
-    //     const interval = setInterval(() => {
-    //       if(currentDateTime.getHours()  === 6 && flagPeriodo2 === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //         setPeriodo(2)
-    //         setFlagPeriodo2(false)
-    //         setFlagPeriodo3(true)
-    //       }
-    //     }, 1.1)
-    //     return () => {
-    //       clearInterval(interval);
-    //     }; 
-    //   }
-    // }, [flightsSchedule])
-
-    // // Tercer Periodo
-    // React.useEffect(() => {
-    //   const interval = setInterval(() => {
-    //     if(currentDateTime.getHours()  === 12 && flagPeriodo3 === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //       setPeriodo(3)
-    //       setFlagPeriodo3(false)
-    //       setFlagPeriodo4(true)
-    //     }
-        
-    //   }, 1.1)
-    //   return () => {
-    //     clearInterval(interval);
-    //   }; 
-    // })
-
-    // // Cuarto periodo
-    // React.useEffect(() => {
-    //   const interval = setInterval(() => {
-    //     if(currentDateTime.getHours()  === 18 && flagPeriodo4 === true){ // 12 % 6 = 0, 10 % 6 = 4
-    //       setPeriodo(4)
-    //       setFlagPeriodo4(false)
-    //       setFlagPeriodo(true)
-    //     }
-    //   }, 1.1)
-    //   return () => {
-    //     clearInterval(interval);
-    //   }; 
-    // })
-
-    // Como hacemos el codigo para ejecutar la api cada cierto tiempo?
-    // api para el planificador
-    // fecha: 2022-11-21
-    // horaInicio: 09:54
-    // horaFin: 09:54
-    // paraSIm: 1
-
-    // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
-    React.useEffect(() => {
-
+    const enviarPlanificador = (horaActual) => {
       if(currentDateTime != null){
-        let fecha = currentDateTime.toISOString().split('T')[0]
+        let fechaPlanificacon = currentDateTime.toISOString().split('T')[0]
         // let horaInicio = currentDateTime.toISOString().split('T')[1].substring(0, 5) // substr si es inclusivo, si incluye el ultimo indice
-        let horaInicioDate = new Date(fecha)
-        horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
+        let horaInicioDate = new Date(fechaPlanificacon)
+        // horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
+        horaInicioDate.setHours(horaActual - 5) // 0 - 5, 
         // para la hora final tenemos que hacer una serie de calculos
         
         // lapso planificador sera el que nos dara la hora limite del rango
-        let horaFinDate =  new Date(fecha)
-        horaFinDate.setHours(lapsoPlanificador * 4 - 5)
+        let horaFinDate =  new Date(fechaPlanificacon)
+        horaFinDate.setHours(horaActual - 1)// horaActual - 5 + 4
 
         let horaFin = horaFinDate.toISOString().split('T')[1].substring(0, 5)
         let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
         // ahora imprimimos todos los atributos para ver si estan bien
         // console.log("Hora en ISO: " + currentDateTime.toISOString().split('T')[1])
-        console.log(fecha)
+        console.log("Atributos para mandar al post")
+        console.log(fechaPlanificacon)
         console.log(horaInicio)
         console.log(horaFin)
-        // NO SE ESTA EJECC
+        console.log("---------------------------")
+        // FUNCIONA PERFECTO
 
+        // Ahora solo mandamos los datos para hacer el post del planificador
+        let variables = {
+          fecha: fechaPlanificacon,
+          timeInf: horaInicio,
+          timeSup: horaFin,
+          paraSim: 1
+        }
+
+        // planShipmentsSimulation(variables)
+        // .then(function(response){
+        //   if(response === 1){
+        //     console.log("Se ejecute correctamente")
+        //   }
+        // }
+        // )
+        // .catch(function (error){
+        //   console.log(error);
+        //   console.log("NO SE LOGRO PLANIFICAR")
+        // })
       }
-      
-    }, [lapsoPlanificador])
+    }
 
     // Contador que modificara el tiempo:
     React.useEffect(() => {
       const interval = setInterval(() => {
         let temp = currentDateTime;
-        temp.setMinutes(temp.getMinutes() + 2)
+        let horas = temp.getHours()
+        let minutos = temp.getMinutes()
+        temp.setMinutes(temp.getMinutes() + 1)
         setCurrentDateTime(temp)
-        if(temp.getHours() % 4 === 0){ //
-          console.log("La hora en que entra a este if" + temp.getHours()) // solo entra cuando es 0, Porque?s
-          if(lapsoPlanificador === 6){
-            setLapsoPlanificador(1) // para el siguiente dia
-          }else{
-            setLapsoPlanificador(lapsoPlanificador + 1)
-          }
+        if(horas % 4 === 0  && minutos == 0){ 
+          enviarPlanificador(horas)
         }
       }, 200) 
       return () => {
@@ -438,11 +385,7 @@ const Simulacion5Dias = () => {
           flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
           flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
           flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
-          // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
-          // // flightSchedule.horaSalida.setDate(flightSchedule.horaSalida.getDate() + 1)
-          // // flightSchedule.horaLLegada.setDate(flightSchedule.horaLLegada.getDate() + 1)
-          console.log("La hora de salida es: " + flightSchedule.horaSalida)
+          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])          
         }
         return;
       }
@@ -505,6 +448,18 @@ const Simulacion5Dias = () => {
       // setOpenPopUp(true);
       console.log("Click detalle")
     }
+
+    const onChangeSearchTable = (value) => {
+      setValueSearch(value);
+      console.log(value);
+      let filtered = flightsSchedule.filter(function (flight) { 
+        return airportsCoordinates[flight.idAeropuertoOrigen-1].cityName.indexOf(value) !== -1 
+          || airportsCoordinates[flight.idAeropuertoDestino-1].cityName.indexOf(value) !== -1
+          || flight.id.toString().indexOf(value) !== -1; 
+      }).slice(0,20);
+      setSearchTable(filtered);
+    }
+
     return (
 
         <div>
@@ -544,58 +499,62 @@ const Simulacion5Dias = () => {
                     ))}
               </MapContainer>
             </Grid>
-            <Box marginLeft="10px">
-              <Grid className='container-buttons' display='flex' alignItems='center'> 
-                <Typography fontWeight="bold" position='relative'>Controles</Typography>
-                <Button className={'button-control button-play ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>INICIAR</Button>
-                {/* <Button className={'button-control ' + (disablePause ? 'button-disabled-a' : 'button-pause')} disabled={disablePause} onClick={handlePause}>PAUSAR</Button>
-                <Button className={'button-control '  + (disableStop ? 'button-disabled-a' : 'button-stop')} disabled={disableStop} onClick={handleStop}>DETENER</Button> */}
-              </Grid> 
-              <Grid container xs={12} alignItems='center'>
-                <Grid container xs={5}>
-                  <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
-                </Grid>
-                <Grid container xs={6}>
-                  <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate}/>
-                </Grid>
-                
-              </Grid>
-              <Box height="80px"> 
+            <Box marginLeft="20px" marginTop="10px"> 
+              <Box className='box-legend'> 
                 <Grid container>
                   <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
                 </Grid>
                 <Grid display="flex">
                   <Grid container>
-                    <img src={AirportIcon} width="20px" height="20px"></img>
-                    <Typography>Aeropuerto</Typography>
-                  </Grid>
-                  <Grid container width="70%">
-                    <img src={AirplaneIcon} width="20px" height="20px" className='object-legend'></img>
-                    <Typography>Avión</Typography>
-                  </Grid>
-                  <Grid container alignItems='center'>
-                    <Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/>
-                    <Typography>Trayectos</Typography>
+                    <Grid item xs={1}><img src={AirportIcon} width="20px" height="20px"></img></Grid>
+                    <Grid item xs={4}><Typography>Aeropuerto</Typography></Grid>
+                    <Grid item xs={1}><img src={AirplaneIcon} width="20px" height="20px"></img></Grid>
+                    <Grid item xs={2}><Typography>Avión</Typography></Grid>
+                    <Grid item xs={1}><Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/></Grid>
+                    <Grid item xs={3}><Typography>Trayectos</Typography></Grid>
                   </Grid>
                 </Grid>
               </Box> 
-              <Grid> 
+              <Grid container alignItems='center'>
+                <Grid item xs={5}>
+                  <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
+                </Grid>
+                <Grid item xs={5}>
+                  <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate} inputProps={{ min: "2022-08-02", max: "2023-05-24" }}/>
+                </Grid>
+                <Grid item xs={2} align='right'>
+                  <Button className={'button-control ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>
+                    <Icon icon="material-symbols:play-arrow-rounded" width='30px' />
+                  </Button>
+                </Grid>
+              </Grid>
+              <Grid container alignItems='center' marginTop='10px' marginBottom='10px'>
+                  <Grid item xs={5}>
+                    <Typography fontWeight="bold">Filtrar vuelo(s): </Typography>
+                  </Grid>
+                  <Grid item xs={7}>
+                    <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
+                  </Grid>
+                </Grid>
+              <Grid>
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
-                <TableContainer component={Paper} className="table-flights">
+                <TableContainer component={Paper} className="table-collapse-flights">
                   <Table className='table-flights-body' stickyHeader aria-label="customized table">
                     <TableHead>
                       <TableRow>
                         <StyledTableCell className='table-flights-cell cell-ID' align="center">Nombre</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell cell-action'align="center">Ruta</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Origen</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Destino</StyledTableCell>
                         <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody> 
-                      {(flightsSchedule) && 
-                        flightsSchedule.slice(0,10).map((flight) => (
+                      {(searchTable) && 
+                        searchTable.map((flight) => (
                           <StyledTableRow key={flight.name}>
                             <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">
                                 <div className='table-state'>
                                     <Typography className='state-text'
