@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import './Envios.css'
-import { getAeropuertos, getShipmentsByInput, registerShipment } from '../../services/envios/EnviosServices';
+import { getAeropuertos, getShipmentsByInput, registerDateTimes, registerFlights, registerShipment } from '../../services/envios/EnviosServices';
 
-const Envios  = (props) => {  
+const Envios  = (props) => {
     const [shipments, setShipments] = React.useState([]);
     const [airportsCities, setAirportsCities] = React.useState([]);
     const [input, setInput] = React.useState('');
@@ -26,6 +26,11 @@ const Envios  = (props) => {
     const [isLoading, setIsLoading] = React.useState(false);
     const [shipmentRegistered, setShipmentRegistered] = React.useState(false);
     const [isDetail, setIsDetail] = React.useState(false);
+    const [isLoadingInit, setIsLoadingInit] = React.useState(true);
+    const [dateRegister, setDateRegister] = React.useState('');
+    const [daysRegister, setDaysRegister] = React.useState(0);
+    const [isRegisteringFlights, setIsRegisteringFlights] = React.useState(false);
+    const [flightsRegistered, setFlightsRegistered] = React.useState(false);
 
     React.useEffect(() => {
         getAeropuertos()
@@ -73,9 +78,38 @@ const Envios  = (props) => {
             };
             console.log(arrayShipments)
             setShipments(arrayShipments);
+            setIsLoadingInit(false);
         })
         .catch(function (error) {
             console.log(error);
+        })
+    }
+
+    const handleRegisterDays = () => {
+        setIsRegisteringFlights(false);
+        setIsLoading(true);
+        let variables = {
+            date: dateRegister,
+            days: daysRegister,
+            paraSim: 0
+        }
+        registerFlights(variables)
+        .then(function (response) {
+            registerDateTimes(variables)
+            .then(function (response) {
+                setDaysRegister(0);
+                setDateRegister('');
+                setIsLoading(false);
+                setFlightsRegistered(true);
+            })
+            .catch(function (error) {
+                console.log(error);
+                setIsLoading(false);
+            })
+        })
+        .catch(function (error) {
+            console.log(error);
+            setIsLoading(false);
         })
     }
 
@@ -127,7 +161,7 @@ const Envios  = (props) => {
     }
 
     const handleClose = (event, reason) => {
-        if (reason && reason === "backdropClick") 
+        if (reason && reason === "backdropClick")
             return;
         handleReturn();
     }
@@ -138,7 +172,7 @@ const Envios  = (props) => {
     }
 
     const handleCloseConfirm = (event, reason) => {
-        if (reason && reason === "backdropClick") 
+        if (reason && reason === "backdropClick")
             return;
         handleReturn();
     }
@@ -174,7 +208,7 @@ const Envios  = (props) => {
                     </Grid>
                     <Grid item xs={4} className='group-buttons'>
                         <Button className='buttons-actions' onClick={getShipments}>Buscar</Button>
-                        <Button className='buttons-actions'>Subir envíos</Button>
+                        <Button className='buttons-actions' onClick={() => setIsRegisteringFlights(true)}>Cargar días</Button>
                         <Button className='buttons-actions' onClick={handleRegister}>Registrar envíos</Button>
                     </Grid>
                 </Grid>
@@ -184,8 +218,8 @@ const Envios  = (props) => {
                             <TableHead>
                             <TableRow>
                                 <TableCell className='table-shipment-header'>N°</TableCell>
-                                <TableCell className='table-shipment-header'>Emisor</TableCell>
-                                <TableCell className='table-shipment-header'>Destinatario</TableCell>
+                                <TableCell className='table-shipment-header' width='150px'>Emisor</TableCell>
+                                <TableCell className='table-shipment-header' width='150px'>Destinatario</TableCell>
                                 <TableCell className='table-shipment-header'>Estado del envío</TableCell>
                                 <TableCell className='table-shipment-header'>Ciudad de origen</TableCell>
                                 <TableCell className='table-shipment-header'>Ciudad de destino</TableCell>
@@ -205,13 +239,13 @@ const Envios  = (props) => {
                                     <TableCell>{shipment.nombreDestinatario}</TableCell>
                                     <TableCell align='center'>
                                         <Grid justifyContent='center'>
-                                            <Typography className='table-state'
+                                            <Typography className='table-state' align='center'
                                                 border={shipment.estado === 0 ? "1.5px solid #FFFA80" : shipment.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
                                                 backgroundColor={shipment.estado === 0 ? "#FFFA80" : shipment.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
                                             >
                                                 {shipment.estado === 0 ? "Por enviar" : shipment.estado === 1 ? "Enviándose" : "Enviado"}
-                                            </Typography>  
-                                        </Grid> 
+                                            </Typography>
+                                        </Grid>
                                     </TableCell>
                                     <TableCell>{shipment.origen.ciudad.nombre}</TableCell>
                                     <TableCell>{shipment.destino.ciudad.nombre}</TableCell>
@@ -250,7 +284,7 @@ const Envios  = (props) => {
                                 </Grid>
                             </Grid>
                             <Grid container spacing={1} className='container-textfields'>
-                                
+
                                 <Grid item xs={5}>
                                     <TextField size='small' className='' label='Correo electrónico' value={emailFrom} onChange={(e) => setEmailFrom(e.target.value)} fullWidth></TextField>
                                 </Grid>
@@ -349,7 +383,7 @@ const Envios  = (props) => {
                     <Button className='button-register confirm' onClick={handleConfirmRegister} autoFocus>Confirmar</Button>
                 </DialogActions>
             </Dialog>
-            <Dialog 
+            <Dialog
                 open={isLoading}
                 >
                 <DialogTitle>
@@ -373,7 +407,7 @@ const Envios  = (props) => {
                 </DialogActions>
             </Dialog>
             {shipmentDetail &&
-            <Dialog 
+            <Dialog
                 open={isDetail}
                 >
                 <DialogTitle>
@@ -434,6 +468,48 @@ const Envios  = (props) => {
                 </DialogActions>
             </Dialog>
             }
+            <Dialog open={isLoadingInit}>
+                <DialogTitle>
+                    Cargando...
+                </DialogTitle>
+                <DialogContent>
+                    <Grid item container justifyContent='center'>
+                        <CircularProgress className='loading-comp'/>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={isRegisteringFlights}>
+                <DialogTitle>
+                    Cargar vuelos
+                </DialogTitle>
+                <DialogContent>
+                    <Grid container alignItems='center' justifyContent='center'>
+                        <Grid item xs={3}>Desde:</Grid>
+                        <Grid item xs={6}><TextField type='date' size='small' value={dateRegister} fullWidth onChange={(e) => setDateRegister(e.target.value)}/></Grid>
+                    </Grid>
+                    <Grid container alignItems='center' justifyContent='center' marginTop='10px'>
+                        <Grid item xs={3}>Para:</Grid>
+                        <Grid item xs={3}><TextField type='number' size='small' value={daysRegister} fullWidth onChange={(e) => setDaysRegister(e.target.value)}/></Grid>
+                        <Grid item xs={1}></Grid>
+                        <Grid item xs={2}>días</Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button className='button-cancel' variant='outlined' onClick={() => {setIsRegisteringFlights(false); setDateRegister('')}}>Cancelar</Button>
+                    <Button className='button-register' onClick={handleRegisterDays} autoFocus>Registrar</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                className='dialog-register'
+                open={flightsRegistered}
+            >
+                <DialogContent className='content-confirm'>
+                    <Typography className='register-label'>Los vuelos se registraron correctamente</Typography>
+                </DialogContent>
+                <DialogActions className='actions-confirm'>
+                    <Button className='button-register' onClick={() => {setFlightsRegistered(false);getShipments()}} autoFocus>Volver a envíos</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
