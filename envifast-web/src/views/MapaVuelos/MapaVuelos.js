@@ -19,36 +19,30 @@ import AirplaneIcon from '../../assets/icons/avion.png';
 import AirportIcon from '../../assets/icons/aeropuerto.png';
 import { styled } from '@mui/material/styles';
 
-const dataStory = [
-    {
-        // Lima: -12.098056, -77.015278
-      lat: -12.098056,
-      lng: -77.015278,
-      duration_flight: 200
-    },
-    {   // Madrid: 40.472222, -3.560833
-      lat: 40.472222,
-      lng: -3.560833,
-      duration_flight: 200
-    }
-  ];
 
-
-  let cursor = 0;
-  
 
  const MapaVuelos  = (props) => {
-    const [currentTrack, setCurrentTrack] = useState({
-      // Lima: -12.098056, -77.015278
-      // LA POSICION INICIAL
-      lat: -12.098056,
-      lng: -77.015278,
-      duration_flight: 200
-    });
+    
 
+    const [stateButtons, setStateButtons] = React.useState(0);
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
     const [flightsSchedule, setFlightsSchedule] = React.useState([])
-    const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
+    const [currentDateTime, setCurrentDateTime] = React.useState(null);
+    const [initialDate, setInitialDateTime] = React.useState(new Date());
+    const [flagInicioContador, setFlagInicioContador] = React.useState(false);
+    const [currentTrack, setCurrentTrack] = React.useState({});
+
+    // variables para la animacion
+    const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
+    const [segundaSeccion, setSegundaSeccion] = React.useState(1);
+    const [terceraSeccion, setTerceraSeccion] = React.useState(1);
+    const [cuartaSeccion, setCuartaSeccion] = React.useState(1);
+    const [quintaSeccion, setQuintaSeccion] = React.useState(1);
+    const [sextaSeccion, setSextaSeccion] = React.useState(1);
+    const [septimaSeccion, setSeptimaSeccion] = React.useState(1);
+    const [octavaSeccion, setOctavaSeccion] = React.useState(1);
+    const [novenaSeccion, setNovenaSeccion] = React.useState(1);
+
 
     const getIcon = () => {
         return L.icon({
@@ -78,29 +72,10 @@ const dataStory = [
         },
       }));
 
-    const show_interval = () => {
-        setCurrentTrack(dataStory[cursor]);
-        console.log("entra al set interval") 
-        if (cursor === dataStory.length - 1) {            
-            return;
-        }
-        // ENTRA AQUI PARA IR A SU DESTINO
-        console.log("Entro al setCurrent Track, para llegar a su destino")
-        cursor += 1;
-        setCurrentTrack(dataStory[cursor]);
-    }
-
-    React.useEffect(() => {
-        setCurrentDateTime(new Date());
-    })
-
-    
-
     // para la animacion
     React.useEffect(() => {
         getCoordenadasAeropuertos()
         .then(function (response) {
-            // setAirportsCoordinates(response.data);
             var array = [];
             for (const element of response.data) {
                 array.push({
@@ -111,8 +86,8 @@ const dataStory = [
                 })
             };
             setAirportsCoordinates(array);
-            setCurrentTrack(dataStory[cursor]);//
-            console.log(airportsCoordinates)
+            setCurrentDateTime(new Date())
+            setStateButtons(2)
         })
         .catch(function (error) {
             console.log(error);
@@ -121,11 +96,21 @@ const dataStory = [
 
     // api para obtener los vuelos de un dia. Por ahora estara hardcodeado para el 22
     React.useEffect(() => {
-      let variables = {fecha: "2022-10-22", periodo: 4}
+      if(currentDateTime != null){
+      let date = currentDateTime;
+      date.setHours(date.getHours() - 5);
+      let variables = {
+        fecha: date.toISOString().slice(0, 10),//startDate, // 2022-10-29
+        paraSim: 0
+      }
       getVuelosPorDia(variables)
       .then((response) => {
-        var array = [];
+        var array = []
         for (const element of response.data){
+          let coordenadasOrigenTemp = [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng];
+          let coordenadasDestinosTemp = [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng];
+          let difTime = new Date(element.horaLLegada).getTime() - new Date(element.horaSalida).getTime();
+          let currTime = currentDateTime.getTime() - new Date(element.horaSalida).getTime();
           array.push(
             {
               id: element.id,
@@ -133,30 +118,47 @@ const dataStory = [
               idAeropuertoDestino: element.idAeropuertoDestino,
               horaSalida: element.horaSalida,
               horaLLegada: element.horaLLegada,
-              duracion: element.duracion  
-              }
+              duracion: element.duracion,
+              coordenadasActual: [coordenadasOrigenTemp[0] + (coordenadasDestinosTemp[0] - coordenadasOrigenTemp[0])*currTime/difTime,
+                                  coordenadasOrigenTemp[1] + (coordenadasDestinosTemp[1] - coordenadasOrigenTemp[1])*currTime/difTime],
+              estado: 0
+            }
           )
         };
+        var k = array.length;
+        setPrimeraSeccion(Math.floor(k/10))
+        setSegundaSeccion(Math.floor(k/5))
+        setTerceraSeccion(Math.floor((3/10) * k))
+        setCuartaSeccion(Math.floor((4/10) * k))
+        setQuintaSeccion(Math.floor( k / 2))
+        setSextaSeccion(Math.floor((6/10) * k))
+        setSeptimaSeccion(Math.floor((7/10) * k))
+        setOctavaSeccion(Math.floor((8/10) * k))
+        setNovenaSeccion(Math.floor((9/10) * k))         
         setFlightsSchedule(array)
-        console.log(array) // es lo mismo que flightsSchedule
+        setFlagInicioContador(true);
       })
       .catch(function (error) {
-          console.log(error);
-      })
-    }, [])
+        console.log(error);
+    })
+    }
+    }, [currentDateTime])
 
 
     const AirportMarket = () => {
         return (
             <>
-            {airportsCoordinates.map((airport) => (
-                <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
+            {airportsCoordinates && airportsCoordinates.map((airport) => (
+                ( airport.lat && airport.lng && 
+                  <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
+                )
             ))}
             </> 
         )
     }
 
     return (
+      currentDateTime && 
         <div>
             <Grid display='flex'>
                 <Grid className='containerMapa'>
@@ -171,7 +173,25 @@ const dataStory = [
                     >
                         <AirportMarket/>
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
-                        <AirplaneMarker data={ currentTrack ?? {}} />
+                        {flightsSchedule &&
+                          flightsSchedule.map((flight)=>(
+                            flight.estado === 1 ?
+                            <div>
+                                <AirplaneMarker data={
+                                  { lat: flight.coordenadasActual[0],
+                                    lng: flight.coordenadasActual[1],
+                                    duration_flight: flight.duracion
+                                  } ?? {}
+                                }></AirplaneMarker>
+                                {/* <Polyline
+                                  color='#19D2A6'
+                                  weight={0.5}
+                                  positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
+                                ></Polyline> */}
+                            </div>
+                            :
+                            <></>
+                          ))}
                     </MapContainer>
                 </Grid>
                 <Grid marginLeft='10px'>
@@ -207,7 +227,7 @@ const dataStory = [
                         </TableHead>
                         <TableBody> 
                           {(flightsSchedule) && 
-                            flightsSchedule.slice(0,10).map((flight) => (
+                            flightsSchedule.slice(0,20).map((flight) => (
                               <StyledTableRow key={flight.name}>
                                 <StyledTableCell className='table-flights-now-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
                                 <StyledTableCell className='table-flights-now-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
