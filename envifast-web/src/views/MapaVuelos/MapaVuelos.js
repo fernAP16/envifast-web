@@ -19,36 +19,30 @@ import AirplaneIcon from '../../assets/icons/avion.png';
 import AirportIcon from '../../assets/icons/aeropuerto.png';
 import { styled } from '@mui/material/styles';
 
-const dataStory = [
-    {
-        // Lima: -12.098056, -77.015278
-      lat: -12.098056,
-      lng: -77.015278,
-      duration_flight: 200
-    },
-    {   // Madrid: 40.472222, -3.560833
-      lat: 40.472222,
-      lng: -3.560833,
-      duration_flight: 200
-    }
-  ];
 
-
-  let cursor = 0;
-  
 
  const MapaVuelos  = (props) => {
-    const [currentTrack, setCurrentTrack] = useState({
-      // Lima: -12.098056, -77.015278
-      // LA POSICION INICIAL
-      lat: -12.098056,
-      lng: -77.015278,
-      duration_flight: 200
-    });
+    
 
+    const [stateButtons, setStateButtons] = React.useState(0);
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
     const [flightsSchedule, setFlightsSchedule] = React.useState([])
     const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
+    const [initialDate, setInitialDateTime] = React.useState(new Date());
+    const [flagInicioContador, setFlagInicioContador] = React.useState(false);
+    const [currentTrack, setCurrentTrack] = React.useState({});
+
+    // variables para la animacion
+    const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
+    const [segundaSeccion, setSegundaSeccion] = React.useState(1);
+    const [terceraSeccion, setTerceraSeccion] = React.useState(1);
+    const [cuartaSeccion, setCuartaSeccion] = React.useState(1);
+    const [quintaSeccion, setQuintaSeccion] = React.useState(1);
+    const [sextaSeccion, setSextaSeccion] = React.useState(1);
+    const [septimaSeccion, setSeptimaSeccion] = React.useState(1);
+    const [octavaSeccion, setOctavaSeccion] = React.useState(1);
+    const [novenaSeccion, setNovenaSeccion] = React.useState(1);
+
 
     const getIcon = () => {
         return L.icon({
@@ -78,21 +72,57 @@ const dataStory = [
         },
       }));
 
-    const show_interval = () => {
-        setCurrentTrack(dataStory[cursor]);
-        console.log("entra al set interval") 
-        if (cursor === dataStory.length - 1) {            
-            return;
+    const show_interval = (flightSchedule) => {
+      if(flightSchedule.estado === 2) {
+        
+        // AL PARECER ESTA CONDICIONAL NO FUNCIONA
+        if(currentDateTime.getDate() > initialDate.getDate()){
+          console.log("Entro a este if")
+          flightSchedule.estado = 0
+          flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
+          flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
+          // HORA SALIDA ES UN STRING NO UN DATE
+          let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
+          let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
+          diaSalida += 1
+          diaLlegada += 1
+          let stringSalida = diaSalida.toString()
+          let stringLlegada = diaLlegada.toString()
+          flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
+          flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
+          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
+          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
+          // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
+          // // flightSchedule.horaSalida.setDate(flightSchedule.horaSalida.getDate() + 1)
+          // // flightSchedule.horaLLegada.setDate(flightSchedule.horaLLegada.getDate() + 1)
+          console.log("La hora de salida es: " + flightSchedule.horaSalida)
         }
-        // ENTRA AQUI PARA IR A SU DESTINO
-        console.log("Entro al setCurrent Track, para llegar a su destino")
-        cursor += 1;
-        setCurrentTrack(dataStory[cursor]);
-    }
+        return;
+      }
 
-    React.useEffect(() => {
-        setCurrentDateTime(new Date());
-    })
+      let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
+      let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
+      let dateInicio = new Date(JSON.parse(jsonSalida))
+      let dateFin = new Date(JSON.parse(jsonLlegada))
+      
+      setCurrentTrack({
+          lat: flightSchedule.coordenadasActual[0],
+          lng: flightSchedule.coordenadasActual[1],
+          duration_flight: flightSchedule.duracion
+      });
+
+      let date = new Date(currentDateTime);
+      date.setSeconds(date.getSeconds() - 100);
+
+      if(currentDateTime > dateFin){
+        flightSchedule.estado = 2;
+      } else if(date >= dateInicio){
+        flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasDestinos[0];
+        flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasDestinos[1];
+      } else if(currentDateTime > dateInicio){
+        flightSchedule.estado = 1;
+      }
+    }
 
     
 
@@ -100,7 +130,6 @@ const dataStory = [
     React.useEffect(() => {
         getCoordenadasAeropuertos()
         .then(function (response) {
-            // setAirportsCoordinates(response.data);
             var array = [];
             for (const element of response.data) {
                 array.push({
@@ -111,8 +140,7 @@ const dataStory = [
                 })
             };
             setAirportsCoordinates(array);
-            setCurrentTrack(dataStory[cursor]);//
-            console.log(airportsCoordinates)
+            setStateButtons(2)
         })
         .catch(function (error) {
             console.log(error);
@@ -121,11 +149,18 @@ const dataStory = [
 
     // api para obtener los vuelos de un dia. Por ahora estara hardcodeado para el 22
     React.useEffect(() => {
-      let variables = {fecha: "2022-10-22", periodo: 4}
+      if(currentDateTime != null){
+      let variables = {
+        fecha: currentDateTime.toISOString().slice(0, 10),//startDate, // 2022-10-29
+        paraSim: 0
+      }
+      console.log("Los aeropuertos son: ")
+      console.log(airportsCoordinates)
       getVuelosPorDia(variables)
       .then((response) => {
-        var array = [];
+        var array = []
         for (const element of response.data){
+          console.log(element)
           array.push(
             {
               id: element.id,
@@ -133,17 +168,32 @@ const dataStory = [
               idAeropuertoDestino: element.idAeropuertoDestino,
               horaSalida: element.horaSalida,
               horaLLegada: element.horaLLegada,
-              duracion: element.duracion  
-              }
+              duracion: element.duracion,
+              coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+              coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
+              coordenadasActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+              estado: 0
+            }
           )
         };
+        var k = array.length;
+        setPrimeraSeccion(Math.floor(k/10))
+        setSegundaSeccion(Math.floor(k/5))
+        setTerceraSeccion(Math.floor((3/10) * k))
+        setCuartaSeccion(Math.floor((4/10) * k))
+        setQuintaSeccion(Math.floor( k / 2))
+        setSextaSeccion(Math.floor((6/10) * k))
+        setSeptimaSeccion(Math.floor((7/10) * k))
+        setOctavaSeccion(Math.floor((8/10) * k))
+        setNovenaSeccion(Math.floor((9/10) * k))         
         setFlightsSchedule(array)
-        console.log(array) // es lo mismo que flightsSchedule
+        setFlagInicioContador(true);
       })
       .catch(function (error) {
-          console.log(error);
-      })
-    }, [])
+        console.log(error);
+    })
+    }
+    }, [airportsCoordinates])
 
 
     const AirportMarket = () => {
