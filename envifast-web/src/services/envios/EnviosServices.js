@@ -21,6 +21,7 @@ export const getVuelosPorDia = (variables) => {
         fecha: variables.fecha,
         paraSim: variables.paraSim
     }
+    console.log(API_URL.url + "flights/dayFlightsFive/{fecha} {paraSim}?fecha=" + obj.fecha + "&paraSim=" + obj.paraSim);
     return axios.get(
         API_URL.url + "flights/dayFlightsFive/{fecha} {paraSim}?fecha=" + obj.fecha + "&paraSim=" + obj.paraSim,
     );

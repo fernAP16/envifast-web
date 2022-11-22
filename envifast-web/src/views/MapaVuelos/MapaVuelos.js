@@ -27,7 +27,7 @@ import { styled } from '@mui/material/styles';
     const [stateButtons, setStateButtons] = React.useState(0);
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
     const [flightsSchedule, setFlightsSchedule] = React.useState([])
-    const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
+    const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [initialDate, setInitialDateTime] = React.useState(new Date());
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
     const [currentTrack, setCurrentTrack] = React.useState({});
@@ -72,60 +72,6 @@ import { styled } from '@mui/material/styles';
         },
       }));
 
-    const show_interval = (flightSchedule) => {
-      if(flightSchedule.estado === 2) {
-        
-        // AL PARECER ESTA CONDICIONAL NO FUNCIONA
-        if(currentDateTime.getDate() > initialDate.getDate()){
-          console.log("Entro a este if")
-          flightSchedule.estado = 0
-          flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
-          flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
-          // HORA SALIDA ES UN STRING NO UN DATE
-          let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
-          let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
-          diaSalida += 1
-          diaLlegada += 1
-          let stringSalida = diaSalida.toString()
-          let stringLlegada = diaLlegada.toString()
-          flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
-          flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
-          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-          flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
-          // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
-          // // flightSchedule.horaSalida.setDate(flightSchedule.horaSalida.getDate() + 1)
-          // // flightSchedule.horaLLegada.setDate(flightSchedule.horaLLegada.getDate() + 1)
-          console.log("La hora de salida es: " + flightSchedule.horaSalida)
-        }
-        return;
-      }
-
-      let jsonSalida = "\""  + flightSchedule.horaSalida + "\""
-      let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
-      let dateInicio = new Date(JSON.parse(jsonSalida))
-      let dateFin = new Date(JSON.parse(jsonLlegada))
-      
-      setCurrentTrack({
-          lat: flightSchedule.coordenadasActual[0],
-          lng: flightSchedule.coordenadasActual[1],
-          duration_flight: flightSchedule.duracion
-      });
-
-      let date = new Date(currentDateTime);
-      date.setSeconds(date.getSeconds() - 100);
-
-      if(currentDateTime > dateFin){
-        flightSchedule.estado = 2;
-      } else if(date >= dateInicio){
-        flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasDestinos[0];
-        flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasDestinos[1];
-      } else if(currentDateTime > dateInicio){
-        flightSchedule.estado = 1;
-      }
-    }
-
-    
-
     // para la animacion
     React.useEffect(() => {
         getCoordenadasAeropuertos()
@@ -140,6 +86,7 @@ import { styled } from '@mui/material/styles';
                 })
             };
             setAirportsCoordinates(array);
+            setCurrentDateTime(new Date())
             setStateButtons(2)
         })
         .catch(function (error) {
@@ -150,17 +97,20 @@ import { styled } from '@mui/material/styles';
     // api para obtener los vuelos de un dia. Por ahora estara hardcodeado para el 22
     React.useEffect(() => {
       if(currentDateTime != null){
+      let date = currentDateTime;
+      date.setHours(date.getHours() - 5);
       let variables = {
-        fecha: currentDateTime.toISOString().slice(0, 10),//startDate, // 2022-10-29
+        fecha: date.toISOString().slice(0, 10),//startDate, // 2022-10-29
         paraSim: 0
       }
-      console.log("Los aeropuertos son: ")
-      console.log(airportsCoordinates)
       getVuelosPorDia(variables)
       .then((response) => {
         var array = []
         for (const element of response.data){
-          console.log(element)
+          let coordenadasOrigenTemp = [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng];
+          let coordenadasDestinosTemp = [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng];
+          let difTime = new Date(element.horaLLegada).getTime() - new Date(element.horaSalida).getTime();
+          let currTime = currentDateTime.getTime() - new Date(element.horaSalida).getTime();
           array.push(
             {
               id: element.id,
@@ -169,9 +119,8 @@ import { styled } from '@mui/material/styles';
               horaSalida: element.horaSalida,
               horaLLegada: element.horaLLegada,
               duracion: element.duracion,
-              coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
-              coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
-              coordenadasActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
+              coordenadasActual: [coordenadasOrigenTemp[0] + (coordenadasDestinosTemp[0] - coordenadasOrigenTemp[0])*currTime/difTime,
+                                  coordenadasOrigenTemp[1] + (coordenadasDestinosTemp[1] - coordenadasOrigenTemp[1])*currTime/difTime],
               estado: 0
             }
           )
@@ -193,20 +142,23 @@ import { styled } from '@mui/material/styles';
         console.log(error);
     })
     }
-    }, [airportsCoordinates])
+    }, [currentDateTime])
 
 
     const AirportMarket = () => {
         return (
             <>
-            {airportsCoordinates.map((airport) => (
-                <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
+            {airportsCoordinates && airportsCoordinates.map((airport) => (
+                ( airport.lat && airport.lng && 
+                  <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
+                )
             ))}
             </> 
         )
     }
 
     return (
+      currentDateTime && 
         <div>
             <Grid display='flex'>
                 <Grid className='containerMapa'>
@@ -221,7 +173,25 @@ import { styled } from '@mui/material/styles';
                     >
                         <AirportMarket/>
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
-                        <AirplaneMarker data={ currentTrack ?? {}} />
+                        {flightsSchedule &&
+                          flightsSchedule.map((flight)=>(
+                            flight.estado === 1 ?
+                            <div>
+                                <AirplaneMarker data={
+                                  { lat: flight.coordenadasActual[0],
+                                    lng: flight.coordenadasActual[1],
+                                    duration_flight: flight.duracion
+                                  } ?? {}
+                                }></AirplaneMarker>
+                                {/* <Polyline
+                                  color='#19D2A6'
+                                  weight={0.5}
+                                  positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
+                                ></Polyline> */}
+                            </div>
+                            :
+                            <></>
+                          ))}
                     </MapContainer>
                 </Grid>
                 <Grid marginLeft='10px'>
@@ -257,7 +227,7 @@ import { styled } from '@mui/material/styles';
                         </TableHead>
                         <TableBody> 
                           {(flightsSchedule) && 
-                            flightsSchedule.slice(0,10).map((flight) => (
+                            flightsSchedule.slice(0,20).map((flight) => (
                               <StyledTableRow key={flight.name}>
                                 <StyledTableCell className='table-flights-now-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
                                 <StyledTableCell className='table-flights-now-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
