@@ -44,7 +44,7 @@
 
 .table-flights-now{
     height: 542px;
-    width: 355px;
+    width: 400px;
     overflow-y: scroll;
 }
 
@@ -64,9 +64,4 @@
   /* Handle on hover */
 .table-flights-now::-webkit-scrollbar-thumb:hover {
     background: #555;
-}
-
-.table-flights-now-cell{
-    justify-content: center;
-    padding: 8px;
 }

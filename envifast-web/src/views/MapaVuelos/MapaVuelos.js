@@ -1,6 +1,6 @@
 import React from 'react';
 import './../../App';
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'; // objeto principal para los mapas
+import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet'; // objeto principal para los mapas
 import { getCoordenadasAeropuertos, getVuelosPorDia } from '../../services/envios/EnviosServices';
 import Markers from '../../components/Markers/Markers';
 import AirportLocation from '../../components/AirportLocation/AirportLocation';
@@ -109,8 +109,11 @@ import { styled } from '@mui/material/styles';
         for (const element of response.data){
           let coordenadasOrigenTemp = [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng];
           let coordenadasDestinosTemp = [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng];
+          let currentTimeNow = currentDateTime.getTime();
           let difTime = new Date(element.horaLLegada).getTime() - new Date(element.horaSalida).getTime();
-          let currTime = currentDateTime.getTime() - new Date(element.horaSalida).getTime();
+          let currTime = currentTimeNow - new Date(element.horaSalida).getTime(); // PROBLEMA
+          let estado = currentTimeNow < new Date(element.horaSalida).getTime() ? 0 : 
+                      (currentTimeNow < new Date(element.horaLLegada).getTime() ? 1 : 2);
           array.push(
             {
               id: element.id,
@@ -119,9 +122,11 @@ import { styled } from '@mui/material/styles';
               horaSalida: element.horaSalida,
               horaLLegada: element.horaLLegada,
               duracion: element.duracion,
+              coordenadasOrigen: coordenadasOrigenTemp,
+              coordenadasDestinos: coordenadasDestinosTemp,
               coordenadasActual: [coordenadasOrigenTemp[0] + (coordenadasDestinosTemp[0] - coordenadasOrigenTemp[0])*currTime/difTime,
                                   coordenadasOrigenTemp[1] + (coordenadasDestinosTemp[1] - coordenadasOrigenTemp[1])*currTime/difTime],
-              estado: 0
+              estado: estado
             }
           )
         };
@@ -174,7 +179,7 @@ import { styled } from '@mui/material/styles';
                         <AirportMarket/>
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'></TileLayer>
                         {flightsSchedule &&
-                          flightsSchedule.map((flight)=>(
+                          flightsSchedule.slice(0,100).map((flight)=>(
                             flight.estado === 1 ?
                             <div>
                                 <AirplaneMarker data={
@@ -183,55 +188,54 @@ import { styled } from '@mui/material/styles';
                                     duration_flight: flight.duracion
                                   } ?? {}
                                 }></AirplaneMarker>
-                                {/* <Polyline
+                                <Polyline
                                   color='#19D2A6'
-                                  weight={0.5}
+                                  weight={0.4}
                                   positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
-                                ></Polyline> */}
+                                ></Polyline>
                             </div>
-                            :
-                            <></>
+                             :
+                             <></>
                           ))}
                     </MapContainer>
                 </Grid>
-                <Grid marginLeft='10px'>
-                  <Box height="80px" marginTop='20px'> 
+                <Grid marginLeft='20px' marginTop='10px'>
+                  <Box className='box-legend'> 
+                    <Grid container>
+                      <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
+                    </Grid>
+                    <Grid display="flex">
                       <Grid container>
-                          <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
+                        <Grid item xs={1}><img src={AirportIcon} width="20px" height="20px"></img></Grid>
+                        <Grid item xs={4}><Typography>Aeropuerto</Typography></Grid>
+                        <Grid item xs={1}><img src={AirplaneIcon} width="20px" height="20px"></img></Grid>
+                        <Grid item xs={2}><Typography>Avión</Typography></Grid>
+                        <Grid item xs={1}><Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/></Grid>
+                        <Grid item xs={3}><Typography>Trayectos</Typography></Grid>
                       </Grid>
-                      <Grid display="flex">
-                        <Grid container className='legend-item'>
-                            <img src={AirportIcon} width="20px" height="20px"></img>
-                            <Typography>Aeropuerto</Typography>
-                        </Grid>
-                        <Grid container className='legend-item'>
-                            <img src={AirplaneIcon} width="20px" height="20px" className='object-legend'></img>
-                            <Typography>Avión</Typography>
-                        </Grid>
-                        <Grid container className='legend-item'>
-                            <Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/>
-                            <Typography>Trayectos</Typography>
-                      </Grid>
-                      </Grid>
+                    </Grid>
                   </Box> 
                   <Grid> 
                     <Typography fontWeight="bold">Listado de vuelos</Typography>
                     <TableContainer component={Paper} className="table-flights-now">
-                      <Table className='table-flights-now-body' stickyHeader aria-label="customized table">
+                      <Table className='table-flights-now' stickyHeader aria-label="customized table">
                         <TableHead>
                           <TableRow>
-                            <StyledTableCell className='table-flights-now-cell' align="center">Nombre</StyledTableCell>
-                            <StyledTableCell className='table-flights-now-cell'align="center">Ruta</StyledTableCell>
-                            <StyledTableCell className='table-flights-now-cell' align="center">Estado</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell cell-ID' align="center">Nombre</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell cell-city' align="center">Origen</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell cell-city' align="center">Destino</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody> 
                           {(flightsSchedule) && 
-                            flightsSchedule.slice(0,20).map((flight) => (
+                            flightsSchedule.slice(0,100).map((flight) => (
+                              flight.estado === 1 ? 
                               <StyledTableRow key={flight.name}>
-                                <StyledTableCell className='table-flights-now-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
-                                <StyledTableCell className='table-flights-now-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName + ' - ' + airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
-                                <StyledTableCell className='table-flights-now-cell' align="center">
+                                <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell' align="center">
                                     <div className='table-state'>
                                         <Typography className='state-text'
                                             border={flight.estado === 0 ? "1.5px solid #FFFA80" : flight.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
@@ -242,6 +246,7 @@ import { styled } from '@mui/material/styles';
                                     </div>
                                 </StyledTableCell>
                               </StyledTableRow>
+                              : <></>
                             ))
                           }
                         </TableBody>
