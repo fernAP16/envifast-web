@@ -2,7 +2,7 @@ import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
 import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime, planShipmentsSimulation } from '../../services/envios/EnviosServices';
-import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress } from '@mui/material';
+import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, DialogActions } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
 import AirplaneIcon from '../../assets/icons/avion.png';
@@ -58,6 +58,7 @@ const Simulacion5Dias = () => {
     const [lapsoPlanificador, setLapsoPlanificador] = React.useState(0)
     const [valueSearch, setValueSearch] = React.useState('')
     const [searchTable, setSearchTable] = React.useState([]);
+    const [arrive5Days, setArrive5Days] = React.useState(true);
 
     const getIcon = () => {
         return L.icon({
@@ -156,7 +157,7 @@ const Simulacion5Dias = () => {
     }, [stateButtons]) 
 
     const enviarPlanificador = (horaActual) => {
-      if(currentDateTime != null){
+      if(currentDateTime != null && !arrive5Days){
         let fechaPlanificacon = currentDateTime.toISOString().split('T')[0]
         // let horaInicio = currentDateTime.toISOString().split('T')[1].substring(0, 5) // substr si es inclusivo, si incluye el ultimo indice
         let horaInicioDate = new Date(fechaPlanificacon)
@@ -203,27 +204,35 @@ const Simulacion5Dias = () => {
 
     // Contador que modificara el tiempo:
     React.useEffect(() => {
-      const interval = setInterval(() => {
-        let temp = currentDateTime;
-        let horas = temp.getHours()
-        let minutos = temp.getMinutes()
-        temp.setMinutes(temp.getMinutes() + 1)
-        setCurrentDateTime(temp)
-        if(horas % 4 === 0  && minutos == 0){ 
-          enviarPlanificador(horas)
-        }
-      }, 200) 
-      return () => {
-        clearInterval(interval);
-      };
+      if(flagInicioContador){
+        const interval = setInterval(() => {
+          let temp = currentDateTime;
+          let horas = temp.getHours();
+          let minutos = temp.getMinutes();
+          temp.setMinutes(temp.getMinutes() + 1);
+          setCurrentDateTime(temp);
+          if(currentDateTime.getDate() - initialDate.getDate() === 5 ){
+            console.log("FIN SIMULACION");
+            setArrive5Days(true);
+            return;
+          }
+          if(horas % 4 === 0  && minutos === 0){ 
+            enviarPlanificador(horas)
+          }
+        }, 50) 
+        return () => {
+          clearInterval(interval);
+        };
+      }
     }, [flagInicioContador])
 
     
 
     // Primera Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
-        const interval = setInterval(() => { 
+        const interval = setInterval(() => {
           for(var i = 0 ; i < primeraSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -236,6 +245,7 @@ const Simulacion5Dias = () => {
 
     // Segunda seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           for(var i = primeraSeccion; i < segundaSeccion; i++){
@@ -250,6 +260,7 @@ const Simulacion5Dias = () => {
 
     // Tercera Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           for(var i = segundaSeccion; i < terceraSeccion; i++){
@@ -264,8 +275,9 @@ const Simulacion5Dias = () => {
 
     // Cuarta Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
-        const interval = setInterval(() => {  
+        const interval = setInterval(() => {
           for(var i = terceraSeccion; i < cuartaSeccion; i++){
             show_interval(flightsSchedule[i])
           }
@@ -278,6 +290,7 @@ const Simulacion5Dias = () => {
 
     // Quinta Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           for(var i = cuartaSeccion; i < quintaSeccion; i++){
@@ -292,6 +305,7 @@ const Simulacion5Dias = () => {
 
     // Sexta Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           for(var i = quintaSeccion; i < sextaSeccion; i++){
@@ -307,6 +321,7 @@ const Simulacion5Dias = () => {
 
     // Septima Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           for(var i = sextaSeccion; i < septimaSeccion; i++){
@@ -321,6 +336,7 @@ const Simulacion5Dias = () => {
 
     // Octava Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           for(var i = septimaSeccion; i < octavaSeccion; i++){
@@ -335,6 +351,7 @@ const Simulacion5Dias = () => {
 
     // Novena Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           for(var i = octavaSeccion; i < novenaSeccion; i++){
@@ -349,6 +366,7 @@ const Simulacion5Dias = () => {
 
     // Decima Seccion
     React.useEffect(() => {
+      if(arrive5Days)return;
       if(stateButtons === 2){
         const interval = setInterval(() => {
           if(flightsSchedule !== null){
@@ -368,10 +386,7 @@ const Simulacion5Dias = () => {
     }
     const show_interval = (flightSchedule) => {
       if(flightSchedule.estado === 2) {
-        
-        // AL PARECER ESTA CONDICIONAL NO FUNCIONA
         if(currentDateTime.getDate() > initialDate.getDate()){
-          console.log("Entro a este if")
           flightSchedule.estado = 0
           flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
           flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
@@ -520,7 +535,8 @@ const Simulacion5Dias = () => {
                   <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
                 </Grid>
                 <Grid item xs={5}>
-                  <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate} inputProps={{ min: "2022-08-02", max: "2023-05-24" }}/>
+                  <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate} 
+                    inputProps={{ min: "2022-08-02", max: "2023-05-24" }} disabled={stateButtons === 2}/>
                 </Grid>
                 <Grid item xs={2} align='right'>
                   <Button className={'button-control ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>
@@ -584,9 +600,17 @@ const Simulacion5Dias = () => {
               </Grid>
             </DialogContent>
           </Dialog>
-          <Popup openPopUp = {openPopUp} setOpenPopUp = {setOpenPopUp}> 
-
-          </Popup>
+          <Dialog open={arrive5Days}> 
+                <DialogTitle>
+                  Reporte de simulación: Última planificación
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>*última planificación*</Typography>
+                </DialogContent>
+                <DialogActions className='button-return-dialog'>
+                  <Button className='button-return' onClick={() => {setArrive5Days(false)}} autoFocus>Volver a simulación</Button>
+                </DialogActions>
+          </Dialog>
         </div>
     )
 }
