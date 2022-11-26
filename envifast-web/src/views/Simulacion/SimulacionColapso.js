@@ -420,8 +420,7 @@ const Simulacion5Dias = () => {
               <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm')}</Typography>
               <MapContainer
                   className="mapa-vuelo"
-                  // center = {{lat: '28.058522', lng: '-20.591226'}}
-                  center = {{lat: '23.058522', lng: '-20.591226'}}
+                  center = {{lat: '21.658522', lng: '-20.591226'}}
                   zoom = {2.7}
                   minZoom = {2.0}
                   maxZoom = {18.0}
