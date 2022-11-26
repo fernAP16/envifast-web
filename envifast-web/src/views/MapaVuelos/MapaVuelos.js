@@ -11,7 +11,7 @@ import L from "leaflet";
 
 import AirplaneMarker from "./AirplaneMarker";
 import {useState} from 'react'
-import { Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { isElementOfType } from 'react-dom/test-utils';
 import { Box } from '@mui/system';
 import { Icon } from '@iconify/react';
@@ -29,6 +29,8 @@ import { styled } from '@mui/material/styles';
     const [flightsSchedule, setFlightsSchedule] = React.useState([])
     const [currentDateTime, setCurrentDateTime] = React.useState(null);
     const [currentDateTimePrint, setCurrentDateTimePrint] = React.useState(new Date());
+    const [valueSearch, setValueSearch] = React.useState('')
+    const [searchTable, setSearchTable] = React.useState([]);
     const [initialDate, setInitialDateTime] = React.useState(new Date());
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
     const [currentTrack, setCurrentTrack] = React.useState({});
@@ -121,7 +123,7 @@ import { styled } from '@mui/material/styles';
                         (currentTimeNow < new Date(element.horaLLegada).getTime() ? 1 : 2);
             array.push(
               {
-                id: element.id,
+                id: "TAP" + element.id.toString(),
                 idAeropuertoOrigen: element.idAeropuertoOrigen,
                 idAeropuertoDestino: element.idAeropuertoDestino,
                 horaSalida: element.horaSalida,
@@ -146,7 +148,9 @@ import { styled } from '@mui/material/styles';
           setOctavaSeccion(Math.floor((8/10) * k))
           setNovenaSeccion(Math.floor((9/10) * k))         
           setFlightsSchedule(array)
+          setSearchTable(array.slice(0,20));
           setFlagInicioContador(true);
+          console.log(array);
         })
         .catch(function (error) {
           console.log(error);
@@ -164,6 +168,16 @@ import { styled } from '@mui/material/styles';
             ))}
             </> 
         )
+    }
+
+    const onChangeSearchTable = (value) => {
+      setValueSearch(value);
+      let filtered = flightsSchedule.filter(function (flight) { 
+        return airportsCoordinates[flight.idAeropuertoOrigen-1].cityName.indexOf(value) !== -1 
+        || airportsCoordinates[flight.idAeropuertoDestino-1].cityName.indexOf(value) !== -1
+        || flight.id.toString().indexOf(value) !== -1; 
+      }).slice(0,100);
+      setSearchTable(filtered);
     }
 
     return (
@@ -219,28 +233,35 @@ import { styled } from '@mui/material/styles';
                       </Grid>
                     </Grid>
                   </Box> 
+                  <Grid container alignItems='center' marginTop='10px' marginBottom='10px'>
+                    <Grid item xs={5}>
+                      <Typography fontWeight="bold">Filtrar vuelo(s): </Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
+                    </Grid>
+                  </Grid>
                   <Grid> 
                     <Typography fontWeight="bold">Listado de vuelos</Typography>
                     <TableContainer component={Paper} className="table-flights-now">
-                      <Table className='table-flights-now' stickyHeader aria-label="customized table">
+                      <Table stickyHeader aria-label="customized table">
                         <TableHead>
                           <TableRow>
-                            <StyledTableCell className='table-flights-cell cell-ID' align="center">Nombre</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell cell-city' align="center">Origen</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell cell-city' align="center">Destino</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Nombre</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Origen</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Destino</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Estado</StyledTableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody> 
-                          {(flightsSchedule) && 
-                            flightsSchedule.slice(0,100).map((flight) => (
-                              flight.estado === 1 ? 
+                          {(searchTable) && 
+                            searchTable.map((flight) => (
                               <StyledTableRow key={flight.name}>
-                                <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
-                                <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
-                                <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
-                                <StyledTableCell className='table-flights-cell' align="center">
-                                    <div className='table-state'>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.id}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">
+                                    <div>
                                         <Typography className='state-text'
                                             border={flight.estado === 0 ? "1.5px solid #FFFA80" : flight.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
                                             backgroundColor={flight.estado === 0 ? "#FFFA80" : flight.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
@@ -250,7 +271,6 @@ import { styled } from '@mui/material/styles';
                                     </div>
                                 </StyledTableCell>
                               </StyledTableRow>
-                              : <></>
                             ))
                           }
                         </TableBody>

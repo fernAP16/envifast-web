@@ -122,7 +122,7 @@ const Simulacion5Dias = () => {
           for (const element of response.data){
             array.push(
               {
-                id: element.id,
+                id: "TAP" + element.id.toString(),
                 idAeropuertoOrigen: element.idAeropuertoOrigen,
                 idAeropuertoDestino: element.idAeropuertoDestino,
                 horaSalida: element.horaSalida,
@@ -471,7 +471,7 @@ const Simulacion5Dias = () => {
         return airportsCoordinates[flight.idAeropuertoOrigen-1].cityName.indexOf(value) !== -1 
           || airportsCoordinates[flight.idAeropuertoDestino-1].cityName.indexOf(value) !== -1
           || flight.id.toString().indexOf(value) !== -1; 
-      }).slice(0,20);
+      }).slice(0,100);
       setSearchTable(filtered);
     }
 
@@ -545,34 +545,34 @@ const Simulacion5Dias = () => {
                 </Grid>
               </Grid>
               <Grid container alignItems='center' marginTop='10px' marginBottom='10px'>
-                  <Grid item xs={5}>
-                    <Typography fontWeight="bold">Filtrar vuelo(s): </Typography>
-                  </Grid>
-                  <Grid item xs={7}>
-                    <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
-                  </Grid>
+                <Grid item xs={5}>
+                  <Typography fontWeight="bold">Filtrar vuelo(s): </Typography>
                 </Grid>
+                <Grid item xs={7}>
+                  <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
+                </Grid>
+              </Grid>
               <Grid>
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
                 <TableContainer component={Paper} className="table-collapse-flights">
-                  <Table className='table-flights-body' stickyHeader aria-label="customized table">
+                  <Table stickyHeader aria-label="customized table">
                     <TableHead>
                       <TableRow>
-                        <StyledTableCell className='table-flights-cell cell-ID' align="center">Nombre</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell cell-city'align="center">Origen</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell cell-city'align="center">Destino</StyledTableCell>
-                        <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">Nombre</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">Origen</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">Destino</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">Estado</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody> 
                       {(searchTable) && 
                         searchTable.map((flight) => (
                           <StyledTableRow key={flight.name}>
-                            <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell' align="center">
-                                <div className='table-state'>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.id}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">
+                                <div>
                                     <Typography className='state-text'
                                         border={flight.estado === 0 ? "1.5px solid #FFFA80" : flight.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
                                         backgroundColor={flight.estado === 0 ? "#FFFA80" : flight.estado === 1 ? "#FFA0A0" : "#B6FFD8"}

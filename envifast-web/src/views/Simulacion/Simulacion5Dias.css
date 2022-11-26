@@ -62,35 +62,21 @@
     background: #555;
 }
 
-.table-flights-cell{
-    justify-content: center;
-    padding: 8px;
-}
-
 .cell-ID{
-    width: 80px;
+    width: 100px;
 }
 
 .cell-city{
-    width: 90px;
+    width: 100px;
 }
 
 .cell-state{
-    width: 90px;
+    width: 100px;
 }
 
 .button-flights{
     box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.12);
     border-radius: 4px;
-}
-
-.state-text {
-    font-size: 10px;
-    text-align: center;
-    border-radius: 8px;
-    padding: 2px;
-    margin: 2px;
-    width: 80px;
 }
 
 .loading-comp{

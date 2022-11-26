@@ -120,7 +120,7 @@ const Simulacion5Dias = () => {
           for (const element of response.data){
             array.push(
               {
-                id: element.id,
+                id: "TAP" + element.id.toString(),
                 idAeropuertoOrigen: element.idAeropuertoOrigen,
                 idAeropuertoDestino: element.idAeropuertoDestino,
                 horaSalida: element.horaSalida,
@@ -406,7 +406,7 @@ const Simulacion5Dias = () => {
         return airportsCoordinates[flight.idAeropuertoOrigen-1].cityName.indexOf(value) !== -1 
           || airportsCoordinates[flight.idAeropuertoDestino-1].cityName.indexOf(value) !== -1
           || flight.id.toString().indexOf(value) !== -1; 
-      }).slice(0,20);
+      }).slice(0,100);
       setSearchTable(filtered);
     }
 
@@ -502,7 +502,7 @@ const Simulacion5Dias = () => {
                       {(searchTable) && 
                         searchTable.map((flight) => (
                           <StyledTableRow key={flight.name}>
-                            <StyledTableCell className='table-flights-cell' align="center">{"TAP" + flight.id.toString()}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{flight.id}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
                             <StyledTableCell className='table-flights-cell' align="center">
