@@ -13,7 +13,7 @@ const Layout = (props) => {
     return (
         <Auxiliar>
             <Box sx={{ display: 'flex' }}>
-                <CssBaseline/>|
+                <CssBaseline/>
                 <AppBar
                     position="fixed"
                     sx={{
@@ -21,11 +21,6 @@ const Layout = (props) => {
                     ml: { sm: `100px` },
                     }}
                 >
-                    <Toolbar className="toolbar-main">
-                        <Typography>
-                            Usuario
-                        </Typography>
-                    </Toolbar>
                 </AppBar>
                 <Drawer
                     className="layoutDrawer"
@@ -36,9 +31,8 @@ const Layout = (props) => {
                 </Drawer>
                 <Box
                     component="main"
-                    style={{marginLeft:"215px", marginTop:"0px"}}
+                    style={{marginLeft:"220px", marginTop:"20px"}}
                 >
-                    <Toolbar />
                     {props.children}
                 </Box>
             </Box>

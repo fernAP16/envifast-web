@@ -199,8 +199,8 @@ const Envios  = (props) => {
     }
 
     return (
-        <div>
-            <Grid className='container-shipment'>
+        <div className='container-shipment'>
+            <Grid className='container-shipment-title'>
                 <Typography className='title-shipment'>Envíos</Typography>
                 <Grid container className='search-actions'>
                     <Grid item xs={4}>
@@ -220,11 +220,11 @@ const Envios  = (props) => {
                                 <TableCell className='table-shipment-header'>N°</TableCell>
                                 <TableCell className='table-shipment-header' width='150px'>Emisor</TableCell>
                                 <TableCell className='table-shipment-header' width='150px'>Destinatario</TableCell>
-                                <TableCell className='table-shipment-header'>Estado del envío</TableCell>
+                                <TableCell className='table-shipment-header' align='center'>Estado del envío</TableCell>
                                 <TableCell className='table-shipment-header'>Ciudad de origen</TableCell>
                                 <TableCell className='table-shipment-header'>Ciudad de destino</TableCell>
-                                <TableCell className='table-shipment-header'>N° de paquetes</TableCell>
-                                <TableCell className='table-shipment-header'>Fecha de envío</TableCell>
+                                <TableCell className='table-shipment-header' align='center'>N° de paquetes</TableCell>
+                                <TableCell className='table-shipment-header' align='center'>Fecha de envío</TableCell>
                                 <TableCell className='table-shipment-header' align='center' width='150px'>Acciones</TableCell>
                             </TableRow>
                             </TableHead>
@@ -238,7 +238,7 @@ const Envios  = (props) => {
                                     <TableCell>{shipment.nombreEmisor}</TableCell>
                                     <TableCell>{shipment.nombreDestinatario}</TableCell>
                                     <TableCell align='center'>
-                                        <Grid justifyContent='center'>
+                                        <Grid container justifyContent='center'>
                                             <Typography className='table-state' align='center'
                                                 border={shipment.estado === 0 ? "1.5px solid #FFFA80" : shipment.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
                                                 backgroundColor={shipment.estado === 0 ? "#FFFA80" : shipment.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
@@ -249,9 +249,9 @@ const Envios  = (props) => {
                                     </TableCell>
                                     <TableCell>{shipment.origen.ciudad.nombre}</TableCell>
                                     <TableCell>{shipment.destino.ciudad.nombre}</TableCell>
-                                    <TableCell>{shipment.cantPaquetes}</TableCell>
-                                    <TableCell>{shipment.fechaEnvio}</TableCell>
-                                    <TableCell align='center'><Button className='buttons-actions' onClick={() => handleVerDetalle(shipment)}>Ver detalle</Button></TableCell>
+                                    <TableCell align='center'>{shipment.cantPaquetes}</TableCell>
+                                    <TableCell align='center'>{shipment.fechaEnvio}</TableCell>
+                                    <TableCell align='center'><Button className='buttons-detail' onClick={() => handleVerDetalle(shipment)}>Ver detalle</Button></TableCell>
                                 </TableRow>
                             ))}
                             </TableBody>

@@ -35,7 +35,7 @@ const MenuLateral = (props) => {
             </div>
             <Divider/>
             <List>
-                {['Mapa de vuelos','Envios','Simulacion','De 5 dias','Colapso logístico'].map((text,index) => (
+                {['Mapa de vuelos','Envíos','Simulación','De 5 días','Colapso logístico'].map((text,index) => (
                     <ListItem key={text} disablePadding>
                         <ListItemButton 
                             selected={selectedIndex === text}

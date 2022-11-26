@@ -554,7 +554,7 @@ const Simulacion5Dias = () => {
               </Grid>
               <Grid>
                 <Typography fontWeight="bold">Listado de vuelos</Typography>
-                <TableContainer component={Paper} className="table-collapse-flights">
+                <TableContainer component={Paper} className="table-simulation-flights">
                   <Table stickyHeader aria-label="customized table">
                     <TableHead>
                       <TableRow>

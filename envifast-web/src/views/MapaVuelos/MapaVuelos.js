@@ -189,7 +189,7 @@ import { styled } from '@mui/material/styles';
                     <Typography className='date-map'>{"Tiempo actual: " + currentDateTimePrint.toLocaleString()}</Typography>
                     <MapContainer
                         className="mapa-vuelo"
-                        center = {{lat: '28.058522', lng: '-20.591226'}}
+                        center = {{lat: '22.058522', lng: '-20.591226'}}
                         zoom = {2.8}
                         minZoom = {2.0}
                         maxZoom = {18.0}
