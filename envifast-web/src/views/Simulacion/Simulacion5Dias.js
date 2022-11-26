@@ -58,7 +58,7 @@ const Simulacion5Dias = () => {
     const [lapsoPlanificador, setLapsoPlanificador] = React.useState(0)
     const [valueSearch, setValueSearch] = React.useState('')
     const [searchTable, setSearchTable] = React.useState([]);
-    const [arrive5Days, setArrive5Days] = React.useState(true);
+    const [arrive5Days, setArrive5Days] = React.useState(false);
 
     const getIcon = () => {
         return L.icon({
@@ -219,7 +219,7 @@ const Simulacion5Dias = () => {
           if(horas % 4 === 0  && minutos === 0){ 
             enviarPlanificador(horas)
           }
-        }, 50) 
+        }, 200) 
         return () => {
           clearInterval(interval);
         };
@@ -608,7 +608,7 @@ const Simulacion5Dias = () => {
                     <Typography>*última planificación*</Typography>
                 </DialogContent>
                 <DialogActions className='button-return-dialog'>
-                  <Button className='button-return' onClick={() => {setArrive5Days(false)}} autoFocus>Volver a simulación</Button>
+                  <Button className='button-return' onClick={() => {setArrive5Days(false); window.location.reload(false);}} autoFocus>Volver a simulación</Button>
                 </DialogActions>
           </Dialog>
         </div>

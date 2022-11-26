@@ -28,6 +28,7 @@ import { styled } from '@mui/material/styles';
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
     const [flightsSchedule, setFlightsSchedule] = React.useState([])
     const [currentDateTime, setCurrentDateTime] = React.useState(null);
+    const [currentDateTimePrint, setCurrentDateTimePrint] = React.useState(new Date());
     const [initialDate, setInitialDateTime] = React.useState(new Date());
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
     const [currentTrack, setCurrentTrack] = React.useState({});
@@ -53,102 +54,105 @@ import { styled } from '@mui/material/styles';
     }
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
-        [`&.${tableCellClasses.head}`]: {
-          backgroundColor: "#AFD6D6",
-          color: theme.palette.common.black,
-        },
-        [`&.${tableCellClasses.body}`]: {
-          fontSize: 14,
-        },
-      }));
+      [`&.${tableCellClasses.head}`]: {
+        backgroundColor: "#AFD6D6",
+        color: theme.palette.common.black,
+      },
+      [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+      },
+    }));
   
-      const StyledTableRow = styled(TableRow)(({ theme }) => ({
-        '&:nth-of-type(odd)': {
-          backgroundColor: theme.palette.action.hover,
-        },
-        // hide last border
-        '&:last-child td, &:last-child th': {
-          border: 0,
-        },
-      }));
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+      },
+      // hide last border
+      '&:last-child td, &:last-child th': {
+        border: 0,
+      },
+    }));
+
+    React.useEffect(() => {
+      setCurrentDateTimePrint(new Date());
+    })
 
     // para la animacion
     React.useEffect(() => {
-        getCoordenadasAeropuertos()
-        .then(function (response) {
-            var array = [];
-            for (const element of response.data) {
-                array.push({
-                    id: element.id,
-                    cityName: element.cityName,
-                    lat: element.x_pos,
-                    lng: element.y_pos
-                })
-            };
-            setAirportsCoordinates(array);
-            setCurrentDateTime(new Date())
-            setStateButtons(2)
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
+      getCoordenadasAeropuertos()
+      .then(function (response) {
+        var array = [];
+        for (const element of response.data) {
+          array.push({
+            id: element.id,
+            cityName: element.cityName,
+            lat: element.x_pos,
+            lng: element.y_pos
+          })
+        };
+        setAirportsCoordinates(array);
+        setCurrentDateTime(new Date())
+        setStateButtons(2)
+      })
+      .catch(function (error) {
+          console.log(error);
+      })
     },[])
 
     // api para obtener los vuelos de un dia. Por ahora estara hardcodeado para el 22
     React.useEffect(() => {
       if(currentDateTime != null){
-      let date = currentDateTime;
-      date.setHours(date.getHours() - 5);
-      let variables = {
-        fecha: date.toISOString().slice(0, 10),//startDate, // 2022-10-29
-        paraSim: 0
+        let date = currentDateTime;
+        date.setHours(date.getHours() - 5);
+        let variables = {
+          fecha: date.toISOString().slice(0, 10),//startDate, // 2022-10-29
+          paraSim: 0
+        }
+        getVuelosPorDia(variables)
+        .then((response) => {
+          var array = []
+          for (const element of response.data){
+            let coordenadasOrigenTemp = [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng];
+            let coordenadasDestinosTemp = [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng];
+            let currentTimeNow = currentDateTime.getTime();
+            let difTime = new Date(element.horaLLegada).getTime() - new Date(element.horaSalida).getTime();
+            let currTime = currentTimeNow - new Date(element.horaSalida).getTime(); // PROBLEMA
+            let estado = currentTimeNow < new Date(element.horaSalida).getTime() ? 0 : 
+                        (currentTimeNow < new Date(element.horaLLegada).getTime() ? 1 : 2);
+            array.push(
+              {
+                id: element.id,
+                idAeropuertoOrigen: element.idAeropuertoOrigen,
+                idAeropuertoDestino: element.idAeropuertoDestino,
+                horaSalida: element.horaSalida,
+                horaLLegada: element.horaLLegada,
+                duracion: element.duracion,
+                coordenadasOrigen: coordenadasOrigenTemp,
+                coordenadasDestinos: coordenadasDestinosTemp,
+                coordenadasActual: [coordenadasOrigenTemp[0] + (coordenadasDestinosTemp[0] - coordenadasOrigenTemp[0])*currTime/difTime,
+                                    coordenadasOrigenTemp[1] + (coordenadasDestinosTemp[1] - coordenadasOrigenTemp[1])*currTime/difTime],
+                estado: estado
+              }
+            )
+          };
+          var k = array.length;
+          setPrimeraSeccion(Math.floor(k/10))
+          setSegundaSeccion(Math.floor(k/5))
+          setTerceraSeccion(Math.floor((3/10) * k))
+          setCuartaSeccion(Math.floor((4/10) * k))
+          setQuintaSeccion(Math.floor( k / 2))
+          setSextaSeccion(Math.floor((6/10) * k))
+          setSeptimaSeccion(Math.floor((7/10) * k))
+          setOctavaSeccion(Math.floor((8/10) * k))
+          setNovenaSeccion(Math.floor((9/10) * k))         
+          setFlightsSchedule(array)
+          setFlagInicioContador(true);
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
       }
-      getVuelosPorDia(variables)
-      .then((response) => {
-        var array = []
-        for (const element of response.data){
-          let coordenadasOrigenTemp = [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng];
-          let coordenadasDestinosTemp = [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng];
-          let currentTimeNow = currentDateTime.getTime();
-          let difTime = new Date(element.horaLLegada).getTime() - new Date(element.horaSalida).getTime();
-          let currTime = currentTimeNow - new Date(element.horaSalida).getTime(); // PROBLEMA
-          let estado = currentTimeNow < new Date(element.horaSalida).getTime() ? 0 : 
-                      (currentTimeNow < new Date(element.horaLLegada).getTime() ? 1 : 2);
-          array.push(
-            {
-              id: element.id,
-              idAeropuertoOrigen: element.idAeropuertoOrigen,
-              idAeropuertoDestino: element.idAeropuertoDestino,
-              horaSalida: element.horaSalida,
-              horaLLegada: element.horaLLegada,
-              duracion: element.duracion,
-              coordenadasOrigen: coordenadasOrigenTemp,
-              coordenadasDestinos: coordenadasDestinosTemp,
-              coordenadasActual: [coordenadasOrigenTemp[0] + (coordenadasDestinosTemp[0] - coordenadasOrigenTemp[0])*currTime/difTime,
-                                  coordenadasOrigenTemp[1] + (coordenadasDestinosTemp[1] - coordenadasOrigenTemp[1])*currTime/difTime],
-              estado: estado
-            }
-          )
-        };
-        var k = array.length;
-        setPrimeraSeccion(Math.floor(k/10))
-        setSegundaSeccion(Math.floor(k/5))
-        setTerceraSeccion(Math.floor((3/10) * k))
-        setCuartaSeccion(Math.floor((4/10) * k))
-        setQuintaSeccion(Math.floor( k / 2))
-        setSextaSeccion(Math.floor((6/10) * k))
-        setSeptimaSeccion(Math.floor((7/10) * k))
-        setOctavaSeccion(Math.floor((8/10) * k))
-        setNovenaSeccion(Math.floor((9/10) * k))         
-        setFlightsSchedule(array)
-        setFlagInicioContador(true);
-      })
-      .catch(function (error) {
-        console.log(error);
-    })
-    }
     }, [currentDateTime])
-
 
     const AirportMarket = () => {
         return (
@@ -168,7 +172,7 @@ import { styled } from '@mui/material/styles';
             <Grid display='flex'>
                 <Grid className='containerMapa'>
                     <Typography className='title'>Mapa de vuelos</Typography>
-                    <Typography className='date-map'>{"Tiempo actual: " + currentDateTime.toLocaleString()}</Typography>
+                    <Typography className='date-map'>{"Tiempo actual: " + currentDateTimePrint.toLocaleString()}</Typography>
                     <MapContainer
                         className="mapa-vuelo"
                         center = {{lat: '28.058522', lng: '-20.591226'}}
