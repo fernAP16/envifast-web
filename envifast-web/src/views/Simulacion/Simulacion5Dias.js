@@ -214,11 +214,15 @@ const Simulacion5Dias = () => {
           let minutos = temp.getMinutes();
           temp.setMinutes(temp.getMinutes() + 1);
           setCurrentDateTime(temp);
-          if(currentDateTime.getDate() - initialDate.getDate() === 5 ){
+          if(currentDateTime.getDate() - initialDate.getDate() === 5){
+            let lastDate = currentDateTime;
+            lastDate.setDate(lastDate.getDate()-1);
             navigate(ROUTES.SIMULACION5DIASREPORTE, {
               state: {
-                  lastDate: "03",
-                  from: 1
+                  lastDate: lastDate,
+                  from: "22:00",
+                  to: "00:00",
+                  type: 1
               }
             });
           }

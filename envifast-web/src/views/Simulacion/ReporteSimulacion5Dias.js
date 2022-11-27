@@ -6,15 +6,11 @@ import './Simulacion5Dias.css';
 
 const ReporteSimulacion5Dias = () => {
   const {state} = useLocation();
-  // const { lastDate, from } = state;
+  const { lastDate, from, to, type } = state;
   const [idPlanSelected, setIdPlanSelected] = React.useState(0);
   const [isSelected, setIsSelected] = React.useState(false);
   const [packageFlights, setPackageFlights] = React.useState([]);
   const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
-
-  const [fechaUltimoDia, setFechaUltimoDia] = React.useState("2022-11-26")
-  const [horaInicio, setHoraInicio] = React.useState("22:00")
-  const [horaFin, setHoraFin] = React.useState("00:00")
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -56,42 +52,49 @@ const ReporteSimulacion5Dias = () => {
   },[])
   
   return (
-    <div>
-      <Grid>
-        <Typography>
-          Reporte Simulación 5 días
-        </Typography>
-
-        <Grid container spacing={10} alignItems='center' marginBottom='100px'>
-          <Grid item xs={5}>
-            <Typography>Fecha de ultimo envio: {fechaUltimoDia} </Typography>
-          </Grid>
-          <Grid item xs={5}>
-            <Typography>Cantidad de paquetes planificados: 1342 </Typography>
-          </Grid>
-
-          <Grid item xs={3}>
-              <Typography> Buscar planes de vuelo para los paquetes </Typography>
+    <div className='container-report'>
+      <Grid className='container-report-header'>
+        <Typography className='container-report-title'>{"Reporte " + (type === 1 ? "Simulación 5 días" : "Colapso logístico")}</Typography>
+        <Typography className='container-report-info'>Datos obtenidos </Typography>
+        <div className='container-report-grid'>
+          <Grid container alignItems='center'>
+            <Grid item xs={3}>
+              <Typography>Fecha de último registro: </Typography>
             </Grid>
-
-          <Grid item xs={3}>
-            <Typography> Ingrese fecha de registro: </Typography>
+            <Grid item xs={3}>
+              <TextField type='date'size='small' disabled={true} value={lastDate.toISOString().split('T')[0]}></TextField>
+            </Grid>
+            <Grid item xs={1}>
+              <Typography>Desde: </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <TextField type='time' size='small' value={from} disabled={true}></TextField>
+            </Grid>
+            <Grid item xs={1}>
+              <Typography>Hasta: </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <TextField type='time' size='small' value={to} disabled={true}></TextField>
+            </Grid>
           </Grid>
-
-          <Grid item xs={3}>
-            <TextField size='small' disabled={false} ></TextField>
+          <Grid container marginTop='15px'>
+            <Grid container alignItems='center'>
+              <Grid item xs={4}>
+                <Typography className='container-report-label'>Cantidad de paquetes planificados: </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <TextField size='small' disabled={true} value={1342}></TextField>
+              </Grid>
+            </Grid>
           </Grid>
-
-
-        </Grid>
-
+        </div>
         <TableContainer component={Paper} className="table-package-flight">
             <Table stickyHeader aria-label="customized table">
               <TableHead>
                 <TableRow>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Id Paquete</StyledTableCell>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Id Envio</StyledTableCell>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Fecha de Registro</StyledTableCell>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Hora de Registro</StyledTableCell>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Plan de Vuelo</StyledTableCell>
                 </TableRow>
               </TableHead>
