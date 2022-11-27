@@ -217,11 +217,10 @@ const Simulacion5Dias = () => {
           if(currentDateTime.getDate() - initialDate.getDate() === 5 ){
             navigate(ROUTES.SIMULACION5DIASREPORTE, {
               state: {
-                  lastDate: "03"
+                  lastDate: "03",
+                  from: 1
               }
             });
-            setArrive5Days(true);
-            return;
           }
           if(horas % 4 === 0  && minutos === 0){ 
             enviarPlanificador(horas)
