@@ -1,16 +1,19 @@
-import { Dialog, DialogContent, DialogTitle, Grid, Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React from 'react'
 import { useLocation } from 'react-router-dom'
-import { getCoordenadasAeropuertos } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getPackageRoute, getPlanifiedOrders } from '../../services/envios/EnviosServices';
 import './Simulacion5Dias.css';
 
 const ReporteSimulacion5Dias = () => {
   const {state} = useLocation();
-  const { lastDate, from, to, type } = state;
+  const { firstDate, lastDate, from, to, type } = state;
   const [idPlanSelected, setIdPlanSelected] = React.useState(0);
   const [isSelected, setIsSelected] = React.useState(false);
-  const [packageFlights, setPackageFlights] = React.useState([]);
-  const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
+  const [packages, setPackages] = React.useState(null);
+  const [packageSelected, setPackageSelected] = React.useState({});
+  const [packageFlights, setPackagesFlights] = React.useState([])
+  const [airportsCoordinates, setAirportsCoordinates] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -33,24 +36,63 @@ const ReporteSimulacion5Dias = () => {
   }));
 
   React.useEffect(() => {
-    getCoordenadasAeropuertos()
+    let variables = {
+      date: lastDate.toISOString().split('T')[0],
+      timeInf: from,
+      timeSup: to,
+      paraSim: 1
+    }
+    getPlanifiedOrders(variables)
     .then(function (response) {
-      var arrayAirports = [];
+      console.log(response);
+      var array = [];
       for (const element of response.data) {
-        arrayAirports.push({
-          id: element.id,
-          cityName: element.cityName,
-          lat: element.x_pos,
-          lng: element.y_pos
+        array.push({
+          idPackage: element.codPaquete,
+          idShipment: element.codEnvio,
+          timeRegistering: element.fecha
         })
       };
-      setAirportsCoordinates(arrayAirports);
+      setPackages(array);
+      setIsLoading(false);
     })
     .catch(function (error) {
         console.log(error);
     })
   },[])
+
+  const handleDetail= (pack) => {
+    // packageFlights
+    getPackageRoute(pack.idPackage)
+    .then(function (response) {
+      console.log(response);
+      var array = [];
+      for (const element of response.data) {
+        array.push({
+          origen: element.ciudadOrigen,
+          destino: element.ciudadDestino,
+          horaSalida: element.horaSalida,
+          horaLLegada: element.horaLLegada
+        })        
+      };
+      setPackagesFlights(array);
+      setPackageSelected({
+        idPackage: pack.idPackage,
+        idShipment: pack.idShipment,
+        timeRegistering: pack.timeRegistering
+      })
+    })
+    .catch(function (error) {
+        console.log(error);
+    })
+    setIsSelected(true);
+  }
   
+  const handleReturn = () => {
+    setPackagesFlights([])
+    setIsSelected(false);
+  }
+
   return (
     <div className='container-report'>
       <Grid className='container-report-header'>
@@ -58,6 +100,12 @@ const ReporteSimulacion5Dias = () => {
         <Typography className='container-report-info'>Datos obtenidos </Typography>
         <div className='container-report-grid'>
           <Grid container alignItems='center'>
+            <Grid item xs={3}>
+              <Typography>Fecha del primer registro: </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField type='date'size='small' disabled={true} value={firstDate.toISOString().split('T')[0]}></TextField>
+            </Grid>
             <Grid item xs={3}>
               <Typography>Fecha de último registro: </Typography>
             </Grid>
@@ -83,29 +131,31 @@ const ReporteSimulacion5Dias = () => {
                 <Typography className='container-report-label'>Cantidad de paquetes planificados: </Typography>
               </Grid>
               <Grid item xs={1}>
-                <TextField size='small' disabled={true} value={1342}></TextField>
+                <TextField size='small' disabled={true} value={packages ? packages.length : '-'}></TextField>
               </Grid>
             </Grid>
           </Grid>
         </div>
-        <TableContainer component={Paper} className="table-package-flight">
+        <TableContainer component={Paper} className="table-package-flight-large">
             <Table stickyHeader aria-label="customized table">
               <TableHead>
                 <TableRow>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Id Paquete</StyledTableCell>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Id Envio</StyledTableCell>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Hora de Registro</StyledTableCell>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Plan de Vuelo</StyledTableCell>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Acciones</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody> 
-                {packageFlights && 
-                  packageFlights.map((flight, index) => (
-                    <StyledTableRow key={flight.name}>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida}</StyledTableCell>                      
+                {packages && 
+                  packages.map((pack) => (
+                    <StyledTableRow>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.idPackage}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.idShipment}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.timeRegistering}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">
+                        <Button className='button-return' onClick={() => handleDetail(pack)}>Ver plan de vuelo</Button>
+                      </StyledTableCell>
                     </StyledTableRow>
                   ))
                 }
@@ -115,25 +165,27 @@ const ReporteSimulacion5Dias = () => {
       </Grid>
 
       {/* Para el pop up */}
+      {packageSelected &&
       <Dialog
         open={isSelected}
+        maxWidth="1000px"
       >
         <DialogTitle>
-          {"Plan de vuelo " + idPlanSelected}
+          {"Paquete " + packageSelected.idPackage}
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={1} alignItems='center' marginBottom='10px'>
-            <Grid item xs={3}>
-              <Typography>Código del paquete:  </Typography>
+            <Grid item xs={2}>
+              <Typography>{"Plan de vuelo: "}</Typography>
             </Grid>
             <Grid item xs={3}>
-              <TextField size='small' disabled={true} value={"ECEJOCS1567848"}></TextField>
+              <TextField size='small' disabled={true} value={packageSelected.idShipment}></TextField>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Typography>Fecha de llegada: </Typography>
             </Grid>
             <Grid item xs={3}>
-              <TextField size='small' disabled={true} value={"28/11/2022"}></TextField>
+              <TextField size='small' disabled={true} value={packageSelected.timeRegistering}></TextField>
             </Grid>
           </Grid>
           <TableContainer component={Paper} className="table-package-flight">
@@ -152,10 +204,10 @@ const ReporteSimulacion5Dias = () => {
                   packageFlights.map((flight, index) => (
                     <StyledTableRow key={flight.name}>
                       <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.origen}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.destino}</StyledTableCell>
                       <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaLlegada}</StyledTableCell>                        
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaLLegada}</StyledTableCell>                        
                     </StyledTableRow>
                   ))
                 }
@@ -163,7 +215,21 @@ const ReporteSimulacion5Dias = () => {
             </Table>
           </TableContainer>
         </DialogContent>
+        <DialogActions>
+          <Button className='button-return' onClick={handleReturn}>Volver</Button>
+        </DialogActions>
       </Dialog>
+    }
+    <Dialog open={isLoading}>
+      <DialogTitle>
+        Generando reporte...
+      </DialogTitle>
+      <DialogContent>
+        <Grid item container justifyContent='center'>
+          <CircularProgress className='loading-comp'/>
+        </Grid>
+      </DialogContent>
+    </Dialog>
     </div>
     
   )

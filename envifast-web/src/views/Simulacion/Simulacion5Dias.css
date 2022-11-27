@@ -135,8 +135,14 @@
     width: 120px;
 }
 
-.table-package-flight{
+.table-package-flight-large{
     height: 450px;
+    width: 1000px;
+    overflow-y: scroll;
+}
+
+.table-package-flight{
+    height: 200px;
     width: 1000px;
     overflow-y: scroll;
 }
