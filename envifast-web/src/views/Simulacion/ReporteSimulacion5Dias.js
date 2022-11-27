@@ -8,9 +8,13 @@ const ReporteSimulacion5Dias = () => {
   const {state} = useLocation();
   // const { lastDate, from } = state;
   const [idPlanSelected, setIdPlanSelected] = React.useState(0);
-  const [isSelected, setIsSelected] = React.useState(true);
+  const [isSelected, setIsSelected] = React.useState(false);
   const [packageFlights, setPackageFlights] = React.useState([]);
   const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
+
+  const [fechaUltimoDia, setFechaUltimoDia] = React.useState("2022-11-26")
+  const [horaInicio, setHoraInicio] = React.useState("22:00")
+  const [horaFin, setHoraFin] = React.useState("00:00")
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -53,7 +57,61 @@ const ReporteSimulacion5Dias = () => {
   
   return (
     <div>
-      Reporte Simulación 5 días
+      <Grid>
+        <Typography>
+          Reporte Simulación 5 días
+        </Typography>
+
+        <Grid container spacing={10} alignItems='center' marginBottom='100px'>
+          <Grid item xs={5}>
+            <Typography>Fecha de ultimo envio: {fechaUltimoDia} </Typography>
+          </Grid>
+          <Grid item xs={5}>
+            <Typography>Cantidad de paquetes planificados: 1342 </Typography>
+          </Grid>
+
+          <Grid item xs={3}>
+              <Typography> Buscar planes de vuelo para los paquetes </Typography>
+            </Grid>
+
+          <Grid item xs={3}>
+            <Typography> Ingrese fecha de registro: </Typography>
+          </Grid>
+
+          <Grid item xs={3}>
+            <TextField size='small' disabled={false} ></TextField>
+          </Grid>
+
+
+        </Grid>
+
+        <TableContainer component={Paper} className="table-package-flight">
+            <Table stickyHeader aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Id Paquete</StyledTableCell>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Id Envio</StyledTableCell>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Fecha de Registro</StyledTableCell>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Plan de Vuelo</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody> 
+                {packageFlights && 
+                  packageFlights.map((flight, index) => (
+                    <StyledTableRow key={flight.name}>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida}</StyledTableCell>                      
+                    </StyledTableRow>
+                  ))
+                }
+              </TableBody>
+            </Table>
+          </TableContainer>
+      </Grid>
+
+      {/* Para el pop up */}
       <Dialog
         open={isSelected}
       >
