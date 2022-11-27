@@ -1,8 +1,15 @@
+import { Dialog } from '@mui/material'
 import React from 'react'
 
 const ReporteSimulacion5Dias = () => {
   return (
-    <div>ReporteSimulacion5Dias</div>
+    <div>
+      Reporte Simulación 5 días
+      <Dialog>
+
+      </Dialog>
+    </div>
+    
   )
 }
 

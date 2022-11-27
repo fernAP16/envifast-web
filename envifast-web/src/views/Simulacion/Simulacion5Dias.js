@@ -22,6 +22,8 @@ import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
 import { Icon } from '@iconify/react';
 import Popup from '../MapaVuelos/VerPlanVuelo';
 import { isCompositeComponent } from 'react-dom/test-utils';
+import { useNavigate } from 'react-router-dom';
+import * as ROUTES from "../../routes/routes";
 
 const Simulacion5Dias = () => {
     const [airportsCoordinates, setAirportsCoordinates] = React.useState([])
@@ -59,6 +61,7 @@ const Simulacion5Dias = () => {
     const [valueSearch, setValueSearch] = React.useState('')
     const [searchTable, setSearchTable] = React.useState([]);
     const [arrive5Days, setArrive5Days] = React.useState(false);
+    const navigate = useNavigate();
 
     const getIcon = () => {
         return L.icon({
@@ -212,7 +215,11 @@ const Simulacion5Dias = () => {
           temp.setMinutes(temp.getMinutes() + 1);
           setCurrentDateTime(temp);
           if(currentDateTime.getDate() - initialDate.getDate() === 5 ){
-            console.log("FIN SIMULACION");
+            navigate(ROUTES.SIMULACION5DIASREPORTE, {
+              state: {
+                  lastDate: "03"
+              }
+            });
             setArrive5Days(true);
             return;
           }
@@ -597,17 +604,6 @@ const Simulacion5Dias = () => {
                 <CircularProgress className='loading-comp'/>
               </Grid>
             </DialogContent>
-          </Dialog>
-          <Dialog open={arrive5Days}> 
-                <DialogTitle>
-                  Reporte de simulación: Última planificación
-                </DialogTitle>
-                <DialogContent>
-                    <Typography>*última planificación*</Typography>
-                </DialogContent>
-                <DialogActions className='button-return-dialog'>
-                  <Button className='button-return' onClick={() => {setArrive5Days(false); window.location.reload(false);}} autoFocus>Volver a simulación</Button>
-                </DialogActions>
           </Dialog>
         </div>
     )
