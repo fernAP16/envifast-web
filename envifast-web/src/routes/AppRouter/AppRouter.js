@@ -7,6 +7,7 @@ import Envios from "../../views/Envios/Envios";
 import Layout from '../../hoc/layout/Layout';
 import Simulacion5Dias from '../../views/Simulacion/Simulacion5Dias';
 import SimulacionColapso from '../../views/Simulacion/SimulacionColapso';
+import ReporteSimulacion5Dias from '../../views/Simulacion/ReporteSimulacion5Dias';
 
 const AppRouter = (props) => {
 
@@ -19,11 +20,12 @@ const AppRouter = (props) => {
 
     let routes = (
         <Routes>  
-            <Route index element={<Login/>}/> 
-            <Route path={ROUTES.MAPAVUELO} element={<Layout title='Mapa de vuelos'><MapaVuelo/></Layout>}/>          
-            <Route path={ROUTES.ENVIOS} element={<Layout title='Envios'><Envios/></Layout>}/>    
-            <Route path={ROUTES.SIMULACION5DIAS} element={<Layout title='Simulacion 5 dias'><Simulacion5Dias/></Layout>}/>  
-            <Route path={ROUTES.SIMULACIONCOLAPSO} element={<Layout title='Simulacion colapso logístico'><SimulacionColapso/></Layout>}/>  
+            <Route index element={<Login/>}/>
+            <Route path={ROUTES.MAPAVUELO} element={<Layout title='Mapa de vuelos'><MapaVuelo/></Layout>}/>
+            <Route path={ROUTES.ENVIOS} element={<Layout title='Envios'><Envios/></Layout>}/>
+            <Route path={ROUTES.SIMULACION5DIAS} element={<Layout title='Simulacion 5 dias'><Simulacion5Dias/></Layout>}/>
+            <Route path={ROUTES.SIMULACION5DIASREPORTE} element={<Layout title='Simulacion 5 dias: Reporte'><ReporteSimulacion5Dias/></Layout>}/>
+            <Route path={ROUTES.SIMULACIONCOLAPSO} element={<Layout title='Simulacion colapso logístico'><SimulacionColapso/></Layout>}/>
         </Routes>
     );
 

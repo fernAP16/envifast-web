@@ -189,7 +189,7 @@ import { styled } from '@mui/material/styles';
                     <Typography className='date-map'>{"Tiempo actual: " + currentDateTimePrint.toLocaleString()}</Typography>
                     <MapContainer
                         className="mapa-vuelo"
-                        center = {{lat: '22.058522', lng: '-20.591226'}}
+                        center = {{lat: '21.658522', lng: '-20.591226'}}
                         zoom = {2.8}
                         minZoom = {2.0}
                         maxZoom = {18.0}
@@ -206,11 +206,11 @@ import { styled } from '@mui/material/styles';
                                     duration_flight: flight.duracion
                                   } ?? {}
                                 }></AirplaneMarker>
-                                <Polyline
+                                {/* <Polyline
                                   color='#19D2A6'
                                   weight={0.4}
                                   positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
-                                ></Polyline>
+                                ></Polyline> */}
                             </div>
                              :
                              <></>
@@ -219,17 +219,15 @@ import { styled } from '@mui/material/styles';
                 </Grid>
                 <Grid marginLeft='20px' marginTop='10px'>
                   <Box className='box-legend'> 
-                    <Grid container>
-                      <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
-                    </Grid>
                     <Grid display="flex">
-                      <Grid container>
+                      <Grid container alignItems='center'>
+                        <Grid item xs={4}>
+                          <Typography fontWeight="bold" marginLeft='2px'>Leyenda</Typography>
+                        </Grid>
                         <Grid item xs={1}><img src={AirportIcon} width="20px" height="20px"></img></Grid>
                         <Grid item xs={4}><Typography>Aeropuerto</Typography></Grid>
                         <Grid item xs={1}><img src={AirplaneIcon} width="20px" height="20px"></img></Grid>
                         <Grid item xs={2}><Typography>Avión</Typography></Grid>
-                        <Grid item xs={1}><Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/></Grid>
-                        <Grid item xs={3}><Typography>Trayectos</Typography></Grid>
                       </Grid>
                     </Grid>
                   </Box> 

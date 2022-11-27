@@ -486,7 +486,7 @@ const Simulacion5Dias = () => {
               <MapContainer
                   className="mapa-vuelo"
                   // center = {{lat: '28.058522', lng: '-20.591226'}}
-                  center = {{lat: '23.058522', lng: '-20.591226'}}
+                  center = {{lat: '21.658522', lng: '-20.591226'}}
                   zoom = {2.7}
                   minZoom = {2.0}
                   maxZoom = {18.0}
@@ -516,17 +516,15 @@ const Simulacion5Dias = () => {
             </Grid>
             <Box marginLeft="20px" marginTop="10px"> 
               <Box className='box-legend'> 
-                <Grid container>
-                  <Typography fontWeight="bold" marginBottom="10px">Leyenda</Typography>
-                </Grid>
                 <Grid display="flex">
-                  <Grid container>
+                  <Grid container alignItems='center'>
+                    <Grid item xs={4}>
+                      <Typography fontWeight="bold" marginLeft='2px'>Leyenda</Typography>
+                    </Grid>
                     <Grid item xs={1}><img src={AirportIcon} width="20px" height="20px"></img></Grid>
                     <Grid item xs={4}><Typography>Aeropuerto</Typography></Grid>
                     <Grid item xs={1}><img src={AirplaneIcon} width="20px" height="20px"></img></Grid>
                     <Grid item xs={2}><Typography>Avión</Typography></Grid>
-                    <Grid item xs={1}><Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/></Grid>
-                    <Grid item xs={3}><Typography>Trayectos</Typography></Grid>
                   </Grid>
                 </Grid>
               </Box> 
