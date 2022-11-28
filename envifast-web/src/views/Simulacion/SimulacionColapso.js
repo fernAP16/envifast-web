@@ -209,7 +209,7 @@ const Simulacion5Dias = () => {
            // aqui capturamos, en la parte de colapso, si response
            // es 0 es porque hubo colapso
           //  console.log(response)
-           if(response.data === 0)
+          if(response.data === 0){
             console.log("No se logro planificar, colapso");
             let from = horaInicioDate;
             from.setHours(horaInicioDate.getHours() - 2);
@@ -220,6 +220,7 @@ const Simulacion5Dias = () => {
             setToReport(to.toISOString().split('T')[1].substring(0, 5));
             setIsCollapsing(true);
             setArrive5Days(true);
+          }
         })
         .catch(function (error) {
             console.log(error);

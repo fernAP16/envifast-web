@@ -41,7 +41,8 @@ const ReporteSimulacion5Dias = () => {
       date: lastDate.toISOString().split('T')[0],
       timeInf: from,
       timeSup: to,
-      paraSim: 1
+      paraSim: 1,
+      indicador: (type === 1 ? 0 : 1)
     }
     getPlanifiedOrders(variables)
     .then(function (response) {

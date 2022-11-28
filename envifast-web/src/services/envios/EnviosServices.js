@@ -131,7 +131,7 @@ export const getPlanifiedOrders = (variables) => {
     return axios.get(
         API_URL.url + "orders/planifiedOrders?fecha=" + variables.date + "&timeInf=" + variables.timeInf.split(':')[0] + "%3A" + 
         variables.timeInf.split(':')[1] + "&timeSup=" + variables.timeSup.split(':')[0] + "%3A" + variables.timeSup.split(':')[1] +
-        "&paraSim=" + variables.paraSim
+        "&paraSim=" + variables.paraSim + "&indicador=" + variables.indicador
     )
 }
 
