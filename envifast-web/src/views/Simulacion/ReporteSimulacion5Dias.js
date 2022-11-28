@@ -13,7 +13,8 @@ const ReporteSimulacion5Dias = () => {
   const [packageSelected, setPackageSelected] = React.useState({});
   const [packageFlights, setPackagesFlights] = React.useState([])
   const [airportsCoordinates, setAirportsCoordinates] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isGeneratingReport, setIsGeneratingReport] = React.useState(true);
+  const [isLoadingRoute, setIsLoadingRoute] = React.useState(false);
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -50,11 +51,12 @@ const ReporteSimulacion5Dias = () => {
         array.push({
           idPackage: element.codPaquete,
           idShipment: element.codEnvio,
-          timeRegistering: element.fecha
+          timeRegistering: element.fecha.split('T')[1]
         })
       };
+      console.log(array);
       setPackages(array);
-      setIsLoading(false);
+      setIsGeneratingReport(false);
     })
     .catch(function (error) {
         console.log(error);
@@ -63,6 +65,7 @@ const ReporteSimulacion5Dias = () => {
 
   const handleDetail= (pack) => {
     // packageFlights
+    setIsLoadingRoute(true);
     getPackageRoute(pack.idPackage)
     .then(function (response) {
       console.log(response);
@@ -81,6 +84,7 @@ const ReporteSimulacion5Dias = () => {
         idShipment: pack.idShipment,
         timeRegistering: pack.timeRegistering
       })
+      setIsLoadingRoute(false);
     })
     .catch(function (error) {
         console.log(error);
@@ -94,78 +98,73 @@ const ReporteSimulacion5Dias = () => {
   }
 
   return (
+    
     <div className='container-report'>
-      <Grid className='container-report-header'>
-        <Typography className='container-report-title'>{"Reporte " + (type === 1 ? "Simulación 5 días" : "Colapso logístico")}</Typography>
-        <Typography className='container-report-info'>Datos obtenidos </Typography>
-        <div className='container-report-grid'>
-          <Grid container alignItems='center'>
-            <Grid item xs={3}>
-              <Typography>Fecha del primer registro: </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <TextField type='date'size='small' disabled={true} value={firstDate}></TextField>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography>Fecha de último registro: </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <TextField type='date'size='small' disabled={true} value={lastDate.toISOString().split('T')[0]}></TextField>
-            </Grid>
-            <Grid item xs={1}>
-              <Typography>Desde: </Typography>
-            </Grid>
-            <Grid item xs={2}>
-              <TextField type='time' size='small' value={from} disabled={true}></TextField>
-            </Grid>
-            <Grid item xs={1}>
-              <Typography>Hasta: </Typography>
-            </Grid>
-            <Grid item xs={2}>
-              <TextField type='time' size='small' value={to} disabled={true}></TextField>
-            </Grid>
-          </Grid>
-          <Grid container marginTop='15px'>
+      {!isGeneratingReport &&
+        <Grid className='container-report-header'>
+          <Typography className='container-report-title'>{"Reporte " + (type === 1 ? "Simulación 5 días" : "Colapso logístico")}</Typography>
+          <Typography className='container-report-info'>Datos obtenidos </Typography>
+          <div className='container-report-grid'>
             <Grid container alignItems='center'>
-              <Grid item xs={4}>
-                <Typography className='container-report-label'>Cantidad de paquetes planificados: </Typography>
+              <Grid item xs={3}>
+                <Typography>Fecha de último registro: </Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <TextField type='date'size='small' disabled={true} value={lastDate.toISOString().split('T')[0]}></TextField>
               </Grid>
               <Grid item xs={1}>
-                <TextField size='small' disabled={true} value={packages ? packages.length : '-'}></TextField>
+                <Typography>Desde: </Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <TextField type='time' size='small' value={from} disabled={true}></TextField>
+              </Grid>
+              <Grid item xs={1}>
+                <Typography>Hasta: </Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <TextField type='time' size='small' value={to} disabled={true}></TextField>
               </Grid>
             </Grid>
-          </Grid>
-        </div>
-        <TableContainer component={Paper} className="table-package-flight-large">
-            <Table stickyHeader aria-label="customized table">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Id Paquete</StyledTableCell>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Id Envio</StyledTableCell>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Hora de Registro</StyledTableCell>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Acciones</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody> 
-                {packages && 
-                  packages.map((pack) => (
-                    <StyledTableRow>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.idPackage}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.idShipment}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.timeRegistering}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">
-                        <Button className='button-return' onClick={() => handleDetail(pack)}>Ver plan de vuelo</Button>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))
-                }
-              </TableBody>
-            </Table>
-          </TableContainer>
-      </Grid>
-
-      {/* Para el pop up */}
-      {packageSelected &&
+            <Grid container marginTop='15px'>
+              <Grid container alignItems='center'>
+                <Grid item xs={4}>
+                  <Typography className='container-report-label'>Cantidad de paquetes planificados: </Typography>
+                </Grid>
+                <Grid item xs={1}>
+                  <TextField size='small' disabled={true} value={packages ? packages.length : '-'}></TextField>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+          <TableContainer component={Paper} className="table-package-flight-large">
+              <Table stickyHeader aria-label="customized table">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell className='table-flights-cell row-cell' align="center">Id Paquete</StyledTableCell>
+                    <StyledTableCell className='table-flights-cell row-cell' align="center">Id Envio</StyledTableCell>
+                    <StyledTableCell className='table-flights-cell row-cell' align="center">Hora de Registro</StyledTableCell>
+                    <StyledTableCell className='table-flights-cell row-cell' align="center">Acciones</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody> 
+                  {packages && 
+                    packages.map((pack) => (
+                      <StyledTableRow>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.idPackage}</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.idShipment}</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.timeRegistering}</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell row-cell' align="center">
+                          <Button className='button-return' onClick={() => handleDetail(pack)}>Ver plan de vuelo</Button>
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
+        </Grid>
+      }
+      {packageSelected && !isLoadingRoute &&
       <Dialog
         open={isSelected}
         maxWidth="1000px"
@@ -175,13 +174,13 @@ const ReporteSimulacion5Dias = () => {
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={1} alignItems='center' marginBottom='10px'>
-            <Grid item xs={2}>
+            <Grid item xs={1.5}>
               <Typography>{"Plan de vuelo: "}</Typography>
             </Grid>
             <Grid item xs={3}>
               <TextField size='small' disabled={true} value={packageSelected.idShipment}></TextField>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={1.8}>
               <Typography>Fecha de llegada: </Typography>
             </Grid>
             <Grid item xs={3}>
@@ -195,8 +194,8 @@ const ReporteSimulacion5Dias = () => {
                   <StyledTableCell className='table-flights-cell row-cell' align="center">N°</StyledTableCell>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de origen</StyledTableCell>
                   <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de destino</StyledTableCell>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Hora de salida</StyledTableCell>
-                  <StyledTableCell className='table-flights-cell row-cell' align="center">Hora de llegada</StyledTableCell>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Salida</StyledTableCell>
+                  <StyledTableCell className='table-flights-cell row-cell' align="center">Llegada</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody> 
@@ -206,8 +205,8 @@ const ReporteSimulacion5Dias = () => {
                       <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
                       <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.origen}</StyledTableCell>
                       <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.destino}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida}</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaLLegada}</StyledTableCell>                        
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida.split('T')[0] + ', ' + flight.horaSalida.split('T')[1]}</StyledTableCell>
+                      <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaLLegada.split('T')[0] + ', ' + flight.horaLLegada.split('T')[1]}</StyledTableCell>                        
                     </StyledTableRow>
                   ))
                 }
@@ -220,9 +219,9 @@ const ReporteSimulacion5Dias = () => {
         </DialogActions>
       </Dialog>
     }
-    <Dialog open={isLoading}>
+    <Dialog open={isGeneratingReport || isLoadingRoute}>
       <DialogTitle>
-        Generando reporte...
+        {isGeneratingReport ? "Generando reporte..." : "Cargando ruta..."}
       </DialogTitle>
       <DialogContent>
         <Grid item container justifyContent='center'>
