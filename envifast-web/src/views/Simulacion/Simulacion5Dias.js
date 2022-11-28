@@ -215,7 +215,8 @@ const Simulacion5Dias = () => {
         
       }
     }
-  }
+  
+
 
   // Contador que modificara el tiempo:
   React.useEffect(() => {
