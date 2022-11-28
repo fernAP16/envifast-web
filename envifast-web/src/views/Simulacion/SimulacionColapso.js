@@ -268,8 +268,8 @@ const Simulacion5Dias = () => {
       state: {
           firstDate: startDate,
           lastDate: currentDateTime,
-          from: fromReport, // A
-          to: toReport, // A
+          from: fromReport,
+          to: toReport, 
           type: 2
       }
     });

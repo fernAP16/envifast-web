@@ -109,13 +109,9 @@ export const planShipmentsSimulation = (variables) =>{
     )
 }
 export const getShipmentsByInput = (input) => {
-    const obj = {
-        input: input
-    }
-    console.log(obj);
+    console.log(API_URL.url + "orders?input=" + input)
     return axios.get(
-        API_URL.url + "orders?input=" + obj.input,
-        obj,
+        API_URL.url + "orders?input=" + input,
     )
 }
 
