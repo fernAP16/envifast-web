@@ -49,7 +49,6 @@ const Simulacion5Dias = () => {
     const [periodo, setPeriodo] = React.useState(0);
     const [isLoading, setIsLoading] = React.useState(false);
     const [openPopUp, setOpenPopUp] = React.useState(false);
-   
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
     const [initialDate, setInitialDate] = React.useState(null)
     const [valueSearch, setValueSearch] = React.useState('')
