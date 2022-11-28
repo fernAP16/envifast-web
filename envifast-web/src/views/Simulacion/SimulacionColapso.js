@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime, planShipmentsSimulation } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -194,12 +194,27 @@ const Simulacion5Dias = () => {
         
       }else{
         // aqui tenemos que llamara la api
-        console.log("Si planifica desde las 2: ")
-        console.log("Atributos para mandar al post")
-        console.log(fechaPlanificacon)
-        console.log(horaInicio)
-        console.log(horaFin)
-        console.log("Dia del initial date: " + initialDate)
+        let variables = {
+          fecha: fechaPlanificacon,
+          timeInf: horaInicio,
+          timeSup: horaFin,
+          paraSim: 1
+        }
+
+        planShipmentsSimulation(variables)
+        .then(function (response) {
+           // aqui capturamos, en la parte de colapso, si response
+           // es 0 es porque hubo colapso
+          //  console.log(response)
+           if(response.data === 0)
+            console.log("No se logro planificar, colapso")
+        })
+        .catch(function (error) {
+            console.log(error);
+            setIsLoading(false);
+        })
+
+        // aqui llamamos a la api
       }
       console.log("---------------------------")
       

@@ -103,9 +103,9 @@ export const planShipmentsSimulation = (variables) =>{
         paraSim: 1
     }
     // el link tiene que tener la siguiente forma:
-    // http://localhost:8081/orders/cargarEnviosSim?fecha=2022-11-24&timeInf=23%3A17&timeSup=23%3A17&paraSim=5 no es necesario enviar los minutos
+    // http://inf226g2.inf.pucp.edu.pe:8080/packages/cargarEnviosSim?fecha=2022-08-19&timeInf=20%3A00&timeSup=22%3A00&paraSim=1 no es necesario enviar los minutos
     return axios.post(
-        API_URL.url + "orders/cargar?fecha=" + obj.fecha + "&timeInf=" + obj.timeInf + "&timeSup=" + obj.timeSup + "&paraSim="+ obj.paraSim,
+        API_URL.url + "packages/cargarEnviosSim?fecha=" + obj.fecha + "&timeInf=" + obj.timeInf + "&timeSup=" + obj.timeSup + "&paraSim="+ obj.paraSim,
     )
 }
 export const getShipmentsByInput = (input) => {

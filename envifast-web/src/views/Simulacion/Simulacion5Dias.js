@@ -175,25 +175,40 @@ const Simulacion5Dias = () => {
         // FUNCIONA PERFECTO
 
         // Ahora solo mandamos los datos para hacer el post del planificador
-        console.log("Hora actual: " + horaActual)
-        let variables = {
-          fecha: fechaPlanificacon,
-          timeInf: horaInicio,
-          timeSup: horaFin,
-          paraSim: 1
-        }
+        // console.log("Hora actual: " + horaActual)
+        
 
         if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
           // console.log("NO DEBERIA ENTRAR EN 00:00 CUANDO ES EL PRIMER DIA")
           
         }else{
           // aqui tenemos que llamara la api
-          console.log("Si planifica desde las 2: ")
-          console.log("Atributos para mandar al post")
-          console.log(fechaPlanificacon)
-          console.log(horaInicio)
-          console.log(horaFin)
-          console.log("Dia del initial date: " + initialDate)
+          // console.log("Si planifica desde las 2: ")
+          // console.log("Atributos para mandar al post")
+          // console.log(fechaPlanificacon)
+          // console.log(horaInicio)
+          // console.log(horaFin)
+          // console.log("Dia del initial date: " + initialDate)
+
+          let variables = {
+            fecha: fechaPlanificacon,
+            timeInf: horaInicio,
+            timeSup: horaFin,
+            paraSim: 1
+          }
+
+          planShipmentsSimulation(variables)
+          .then(function (response) {
+             // aqui capturamos, en la parte de colapso, si response
+             // es 0 es porque hubo colapso
+            //  console.log(response)
+             if(response.data === 1)
+              console.log("Logro planificar correctamente")
+          })
+          .catch(function (error) {
+              console.log(error);
+              setIsLoading(false);
+          })
         }
         console.log("---------------------------")
         
