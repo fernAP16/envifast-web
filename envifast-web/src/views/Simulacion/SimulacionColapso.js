@@ -57,6 +57,7 @@ const Simulacion5Dias = () => {
     const [diferenciaDias, setDiferenciaDias] = React.useState(1);
     const [valueSearch, setValueSearch] = React.useState('')
     const [searchTable, setSearchTable] = React.useState([]);
+    const [arrive5Days, setArrive5Days] = React.useState(false);
 
     const getIcon = () => {
         return L.icon({
@@ -154,12 +155,65 @@ const Simulacion5Dias = () => {
       }
     }, [stateButtons])
 
+    const enviarPlanificador = (horaActual) => {
+      if(currentDateTime != null && !arrive5Days){
+        let fechaPlanificacon = currentDateTime.toISOString().split('T')[0]
+        let fechaInicio = initialDate.toISOString().split('T')[0]
+        // let horaInicio = currentDateTime.toISOString().split('T')[1].substring(0, 5) // substr si es inclusivo, si incluye el ultimo indice
+        let horaInicioDate = new Date(fechaPlanificacon)
+        // horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
+        horaInicioDate.setHours(horaActual - 7) // El limite inferior son 2 horas antes de la hora actual -5 - 2 
+        // para la hora final tenemos que hacer una serie de calculos
+        
+        // lapso planificador sera el que nos dara la hora limite del rango
+        let horaFinDate =  new Date(fechaPlanificacon)
+        horaFinDate.setHours(horaActual - 5)// La hora actual es el limite superior
+
+        let horaFin = horaFinDate.toISOString().split('T')[1].substring(0, 5)
+        let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
+        // ahora imprimimos todos los atributos para ver si estan bien
+        // console.log("Hora en ISO: " + currentDateTime.toISOString().split('T')[1])
+        
+        
+        // FUNCIONA PERFECTO
+
+        // Ahora solo mandamos los datos para hacer el post del planificador
+        console.log("Hora actual: " + horaActual)
+        let variables = {
+          fecha: fechaPlanificacon,
+          timeInf: horaInicio,
+          timeSup: horaFin,
+          paraSim: 1
+        }
+
+        if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
+          // console.log("NO DEBERIA ENTRAR EN 00:00 CUANDO ES EL PRIMER DIA")
+          
+        }else{
+          // aqui tenemos que llamara la api
+          console.log("Si planifica desde las 2: ")
+          console.log("Atributos para mandar al post")
+          console.log(fechaPlanificacon)
+          console.log(horaInicio)
+          console.log(horaFin)
+          console.log("Dia del initial date: " + initialDate)
+        }
+        console.log("---------------------------")
+        
+      }
+    }
+
     // Contador que modificara el tiempo:
     React.useEffect(() => {
       const interval = setInterval(() => {
         let temp = currentDateTime;
-        temp.setMinutes(temp.getMinutes() + 2)
+        let horas = temp.getHours();
+        let minutos = temp.getMinutes();
+        temp.setMinutes(temp.getMinutes() + 10)
         setCurrentDateTime(temp)
+        if(horas % 2 === 0  && minutos === 0){ 
+          enviarPlanificador(horas)
+        }
       }, 200) 
       return () => {
         clearInterval(interval);
@@ -317,7 +371,6 @@ const Simulacion5Dias = () => {
         
         // AL PARECER ESTA CONDICIONAL NO FUNCIONA
         if(currentDateTime.getDate() > initialDate.getDate()){
-          console.log("Entro a este if")
           flightSchedule.estado = 0
           flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
           flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
@@ -332,10 +385,7 @@ const Simulacion5Dias = () => {
           flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
           flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
           flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
-          // "2022-11-20T21:56:10.615Z" -> "2022-11-21T21:56:10.615Z"
-          // // flightSchedule.horaSalida.setDate(flightSchedule.horaSalida.getDate() + 1)
-          // // flightSchedule.horaLLegada.setDate(flightSchedule.horaLLegada.getDate() + 1)
-          console.log("La hora de salida es: " + flightSchedule.horaSalida)
+          
         }
         return;
       }

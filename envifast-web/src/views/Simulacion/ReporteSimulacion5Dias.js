@@ -104,7 +104,7 @@ const ReporteSimulacion5Dias = () => {
               <Typography>Fecha del primer registro: </Typography>
             </Grid>
             <Grid item xs={3}>
-              <TextField type='date'size='small' disabled={true} value={firstDate.toISOString().split('T')[0]}></TextField>
+              <TextField type='date'size='small' disabled={true} value={firstDate}></TextField>
             </Grid>
             <Grid item xs={3}>
               <Typography>Fecha de último registro: </Typography>

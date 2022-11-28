@@ -49,15 +49,9 @@ const Simulacion5Dias = () => {
     const [periodo, setPeriodo] = React.useState(0);
     const [isLoading, setIsLoading] = React.useState(false);
     const [openPopUp, setOpenPopUp] = React.useState(false);
-    const [flagPeriodo, setFlagPeriodo] = React.useState(false);
-    const [flagPeriodo2, setFlagPeriodo2] = React.useState(true);
-    const [flagPeriodo3, setFlagPeriodo3] = React.useState(false);
-    const [flagPeriodo4, setFlagPeriodo4] = React.useState(false);
-    const [flightsPeriodo, setFlightsPeriodo] = React.useState(null);
+   
     const [flagInicioContador, setFlagInicioContador] = React.useState(false);
     const [initialDate, setInitialDate] = React.useState(null)
-    const [diferenciaDias, setDiferenciaDias] = React.useState(1)
-    const [lapsoPlanificador, setLapsoPlanificador] = React.useState(0)
     const [valueSearch, setValueSearch] = React.useState('')
     const [searchTable, setSearchTable] = React.useState([]);
     const [arrive5Days, setArrive5Days] = React.useState(false);
@@ -162,28 +156,27 @@ const Simulacion5Dias = () => {
     const enviarPlanificador = (horaActual) => {
       if(currentDateTime != null && !arrive5Days){
         let fechaPlanificacon = currentDateTime.toISOString().split('T')[0]
+        let fechaInicio = initialDate.toISOString().split('T')[0]
         // let horaInicio = currentDateTime.toISOString().split('T')[1].substring(0, 5) // substr si es inclusivo, si incluye el ultimo indice
         let horaInicioDate = new Date(fechaPlanificacon)
         // horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
-        horaInicioDate.setHours(horaActual - 5) // 0 - 5, 
+        horaInicioDate.setHours(horaActual - 7) // El limite inferior son 2 horas antes de la hora actual -5 - 2 
         // para la hora final tenemos que hacer una serie de calculos
         
         // lapso planificador sera el que nos dara la hora limite del rango
         let horaFinDate =  new Date(fechaPlanificacon)
-        horaFinDate.setHours(horaActual - 1)// horaActual - 5 + 4
+        horaFinDate.setHours(horaActual - 5)// La hora actual es el limite superior
 
         let horaFin = horaFinDate.toISOString().split('T')[1].substring(0, 5)
         let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
         // ahora imprimimos todos los atributos para ver si estan bien
         // console.log("Hora en ISO: " + currentDateTime.toISOString().split('T')[1])
-        console.log("Atributos para mandar al post")
-        console.log(fechaPlanificacon)
-        console.log(horaInicio)
-        console.log(horaFin)
-        console.log("---------------------------")
+        
+        
         // FUNCIONA PERFECTO
 
         // Ahora solo mandamos los datos para hacer el post del planificador
+        console.log("Hora actual: " + horaActual)
         let variables = {
           fecha: fechaPlanificacon,
           timeInf: horaInicio,
@@ -191,17 +184,20 @@ const Simulacion5Dias = () => {
           paraSim: 1
         }
 
-        // planShipmentsSimulation(variables)
-        // .then(function(response){
-        //   if(response === 1){
-        //     console.log("Se ejecute correctamente")
-        //   }
-        // }
-        // )
-        // .catch(function (error){
-        //   console.log(error);
-        //   console.log("NO SE LOGRO PLANIFICAR")
-        // })
+        if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
+          // console.log("NO DEBERIA ENTRAR EN 00:00 CUANDO ES EL PRIMER DIA")
+          
+        }else{
+          // aqui tenemos que llamara la api
+          console.log("Si planifica desde las 2: ")
+          console.log("Atributos para mandar al post")
+          console.log(fechaPlanificacon)
+          console.log(horaInicio)
+          console.log(horaFin)
+          console.log("Dia del initial date: " + initialDate)
+        }
+        console.log("---------------------------")
+        
       }
     }
 
@@ -214,7 +210,7 @@ const Simulacion5Dias = () => {
           let minutos = temp.getMinutes();
           temp.setMinutes(temp.getMinutes() + 10); // CAMBIAR
           setCurrentDateTime(temp);
-          if(currentDateTime.getDate() - initialDate.getDate() === 1){ // CAMBIAR
+          if(currentDateTime.getDate() - initialDate.getDate() === 5){ // CAMBIAR
             let lastDate = currentDateTime;
             lastDate.setDate(lastDate.getDate()-1);
             navigate(ROUTES.SIMULACION5DIASREPORTE, {
@@ -227,7 +223,7 @@ const Simulacion5Dias = () => {
               }
             });
           }
-          if(horas % 4 === 0  && minutos === 0){ 
+          if(horas % 2 === 0  && minutos === 0){ 
             enviarPlanificador(horas)
           }
         }, 200) 
