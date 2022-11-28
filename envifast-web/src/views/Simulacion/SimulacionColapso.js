@@ -264,14 +264,12 @@ const Simulacion5Dias = () => {
   }, [flagInicioContador])
   
   const goToReport = () => {
-    let lastDate = currentDateTime;
-    let fromHour = 
     navigate(ROUTES.SIMULACION5DIASREPORTE, {
       state: {
           firstDate: startDate,
-          lastDate: lastDate,
-          from: "22:00", // A
-          to: "23:59", // A
+          lastDate: currentDateTime,
+          from: fromReport, // A
+          to: toReport, // A
           type: 2
       }
     });
