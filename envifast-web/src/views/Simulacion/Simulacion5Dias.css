@@ -146,3 +146,23 @@
     width: 1000px;
     overflow-y: scroll;
 }
+
+.alert-collapse{
+    position: absolute;
+    margin-top: 575px;
+    margin-left: 375px;
+    z-index: 5000;
+    color: #FFFFFF;
+    background-color: #D32F2F;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.alert-title{
+    font-size: 20px;
+}
+
+.alert-button{
+    background-color: yellow !important;
+    color: #000000;
+}

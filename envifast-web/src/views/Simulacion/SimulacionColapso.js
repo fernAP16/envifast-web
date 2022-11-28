@@ -61,6 +61,9 @@ const Simulacion5Dias = () => {
   const [valueSearch, setValueSearch] = React.useState('')
   const [searchTable, setSearchTable] = React.useState([]);
   const [arrive5Days, setArrive5Days] = React.useState(false);
+  const [isCollapsing, setIsCollapsing] = React.useState(false);
+  const [fromReport, setFromReport] = React.useState(false);
+  const [toReport, setToReport] = React.useState(false);
 
   const getIcon = () => {
       return L.icon({
@@ -207,7 +210,16 @@ const Simulacion5Dias = () => {
            // es 0 es porque hubo colapso
           //  console.log(response)
            if(response.data === 0)
-            console.log("No se logro planificar, colapso")
+            console.log("No se logro planificar, colapso");
+            let from = horaInicioDate;
+            from.setHours(horaInicioDate.getHours() - 2);
+            let to = horaFinDate;
+            to.setHours(horaFinDate.getHours() - 2);
+            to.setMinutes(horaFinDate.getMinutes() - 1);
+            setFromReport(from.toISOString().split('T')[1].substring(0, 5));
+            setToReport(to.toISOString().split('T')[1].substring(0, 5));
+            setIsCollapsing(true);
+            setArrive5Days(true);
         })
         .catch(function (error) {
             console.log(error);
@@ -250,9 +262,24 @@ const Simulacion5Dias = () => {
       clearInterval(interval);
     };
   }, [flagInicioContador])
+  
+  const goToReport = () => {
+    let lastDate = currentDateTime;
+    let fromHour = 
+    navigate(ROUTES.SIMULACION5DIASREPORTE, {
+      state: {
+          firstDate: startDate,
+          lastDate: lastDate,
+          from: "22:00", // A
+          to: "23:59", // A
+          type: 2
+      }
+    });
+  }
 
   // Primera Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => { 
         for(var i = 0 ; i < primeraSeccion; i++){
@@ -267,6 +294,7 @@ const Simulacion5Dias = () => {
 
   // Segunda seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         for(var i = primeraSeccion; i < segundaSeccion; i++){
@@ -281,6 +309,7 @@ const Simulacion5Dias = () => {
 
   // Tercera Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         for(var i = segundaSeccion; i < terceraSeccion; i++){
@@ -295,6 +324,7 @@ const Simulacion5Dias = () => {
 
   // Cuarta Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {  
         for(var i = terceraSeccion; i < cuartaSeccion; i++){
@@ -309,6 +339,7 @@ const Simulacion5Dias = () => {
 
   // Quinta Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         for(var i = cuartaSeccion; i < quintaSeccion; i++){
@@ -323,6 +354,7 @@ const Simulacion5Dias = () => {
 
   // Sexta Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         for(var i = quintaSeccion; i < sextaSeccion; i++){
@@ -338,6 +370,7 @@ const Simulacion5Dias = () => {
 
   // Septima Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         for(var i = sextaSeccion; i < septimaSeccion; i++){
@@ -352,6 +385,7 @@ const Simulacion5Dias = () => {
 
   // Octava Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         for(var i = septimaSeccion; i < octavaSeccion; i++){
@@ -366,6 +400,7 @@ const Simulacion5Dias = () => {
 
   // Novena Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         for(var i = octavaSeccion; i < novenaSeccion; i++){
@@ -380,6 +415,7 @@ const Simulacion5Dias = () => {
 
   // Decima Seccion
   React.useEffect(() => {
+    if(arrive5Days)return;
     if(stateButtons === 2){
       const interval = setInterval(() => {
         if(flightsSchedule !== null){
@@ -475,11 +511,6 @@ const Simulacion5Dias = () => {
     setDisableStart(false);
   }
 
-  const handleFlightDetail = () => {
-    // setOpenPopUp(true);
-    console.log("Click detalle")
-  }
-
   const onChangeSearchTable = (value) => {
     setValueSearch(value);
     console.log(value);
@@ -528,6 +559,20 @@ const Simulacion5Dias = () => {
                     <></>
                   ))}
             </MapContainer>
+            {isCollapsing && 
+              <Grid display='flex' className='alert-collapse'>
+              <Grid marginX='2px'>
+                <Icon icon="mdi:alert-circle-outline" color="white" width='25px'/>
+              </Grid>
+              <Grid  marginLeft='5px'>
+                <Grid display='flex' justifyContent='space-between'>
+                  <Typography className='alert-title'>Alerta de colapso logístico</Typography>
+                  <Button className='alert-button' onClick={() => goToReport()}> Ver reporte</Button>
+                </Grid>
+                <Typography className='alert-label'>No hay suficiente espacio para enviar mas paquetes.</Typography>
+              </Grid>
+            </Grid>
+            }
           </Grid>
           <Box marginLeft="20px" marginTop="10px"> 
             <Box className='box-legend'> 
