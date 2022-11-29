@@ -288,7 +288,7 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         let horas = temp.getHours();
         let minutos = temp.getMinutes();
-        temp.setMinutes(temp.getMinutes() + 2); // CAMBIAR
+        temp.setMinutes(temp.getMinutes() + 1); // CAMBIAR
         setCurrentDateTime(temp);
         if(currentDateTime.getDate() - initialDate.getDate() === 5){ // CAMBIAR
           let lastDate = currentDateTime;
