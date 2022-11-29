@@ -116,11 +116,15 @@ export const getFlightsAirport = (variables) =>{
         variables.timeInf.split(':')[1] + "&timeSup=" + variables.timeSup.split(':')[0] + "%3A" + variables.timeSup.split(':')[1] + "&paraSim=" + variables.paraSim
     )
 }
-export const getShipmentsByInput = (input) => {
-    console.log(API_URL.url + "orders?input=" + input)
-    return axios.get(
-        API_URL.url + "orders?input=" + input,
-    )
+export const getShipmentsByInput = (variables) => {
+    if(variables.input === '')
+        return axios.get(
+            API_URL.url + "orders?forSim=" + variables.paraSim,
+        );
+    else 
+        return axios.get(
+            API_URL.url + "orders?input=" + variables.input + '&forSim=' + variables.paraSim,
+        );
 }
 
 export const registerFlights = (variables) => {
@@ -146,5 +150,11 @@ export const getPlanifiedOrders = (variables) => {
 export const getPackageRoute = (idPackage) => {
     return axios.get(
         API_URL.url + "packages/route/{id}?id=" + idPackage
+    )
+}
+
+export const getPlanifiedOrdersd2d = () => {
+    return axios.post(
+        API_URL.url + "orders/plan"
     )
 }

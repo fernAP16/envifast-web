@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime, planShipmentsSimulation } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia, getAirportsDateTime, planShipmentsSimulation, registerFlights, registerDateTimes } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -117,8 +117,10 @@ const Simulacion5Dias = () => {
   // Llamamos para cargar los vuelos, solo se llama una vez.
   React.useEffect(() => {
     if(periodo !== 0){
+      let lastDay = new Date(currentDateTime)
+      lastDay.setDate(lastDay.getDate() +  2) 
       let variables = {
-        fecha: currentDateTime.toISOString().slice(0, 10),//startDate, // 2022-10-29
+        fecha: lastDay.toISOString().slice(0, 10),//startDate, // 2022-10-29
         paraSim: 1
       }
       getVuelosPorDia(variables)
@@ -151,7 +153,7 @@ const Simulacion5Dias = () => {
         setOctavaSeccion(Math.floor((8/10) * k));
         setNovenaSeccion(Math.floor((9/10) * k));        
         setFlightsSchedule(array);
-        setSearchTable(array.slice(0,10));
+        setSearchTable(array.slice(0,50));
         setIsLoading(false);
         setFlagInicioContador(true);
       })
@@ -189,7 +191,7 @@ const Simulacion5Dias = () => {
         fecha: fechaPlanificacon,
         timeInf: horaInicio,
         timeSup: horaFin,
-        paraSim: 1
+        paraSim: 2
       }
 
       if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
@@ -201,7 +203,7 @@ const Simulacion5Dias = () => {
           fecha: fechaPlanificacon,
           timeInf: horaInicio,
           timeSup: horaFin,
-          paraSim: 1
+          paraSim: 2
         }
 
         planShipmentsSimulation(variables)
@@ -237,26 +239,28 @@ const Simulacion5Dias = () => {
   // Contador que modificara el tiempo:
   React.useEffect(() => {
     const interval = setInterval(() => {
-      let temp = currentDateTime;
-      let horas = temp.getHours();
-      let minutos = temp.getMinutes();
-      temp.setMinutes(temp.getMinutes() + 10);
-      setCurrentDateTime(temp);
-      if(currentDateTime.getDate() - initialDate.getDate() === 5){ // CAMBIAR
-        let lastDate = currentDateTime;
-        lastDate.setDate(lastDate.getDate()-1);
-        navigate(ROUTES.SIMULACION5DIASREPORTE, {
-          state: {
-              firstDate: startDate,
-              lastDate: lastDate,
-              from: "22:00",
-              to: "23:59",
-              type: 2
-          }
-        });
-      }
-      if(horas % 2 === 0  && minutos === 0){ 
-        enviarPlanificador(horas)
+      if(currentDateTime !== null){
+        let temp = currentDateTime;
+        let horas = temp.getHours();
+        let minutos = temp.getMinutes();
+        temp.setMinutes(temp.getMinutes() + 1);
+        setCurrentDateTime(temp);
+        if(currentDateTime.getDate() - initialDate.getDate() === 5){ // CAMBIAR
+          let lastDate = currentDateTime;
+          lastDate.setDate(lastDate.getDate()-1);
+          navigate(ROUTES.SIMULACION5DIASREPORTE, {
+            state: {
+                firstDate: startDate,
+                lastDate: lastDate,
+                from: "22:00",
+                to: "23:59",
+                type: 2
+            }
+          });
+        }
+        if(horas % 2 === 0  && minutos === 0){ 
+          enviarPlanificador(horas)
+        }
       }
     }, 200) 
     return () => {
@@ -434,13 +438,10 @@ const Simulacion5Dias = () => {
   }
   const show_interval = (flightSchedule) => {
     if(flightSchedule.estado === 2) {
-      
-      // AL PARECER ESTA CONDICIONAL NO FUNCIONA
       if(currentDateTime.getDate() > initialDate.getDate()){
         flightSchedule.estado = 0
         flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
         flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
-        // HORA SALIDA ES UN STRING NO UN DATE
         let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
         let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
         diaSalida += 1
@@ -468,14 +469,22 @@ const Simulacion5Dias = () => {
     });
 
     let date = new Date(currentDateTime);
-    date.setSeconds(date.getSeconds() - 100);
+    date.setMinutes(date.getMinutes() - 2);
+    if(flightSchedule.id === 'TAP4511 ' || flightSchedule.id === 'TAP980')
+      console.log({
+        idFlight: flightSchedule.id,
+        dateInicio: dateInicio.toLocaleString(),
+        currentDateTime: currentDateTime.toLocaleString(),
+        dateFin: dateFin.toLocaleString(),
+        estado: (currentDateTime > dateFin ? 2 : (currentDateTime > dateInicio ? 1 : 0))
+      })
 
     if(currentDateTime > dateFin){
       flightSchedule.estado = 2;
     } else if(date >= dateInicio){
       flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasDestinos[0];
       flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasDestinos[1];
-    } else if(currentDateTime > dateInicio){
+    } else if(currentDateTime >= dateInicio){
       flightSchedule.estado = 1;
     }
   }
@@ -491,12 +500,7 @@ const Simulacion5Dias = () => {
   }
 
   const handleStart = () => {
-    if(stateButtons === 1){
-      setIsLoading(true);
-      setStateButtons(2);
-      setPeriodo(periodo + 1);
-    }
-    else setStateButtons(3)
+    setIsLoading(true);
     setDisableStart(true);
   }
 

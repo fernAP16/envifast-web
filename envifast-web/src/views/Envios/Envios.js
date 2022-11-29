@@ -52,38 +52,41 @@ const Envios  = (props) => {
 
     const getShipments = () => {
         setShipments([]);
-        // getShipmentsByInput(input)
-        // .then(function (response) {
-        //     console.log(response);
-        //     var arrayShipments = [];
-        //     for (const element of response.data) {
-        //         arrayShipments.push({
-        //             id: element.id,
-        //             codigo: element.codigo,
-        //             nombreEmisor: element.emisorNombres + ' ' + element.emisorApellidoP + ' ' + element.emisorApellidoM,
-        //             correoEmisor: element.emisorCorreo,
-        //             numeroEmisor: element.emisorTelefonoNumero,
-        //             nombreDestinatario: element.destinatarioNombres + ' ' + element.destinatarioApellidoP + ' ' + element.destinatarioApellidoM,
-        //             correoDestinatario: element.destinatarioCorreo,
-        //             telefonoDestinatario: element.destinatarioTelefonoNumero,
-        //             paquetes: element.paquetes,
-        //             estado: 0, // Cambiar para que tenga sentido
-        //             origen: element.origen,
-        //             destino: element.destino,
-        //             cantPaquetes: element.paquetes.length,
-        //             fechaEnvio: new Date(element.fechaEnvio).toLocaleDateString(),
-        //             tiempoTotal: element.tiempoTotal
-        //         })
-        //     };
-        //     console.log(arrayShipments)
-        //     setShipments(arrayShipments);
-        //     setIsLoadingInit(false);
-        // })
-        // .catch(function (error) {
-        //     console.log(error);
-        //     setIsLoadingInit(false);
-        // })
-        setIsLoadingInit(false);
+        let variables = {
+            input: input,
+            paraSim: 0
+        }
+        getShipmentsByInput(variables)
+        .then(function (response) {
+            console.log(response);
+            var arrayShipments = [];
+            for (const element of response.data) {
+                arrayShipments.push({
+                    id: element.id,
+                    codigo: element.codigo,
+                    nombreEmisor: element.emisorNombres + ' ' + element.emisorApellidoP + ' ' + element.emisorApellidoM,
+                    correoEmisor: element.emisorCorreo,
+                    numeroEmisor: element.emisorTelefonoNumero,
+                    nombreDestinatario: element.destinatarioNombres + ' ' + element.destinatarioApellidoP + ' ' + element.destinatarioApellidoM,
+                    correoDestinatario: element.destinatarioCorreo,
+                    telefonoDestinatario: element.destinatarioTelefonoNumero,
+                    paquetes: element.paquetes,
+                    estado: 0,
+                    origen: element.origen,
+                    destino: element.destino,
+                    cantPaquetes: element.paquetes.length,
+                    fechaEnvio: new Date(element.fechaEnvio).toLocaleDateString(),
+                    tiempoTotal: element.tiempoTotal
+                })
+            };
+            console.log(arrayShipments)
+            setShipments(arrayShipments);
+            setIsLoadingInit(false);
+        })
+        .catch(function (error) {
+            console.log(error);
+            setIsLoadingInit(false);
+        })
     }
 
     const handleRegisterDays = () => {
