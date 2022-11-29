@@ -108,6 +108,14 @@ export const planShipmentsSimulation = (variables) =>{
         API_URL.url + "packages/cargarEnviosSim?fecha=" + obj.fecha + "&timeInf=" + obj.timeInf + "&timeSup=" + obj.timeSup + "&paraSim="+ obj.paraSim,
     )
 }
+
+export const getFlightsAirport = (variables) =>{
+    // http://localhost:8080/orders/cargarEnviosSim?fecha=2022-08-19&timeInf=22%3A00&timeSup=00%3A00&paraSim=1
+    return axios.post(
+        API_URL.url + "orders/cargarEnviosSim?fecha=" + variables.fecha + "&timeInf=" + variables.timeInf.split(':')[0] + "%3A" + 
+        variables.timeInf.split(':')[1] + "&timeSup=" + variables.timeSup.split(':')[0] + "%3A" + variables.timeSup.split(':')[1] + "&paraSim=" + variables.paraSim
+    )
+}
 export const getShipmentsByInput = (input) => {
     console.log(API_URL.url + "orders?input=" + input)
     return axios.get(

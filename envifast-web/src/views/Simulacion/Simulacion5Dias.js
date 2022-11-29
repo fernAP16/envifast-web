@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, registerFlights,registerDateTimes, planShipmentsSimulation } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia, registerFlights,registerDateTimes, planShipmentsSimulation, getFlightsAirport } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, DialogActions } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -41,6 +41,8 @@ const Simulacion5Dias = () => {
   const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
   const [segundaSeccion, setSegundaSeccion] = React.useState(1);
   const [terceraSeccion, setTerceraSeccion] = React.useState(1);
+  const [timeInf, setTimeInf] = React.useState("22:00")
+  const [timeSup, setTimeSup] = React.useState("00:00")
   const [cuartaSeccion, setCuartaSeccion] = React.useState(1);
   const [quintaSeccion, setQuintaSeccion] = React.useState(1);
   const [sextaSeccion, setSextaSeccion] = React.useState(1);
@@ -141,7 +143,6 @@ const Simulacion5Dias = () => {
     .then(function (response) {
         registerDateTimes(variables)
         .then(function (response) {
-            console.log("Funciono el registro de dias y datetimes")
             setIsLoading(false);
             setStateButtons(2);
             setPeriodo(periodo + 1);
@@ -157,6 +158,25 @@ const Simulacion5Dias = () => {
     })
   }
 
+  const handleGetAirport = () => {
+    let lastDay = new Date(currentDateTime)
+    lastDay.setDate(lastDay.getDate() +  4) 
+    let variables = {
+      fecha : lastDay.toISOString().slice(0, 10),
+      timeInf : timeInf,
+      timeSup : timeSup,
+      paraSim: 1
+    }
+
+    getFlightsAirport(variables)
+    .then((response) => {
+      if(response.data === 1)
+        console.log("Planificador real completado")
+    }).catch(function (error) {
+        console.log(error);
+    })
+
+  }
 
 
   React.useEffect(() => {
@@ -194,7 +214,6 @@ const Simulacion5Dias = () => {
           )
         };
         var k = array.length;
-        console.log(array)
         setPrimeraSeccion(Math.floor(k/10))
         setSegundaSeccion(Math.floor(k/5))
         setTerceraSeccion(Math.floor((3/10) * k))
@@ -208,6 +227,7 @@ const Simulacion5Dias = () => {
         setSearchTable(array.slice(0,10));
         setIsLoading(false);
         setFlagInicioContador(true);
+        handleGetAirport()
       })
       .catch(function (error) {
         console.log(error);
@@ -233,7 +253,7 @@ const Simulacion5Dias = () => {
       let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
 
 
-        if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
+      if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
           
         }else{
 
@@ -268,7 +288,7 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         let horas = temp.getHours();
         let minutos = temp.getMinutes();
-        temp.setMinutes(temp.getMinutes() + 10); // CAMBIAR
+        temp.setMinutes(temp.getMinutes() + 2); // CAMBIAR
         setCurrentDateTime(temp);
         if(currentDateTime.getDate() - initialDate.getDate() === 5){ // CAMBIAR
           let lastDate = currentDateTime;
@@ -536,12 +556,10 @@ const Simulacion5Dias = () => {
 
   const handleFlightDetail = () => {
     // setOpenPopUp(true);
-    console.log("Click detalle")
   }
 
   const onChangeSearchTable = (value) => {
     setValueSearch(value);
-    console.log(value);
     let filtered = flightsSchedule.filter(function (flight) { 
       return airportsCoordinates[flight.idAeropuertoOrigen-1].cityName.indexOf(value) !== -1 
         || airportsCoordinates[flight.idAeropuertoDestino-1].cityName.indexOf(value) !== -1
