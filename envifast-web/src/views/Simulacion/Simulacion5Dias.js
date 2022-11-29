@@ -57,6 +57,11 @@ const Simulacion5Dias = () => {
   const [arrive5Days, setArrive5Days] = React.useState(false);
   
 
+  String.prototype.replaceAt = function(index, replacement) {
+    return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+  }
+
+
   const getIcon = () => {
       return L.icon({
           iconUrl : require("../../assets/icons/aeropuerto.png"),
@@ -107,23 +112,51 @@ const Simulacion5Dias = () => {
 
 
   // Llamamos para cargar los vuelos, solo se llama una vez.
+
+  function stringToDay(diaString) {
+    //2022-08-19T12:20:00
+    let [dateValues, timeValues] = diaString.split('T');
+
+    let [year, month, day] = dateValues.split('-');
+    let [hours, minutes, seconds] = timeValues.split(':');
+
+    let dia = new Date(+year, +month - 1, +day, +hours, +minutes, +seconds);
+    return dia
+  }
+
+  function dayToString(diaDate){
+    diaDate.setHours(diaDate.getHours() - 5) // por el tema de ISO
+    let stringDate = diaDate.toISOString();
+    return stringDate
+  }
+
+
   React.useEffect(() => {
     if(periodo !== 0){
+      // fecha para el dia, tiene que ser la fecha de inicio + 3 dias
+      let lastDay = new Date(currentDateTime)
+      lastDay.setDate(lastDay.getDate() +  4) 
       let variables = {
-        fecha: currentDateTime.toISOString().slice(0, 10),//startDate, // 2022-10-29
+        fecha: lastDay.toISOString().slice(0, 10),//startDate, // 2022-10-29
         paraSim: 1
       }
       getVuelosPorDia(variables)
       .then((response) => {
         var array = [];
         for (const element of response.data){
+          let diaSalida = stringToDay(element.horaSalida)
+          let diaLlegada = stringToDay(element.horaLLegada)
+          diaSalida.setDate(diaSalida.getDate() - 4)
+          diaLlegada.setDate(diaLlegada.getDate() - 4)
+          let horaSalidaString = dayToString(diaSalida)
+          let horaLlegadaString = dayToString(diaLlegada)
           array.push(
             {
               id: "TAP" + element.id.toString(),
               idAeropuertoOrigen: element.idAeropuertoOrigen,
               idAeropuertoDestino: element.idAeropuertoDestino,
-              horaSalida: element.horaSalida,
-              horaLLegada: element.horaLLegada,
+              horaSalida: horaSalidaString,
+              horaLLegada: horaLlegadaString,
               duracion: element.duracion,
               coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
               coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
@@ -133,6 +166,7 @@ const Simulacion5Dias = () => {
           )
         };
         var k = array.length;
+        console.log(array)
         setPrimeraSeccion(Math.floor(k/10))
         setSegundaSeccion(Math.floor(k/5))
         setTerceraSeccion(Math.floor((3/10) * k))
@@ -169,27 +203,11 @@ const Simulacion5Dias = () => {
 
       let horaFin = horaFinDate.toISOString().split('T')[1].substring(0, 5)
       let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
-      // ahora imprimimos todos los atributos para ver si estan bien
-      // console.log("Hora en ISO: " + currentDateTime.toISOString().split('T')[1])
-      
-      
-      // FUNCIONA PERFECTO
 
-        // Ahora solo mandamos los datos para hacer el post del planificador
-        // console.log("Hora actual: " + horaActual)
-        
 
         if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
-          // console.log("NO DEBERIA ENTRAR EN 00:00 CUANDO ES EL PRIMER DIA")
           
         }else{
-          // aqui tenemos que llamara la api
-          // console.log("Si planifica desde las 2: ")
-          // console.log("Atributos para mandar al post")
-          // console.log(fechaPlanificacon)
-          // console.log(horaInicio)
-          // console.log(horaFin)
-          // console.log("Dia del initial date: " + initialDate)
 
           let variables = {
             fecha: fechaPlanificacon,
@@ -200,9 +218,6 @@ const Simulacion5Dias = () => {
 
           planShipmentsSimulation(variables)
           .then(function (response) {
-             // aqui capturamos, en la parte de colapso, si response
-             // es 0 es porque hubo colapso
-            //  console.log(response)
              if(response.data === 1)
               console.log("Logro planificar correctamente")
           })
@@ -405,9 +420,7 @@ const Simulacion5Dias = () => {
     }
   })
 
-  String.prototype.replaceAt = function(index, replacement) {
-      return this.substring(0, index) + replacement + this.substring(index + replacement.length);
-  }
+  
   const show_interval = (flightSchedule) => {
     if(flightSchedule.estado === 2) {
       if(currentDateTime.getDate() > initialDate.getDate()){
@@ -415,16 +428,27 @@ const Simulacion5Dias = () => {
         flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
         flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
         // HORA SALIDA ES UN STRING NO UN DATE
-        let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
-        let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
-        diaSalida += 1
-        diaLlegada += 1
-        let stringSalida = diaSalida.toString()
-        let stringLlegada = diaLlegada.toString()
-        flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
-        flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
-        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])          
+        // let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
+        // let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
+        // diaSalida += 1
+        // diaLlegada += 1
+        // let stringSalida = diaSalida.toString()
+        // let stringLlegada = diaLlegada.toString()
+        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
+        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
+        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
+        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])  
+        
+        let diaSalida = stringToDay(flightSchedule.horaSalida)
+        let diaLlegada = stringToDay(flightSchedule.horaLLegada)
+        diaSalida.setDate(diaSalida.getDate() + 1)
+        diaLlegada.setDate(diaLlegada.getDate() + 1)
+        let horaSalidaString = dayToString(diaSalida)
+        let horaLlegadaString = dayToString(diaLlegada)
+        flightSchedule.horaSalida = horaSalidaString
+        flightSchedule.horaLLegada = horaLlegadaString
+        
+
       }
       return;
     }
