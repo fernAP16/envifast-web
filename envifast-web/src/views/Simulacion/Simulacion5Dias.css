@@ -94,3 +94,75 @@
 .button-return-dialog.MuiDialogActions-root{
     justify-content: center;
 }
+
+.container-report{
+    padding-right: 20px;
+    padding-bottom: 20px;
+}
+
+.container-report-header{
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.container-report-title{
+    position: relative;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.container-report-info{
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.container-report-grid{
+    background-color: #e7e7e7;
+    border-radius: 10px;
+    padding: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.container-report-label{
+    font-size: 16px;
+    margin-right: 16px;
+}
+
+.textfield-info{
+    width: 120px;
+}
+
+.table-package-flight-large{
+    height: 450px;
+    width: 1000px;
+    overflow-y: scroll;
+}
+
+.table-package-flight{
+    height: 200px;
+    width: 1000px;
+    overflow-y: scroll;
+}
+
+.alert-collapse{
+    position: absolute;
+    margin-top: 575px;
+    margin-left: 375px;
+    z-index: 5000;
+    color: #FFFFFF;
+    background-color: #D32F2F;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.alert-title{
+    font-size: 20px;
+}
+
+.alert-button{
+    background-color: yellow !important;
+    color: #000000;
+}

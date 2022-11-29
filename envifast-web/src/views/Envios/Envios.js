@@ -51,9 +51,12 @@ const Envios  = (props) => {
     },[])
 
     const getShipments = () => {
-        console.log(input);
         setShipments([]);
-        getShipmentsByInput(input)
+        let variables = {
+            input: input,
+            paraSim: 0
+        }
+        getShipmentsByInput(variables)
         .then(function (response) {
             console.log(response);
             var arrayShipments = [];
@@ -68,7 +71,7 @@ const Envios  = (props) => {
                     correoDestinatario: element.destinatarioCorreo,
                     telefonoDestinatario: element.destinatarioTelefonoNumero,
                     paquetes: element.paquetes,
-                    estado: 0, // Cambiar para que tenga sentido
+                    estado: 0,
                     origen: element.origen,
                     destino: element.destino,
                     cantPaquetes: element.paquetes.length,
@@ -82,6 +85,7 @@ const Envios  = (props) => {
         })
         .catch(function (error) {
             console.log(error);
+            setIsLoadingInit(false);
         })
     }
 

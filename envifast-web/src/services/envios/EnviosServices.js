@@ -103,20 +103,28 @@ export const planShipmentsSimulation = (variables) =>{
         paraSim: 1
     }
     // el link tiene que tener la siguiente forma:
-    // http://localhost:8081/orders/cargarEnviosSim?fecha=2022-11-24&timeInf=23%3A17&timeSup=23%3A17&paraSim=5 no es necesario enviar los minutos
+    // http://inf226g2.inf.pucp.edu.pe:8080/packages/cargarEnviosSim?fecha=2022-08-19&timeInf=20%3A00&timeSup=22%3A00&paraSim=1 no es necesario enviar los minutos
     return axios.post(
-        API_URL.url + "orders/cargar?fecha=" + obj.fecha + "&timeInf=" + obj.timeInf + "&timeSup=" + obj.timeSup + "&paraSim="+ obj.paraSim,
+        API_URL.url + "packages/cargarEnviosSim?fecha=" + obj.fecha + "&timeInf=" + obj.timeInf + "&timeSup=" + obj.timeSup + "&paraSim="+ obj.paraSim,
     )
 }
-export const getShipmentsByInput = (input) => {
-    const obj = {
-        input: input
-    }
-    console.log(obj);
-    return axios.get(
-        API_URL.url + "orders?input=" + obj.input,
-        obj,
+
+export const getFlightsAirport = (variables) =>{
+    // http://localhost:8080/orders/cargarEnviosSim?fecha=2022-08-19&timeInf=22%3A00&timeSup=00%3A00&paraSim=1
+    return axios.post(
+        API_URL.url + "orders/cargarEnviosSim?fecha=" + variables.fecha + "&timeInf=" + variables.timeInf.split(':')[0] + "%3A" + 
+        variables.timeInf.split(':')[1] + "&timeSup=" + variables.timeSup.split(':')[0] + "%3A" + variables.timeSup.split(':')[1] + "&paraSim=" + variables.paraSim
     )
+}
+export const getShipmentsByInput = (variables) => {
+    if(variables.input === '')
+        return axios.get(
+            API_URL.url + "orders?forSim=" + variables.paraSim,
+        );
+    else 
+        return axios.get(
+            API_URL.url + "orders?input=" + variables.input + '&forSim=' + variables.paraSim,
+        );
 }
 
 export const registerFlights = (variables) => {
@@ -128,5 +136,25 @@ export const registerFlights = (variables) => {
 export const registerDateTimes = (variables) => {
     return axios.get(
         API_URL.url + "airports/dateTimes?fecha=" + variables.date + "&dias=" + variables.days + "&paraSim=" + variables.paraSim
+    )
+}
+
+export const getPlanifiedOrders = (variables) => {
+    return axios.get(
+        API_URL.url + "orders/planifiedOrders?fecha=" + variables.date + "&timeInf=" + variables.timeInf.split(':')[0] + "%3A" + 
+        variables.timeInf.split(':')[1] + "&timeSup=" + variables.timeSup.split(':')[0] + "%3A" + variables.timeSup.split(':')[1] +
+        "&paraSim=" + variables.paraSim + "&indicador=" + variables.indicador
+    )
+}
+
+export const getPackageRoute = (idPackage) => {
+    return axios.get(
+        API_URL.url + "packages/route/{id}?id=" + idPackage
+    )
+}
+
+export const getPlanifiedOrdersd2d = () => {
+    return axios.post(
+        API_URL.url + "orders/plan"
     )
 }

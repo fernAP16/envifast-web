@@ -23,7 +23,9 @@ const MenuLateral = (props) => {
         } else {
             setEnableSimulacion(true);
         }
-        navigate(routes[index]);
+        if(index !== 2)
+            navigate(routes[index]);
+        
         
       };
 
