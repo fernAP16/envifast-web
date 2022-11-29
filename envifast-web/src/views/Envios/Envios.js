@@ -128,7 +128,7 @@ const Envios  = (props) => {
 
     const handleConfirmRegister = () => {
         setConfirmRegister(false);
-        // setIsLoading(true);
+        setIsLoading(true);
         let date = new Date();
         date.setHours(date.getHours() - 5);
         let variables = {
@@ -407,7 +407,7 @@ const Envios  = (props) => {
                     <Typography className='register-label'>El envío se registró correctamente</Typography>
                 </DialogContent>
                 <DialogActions className='actions-confirm'>
-                    <Button className='button-register' onClick={() => {setShipmentRegistered(false);getShipments()}} autoFocus>Volver a envíos</Button>
+                    <Button className='button-register' onClick={() => {setShipmentRegistered(false);eraseRegisterInfo();getShipments()}} autoFocus>Volver a envíos</Button>
                 </DialogActions>
             </Dialog>
             {shipmentDetail &&
