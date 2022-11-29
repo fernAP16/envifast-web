@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, generarEnviosPorDia, getAirportsDateTime, planShipmentsSimulation } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getVuelosPorDia, registerFlights,registerDateTimes, planShipmentsSimulation } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, DialogActions } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -55,7 +55,6 @@ const Simulacion5Dias = () => {
   const [valueSearch, setValueSearch] = React.useState('')
   const [searchTable, setSearchTable] = React.useState([]);
   const [arrive5Days, setArrive5Days] = React.useState(false);
-  
 
   String.prototype.replaceAt = function(index, replacement) {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length);
@@ -129,6 +128,35 @@ const Simulacion5Dias = () => {
     let stringDate = diaDate.toISOString();
     return stringDate
   }
+
+  const handleRegisterDays = () => {
+    let lastDay = new Date(currentDateTime)
+    lastDay.setDate(lastDay.getDate() +  4)
+    let variables = {
+        date: lastDay.toISOString().slice(0, 10),
+        days: 3,
+        paraSim: 1
+    }
+    registerFlights(variables)
+    .then(function (response) {
+        registerDateTimes(variables)
+        .then(function (response) {
+            console.log("Funciono el registro de dias y datetimes")
+            setIsLoading(false);
+            setStateButtons(2);
+            setPeriodo(periodo + 1);
+        })
+        .catch(function (error) {
+            console.log(error);
+            setIsLoading(false);
+        })
+    })
+    .catch(function (error) {
+        console.log(error);
+        setIsLoading(false);
+    })
+  }
+
 
 
   React.useEffect(() => {
@@ -428,25 +456,25 @@ const Simulacion5Dias = () => {
         flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
         flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
         // HORA SALIDA ES UN STRING NO UN DATE
-        // let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
-        // let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
-        // diaSalida += 1
-        // diaLlegada += 1
-        // let stringSalida = diaSalida.toString()
-        // let stringLlegada = diaLlegada.toString()
-        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
-        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
-        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])  
+        let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
+        let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
+        diaSalida += 1
+        diaLlegada += 1
+        let stringSalida = diaSalida.toString()
+        let stringLlegada = diaLlegada.toString()
+        flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
+        flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
+        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
+        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])  
         
-        let diaSalida = stringToDay(flightSchedule.horaSalida)
-        let diaLlegada = stringToDay(flightSchedule.horaLLegada)
-        diaSalida.setDate(diaSalida.getDate() + 1)
-        diaLlegada.setDate(diaLlegada.getDate() + 1)
-        let horaSalidaString = dayToString(diaSalida)
-        let horaLlegadaString = dayToString(diaLlegada)
-        flightSchedule.horaSalida = horaSalidaString
-        flightSchedule.horaLLegada = horaLlegadaString
+        // let diaSalida = stringToDay(flightSchedule.horaSalida)
+        // let diaLlegada = stringToDay(flightSchedule.horaLLegada)
+        // diaSalida.setDate(diaSalida.getDate() + 1)
+        // diaLlegada.setDate(diaLlegada.getDate() + 1)
+        // let horaSalidaString = dayToString(diaSalida)
+        // let horaLlegadaString = dayToString(diaLlegada)
+        // flightSchedule.horaSalida = horaSalidaString
+        // flightSchedule.horaLLegada = horaLlegadaString
         
 
       }
@@ -488,12 +516,11 @@ const Simulacion5Dias = () => {
   }
 
   const handleStart = () => {
-    if(stateButtons === 1){
-      setIsLoading(true);
-      setStateButtons(2);
-      setPeriodo(periodo + 1);
-    }
-    else setStateButtons(3)
+    // if(stateButtons === 1){
+    setIsLoading(true);
+    handleRegisterDays();
+    // }
+    // else setStateButtons(3)
     setDisableStart(true);
   }
 
