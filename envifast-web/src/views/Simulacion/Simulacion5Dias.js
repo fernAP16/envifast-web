@@ -62,7 +62,6 @@ const Simulacion5Dias = () => {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length);
   }
 
-
   const getIcon = () => {
       return L.icon({
           iconUrl : require("../../assets/icons/aeropuerto.png"),
@@ -128,12 +127,12 @@ const Simulacion5Dias = () => {
   function dayToString(diaDate){
     diaDate.setHours(diaDate.getHours() - 5) // por el tema de ISO
     let stringDate = diaDate.toISOString();
-    return stringDate
+    return stringDate.substring(0,19);
   }
 
   const handleRegisterDays = () => {
     let lastDay = new Date(currentDateTime)
-    lastDay.setDate(lastDay.getDate() +  4)
+    lastDay.setDate(lastDay.getDate() + 4)
     let variables = {
         date: lastDay.toISOString().slice(0, 10),
         days: 3,
@@ -143,7 +142,6 @@ const Simulacion5Dias = () => {
     .then(function (response) {
         registerDateTimes(variables)
         .then(function (response) {
-            setIsLoading(false);
             setStateButtons(2);
             setPeriodo(periodo + 1);
         })
@@ -170,8 +168,8 @@ const Simulacion5Dias = () => {
 
     getFlightsAirport(variables)
     .then((response) => {
-      if(response.data === 1)
-        console.log("Planificador real completado")
+      if(response.data === 1);
+
     }).catch(function (error) {
         console.log(error);
     })
@@ -185,7 +183,7 @@ const Simulacion5Dias = () => {
       let lastDay = new Date(currentDateTime)
       lastDay.setDate(lastDay.getDate() +  4) 
       let variables = {
-        fecha: lastDay.toISOString().slice(0, 10),//startDate, // 2022-10-29
+        fecha: lastDay.toISOString().slice(0, 10),//startDate, // 2022-10-12
         paraSim: 1
       }
       getVuelosPorDia(variables)
@@ -224,6 +222,7 @@ const Simulacion5Dias = () => {
         setOctavaSeccion(Math.floor((8/10) * k))
         setNovenaSeccion(Math.floor((9/10) * k))         
         setFlightsSchedule(array)
+        console.log(array);
         setSearchTable(array.slice(0,10));
         setIsLoading(false);
         setFlagInicioContador(true);
@@ -239,45 +238,36 @@ const Simulacion5Dias = () => {
     if(currentDateTime != null && !arrive5Days){
       let fechaPlanificacon = currentDateTime.toISOString().split('T')[0]
       let fechaInicio = initialDate.toISOString().split('T')[0]
-      // let horaInicio = currentDateTime.toISOString().split('T')[1].substring(0, 5) // substr si es inclusivo, si incluye el ultimo indice
       let horaInicioDate = new Date(fechaPlanificacon)
-      // horaInicioDate.setHours((lapsoPlanificador - 1) * 4 - 5)
-      horaInicioDate.setHours(horaActual - 7) // El limite inferior son 2 horas antes de la hora actual -5 - 2 
-      // para la hora final tenemos que hacer una serie de calculos
-      
-      // lapso planificador sera el que nos dara la hora limite del rango
+      horaInicioDate.setHours(horaActual - 7)
       let horaFinDate =  new Date(fechaPlanificacon)
       horaFinDate.setHours(horaActual - 5)// La hora actual es el limite superior
-
       let horaFin = horaFinDate.toISOString().split('T')[1].substring(0, 5)
       let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
 
-
       if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
-          
-        }else{
 
-          let variables = {
-            fecha: fechaPlanificacon,
-            timeInf: horaInicio,
-            timeSup: horaFin,
-            paraSim: 1
-          }
-
-          planShipmentsSimulation(variables)
-          .then(function (response) {
-             if(response.data === 1)
-              console.log("Logro planificar correctamente")
-          })
-          .catch(function (error) {
-              console.log(error);
-              setIsLoading(false);
-          })
+      } else {
+        let variables = {
+          fecha: fechaPlanificacon,
+          timeInf: horaInicio,
+          timeSup: horaFin,
+          paraSim: 1
         }
-        console.log("---------------------------")
-        
+        planShipmentsSimulation(variables)
+        .then(function (response) {
+            if(response.data === 1)
+            console.log("Logro planificar correctamente")
+            console.log(flightsSchedule);
+        })
+        .catch(function (error) {
+            console.log(error);
+            setIsLoading(false);
+          })
       }
+      console.log("---------------------------")
     }
+  }
   
 
 
@@ -288,9 +278,9 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         let horas = temp.getHours();
         let minutos = temp.getMinutes();
-        temp.setMinutes(temp.getMinutes() + 1); // CAMBIAR
+        temp.setMinutes(temp.getMinutes() + 1);
         setCurrentDateTime(temp);
-        if(currentDateTime.getDate() - initialDate.getDate() === 5){ // CAMBIAR
+        if(currentDateTime.getDate() - initialDate.getDate() === 5){
           let lastDate = currentDateTime;
           lastDate.setDate(lastDate.getDate()-1);
           navigate(ROUTES.SIMULACION5DIASREPORTE, {
@@ -323,7 +313,7 @@ const Simulacion5Dias = () => {
         for(var i = 0 ; i < primeraSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200) // antes estaba en 1.1
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -469,34 +459,24 @@ const Simulacion5Dias = () => {
   })
 
   
-  const show_interval = (flightSchedule) => {
+  const show_interval = (flightSchedule) => { // ACÁ ESTÁ EL ERROR
     if(flightSchedule.estado === 2) {
       if(currentDateTime.getDate() > initialDate.getDate()){
         flightSchedule.estado = 0
         flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
         flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
-        // HORA SALIDA ES UN STRING NO UN DATE
-        let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10))
+        let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10)) // 2022-12-20T
         let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
         diaSalida += 1
         diaLlegada += 1
-        let stringSalida = diaSalida.toString()
-        let stringLlegada = diaLlegada.toString()
+        let stringSalida = diaSalida.toString();
+        if(stringSalida.length === 1) stringSalida = "0" + stringSalida;
+        let stringLlegada = diaLlegada.toString();
+        if(stringLlegada.length === 1) stringLlegada = "0" + stringLlegada;
         flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
         flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
         flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])  
-        
-        // let diaSalida = stringToDay(flightSchedule.horaSalida)
-        // let diaLlegada = stringToDay(flightSchedule.horaLLegada)
-        // diaSalida.setDate(diaSalida.getDate() + 1)
-        // diaLlegada.setDate(diaLlegada.getDate() + 1)
-        // let horaSalidaString = dayToString(diaSalida)
-        // let horaLlegadaString = dayToString(diaLlegada)
-        // flightSchedule.horaSalida = horaSalidaString
-        // flightSchedule.horaLLegada = horaLlegadaString
-        
-
+        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
       }
       return;
     }
@@ -545,7 +525,6 @@ const Simulacion5Dias = () => {
   }
 
   const handleDate = event => {
-    console.log(event.target.value)
     setStartDate(event.target.value);
     setStartDateString(formatDate(event.target.value));
     setCurrentDateTime(new Date(event.target.value + ' 00:00:00'));

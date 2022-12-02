@@ -182,9 +182,9 @@ const ReporteSimulacion5Dias = () => {
               <TextField size='small' disabled={true} value={packageSelected.idShipment}></TextField>
             </Grid>
             <Grid item xs={1.8}>
-              <Typography>Fecha de llegada: </Typography>
+              <Typography>Hora de registro: </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={1.3}>
               <TextField size='small' disabled={true} value={packageSelected.timeRegistering}></TextField>
             </Grid>
           </Grid>
