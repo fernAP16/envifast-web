@@ -125,9 +125,12 @@ const Simulacion5Dias = () => {
   }
 
   function dayToString(diaDate){
+    // diaDate.setHours(diaDate.getHours() - 5) // por el tema de ISO
+    // let stringDate = diaDate.toISOString();
+    // return stringDate.substring(0,19);
     diaDate.setHours(diaDate.getHours() - 5) // por el tema de ISO
     let stringDate = diaDate.toISOString();
-    return stringDate.substring(0,19);
+    return stringDate.slice(0, stringDate.length - 1)
   }
 
   const handleRegisterDays = () => {
@@ -278,7 +281,7 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         let horas = temp.getHours();
         let minutos = temp.getMinutes();
-        temp.setMinutes(temp.getMinutes() + 1);
+        temp.setMinutes(temp.getMinutes() + 4);
         setCurrentDateTime(temp);
         if(currentDateTime.getDate() - initialDate.getDate() === 5){
           let lastDate = currentDateTime;
@@ -465,18 +468,40 @@ const Simulacion5Dias = () => {
         flightSchedule.estado = 0
         flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
         flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
-        let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10)) // 2022-12-20T
-        let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
-        diaSalida += 1
-        diaLlegada += 1
-        let stringSalida = diaSalida.toString();
-        if(stringSalida.length === 1) stringSalida = "0" + stringSalida;
-        let stringLlegada = diaLlegada.toString();
-        if(stringLlegada.length === 1) stringLlegada = "0" + stringLlegada;
-        flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
-        flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
-        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-        flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
+        // let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10)) // 2022-12-20T
+        // let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
+        // diaSalida += 1
+        // diaLlegada += 1
+        // let stringSalida = diaSalida.toString();
+        // if(stringSalida.length === 1) stringSalida = "0" + stringSalida;
+        // let stringLlegada = diaLlegada.toString();
+        // if(stringLlegada.length === 1) stringLlegada = "0" + stringLlegada;
+        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
+        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
+        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
+        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
+
+        let diaSalida = stringToDay(flightSchedule.horaSalida)
+        let diaLlegada = stringToDay(flightSchedule.horaLLegada)
+
+        diaSalida.setDate(diaSalida.getDate() + 1)
+        diaLlegada.setDate(diaLlegada.getDate() + 1)
+
+        
+        let horaSalidaString = dayToString(diaSalida)
+        let horaLlegadaString = dayToString(diaLlegada)
+
+        flightSchedule.horaSalida = horaSalidaString
+        flightSchedule.horaLLegada = horaLlegadaString 
+
+        console.log({
+          diaSalida: diaSalida,
+          diaLlegada: diaLlegada,
+          horaSalida: flightSchedule.horaSalida,
+          horaLlegada: flightSchedule.horaLLegada,
+          horaSalidaString : horaSalidaString,
+          horaLlegadaString: horaLlegadaString
+        }) // go?
       }
       return;
     }
