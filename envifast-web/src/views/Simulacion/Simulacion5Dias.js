@@ -283,7 +283,8 @@ const Simulacion5Dias = () => {
         let minutos = temp.getMinutes();
         temp.setMinutes(temp.getMinutes() + 4);
         setCurrentDateTime(temp);
-        if(currentDateTime.getDate() - initialDate.getDate() === 5){
+        let daysBetween = parseInt((currentDateTime.getTime() - initialDate.getTime()) / (1000 * 3600 * 24));
+        if(daysBetween === 5){
           let lastDate = currentDateTime;
           lastDate.setDate(lastDate.getDate()-1);
           navigate(ROUTES.SIMULACION5DIASREPORTE, {
@@ -461,47 +462,24 @@ const Simulacion5Dias = () => {
     }
   })
 
+  function getDateInt(date){
+    return date.getFullYear()*10000 + (date.getMonth()+1)*100 + date.getDate();
+  }
   
   const show_interval = (flightSchedule) => { // ACÁ ESTÁ EL ERROR
     if(flightSchedule.estado === 2) {
-      if(currentDateTime.getDate() > initialDate.getDate()){
+      if(getDateInt(currentDateTime) > getDateInt(initialDate)){
         flightSchedule.estado = 0
         flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0];
         flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1];
-        // let diaSalida = parseInt(flightSchedule.horaSalida.substring(8, 10)) // 2022-12-20T
-        // let diaLlegada = parseInt(flightSchedule.horaLLegada.substring(8, 10))
-        // diaSalida += 1
-        // diaLlegada += 1
-        // let stringSalida = diaSalida.toString();
-        // if(stringSalida.length === 1) stringSalida = "0" + stringSalida;
-        // let stringLlegada = diaLlegada.toString();
-        // if(stringLlegada.length === 1) stringLlegada = "0" + stringLlegada;
-        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(8, stringSalida[0])
-        // flightSchedule.horaSalida = flightSchedule.horaSalida.replaceAt(9, stringSalida[1])
-        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(8, stringLlegada[0])
-        // flightSchedule.horaLLegada = flightSchedule.horaLLegada.replaceAt(9, stringLlegada[1])
-
         let diaSalida = stringToDay(flightSchedule.horaSalida)
         let diaLlegada = stringToDay(flightSchedule.horaLLegada)
-
         diaSalida.setDate(diaSalida.getDate() + 1)
         diaLlegada.setDate(diaLlegada.getDate() + 1)
-
-        
         let horaSalidaString = dayToString(diaSalida)
         let horaLlegadaString = dayToString(diaLlegada)
-
         flightSchedule.horaSalida = horaSalidaString
-        flightSchedule.horaLLegada = horaLlegadaString 
-
-        console.log({
-          diaSalida: diaSalida,
-          diaLlegada: diaLlegada,
-          horaSalida: flightSchedule.horaSalida,
-          horaLlegada: flightSchedule.horaLLegada,
-          horaSalidaString : horaSalidaString,
-          horaLlegadaString: horaLlegadaString
-        }) // go?
+        flightSchedule.horaLLegada = horaLlegadaString
       }
       return;
     }
