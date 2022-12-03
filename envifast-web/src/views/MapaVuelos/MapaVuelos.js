@@ -51,7 +51,7 @@ import { styled } from '@mui/material/styles';
         return L.icon({
             iconUrl : require("../../assets/icons/aeropuerto.png"),
             iconRetinaUrl: require("../../assets/icons/aeropuerto.png"),
-            iconSize : 20
+            iconSize : 15
         })
     }
 
@@ -107,7 +107,7 @@ import { styled } from '@mui/material/styles';
         let date = currentDateTime;
         date.setHours(date.getHours() - 5);
         let variables = {
-          fecha: date.toISOString().slice(0, 10),//startDate, // 2022-10-29
+          fecha: date.toISOString().slice(0, 10),
           paraSim: 0
         }
         getVuelosPorDia(variables)
@@ -118,7 +118,7 @@ import { styled } from '@mui/material/styles';
             let coordenadasDestinosTemp = [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng];
             let currentTimeNow = currentDateTime.getTime();
             let difTime = new Date(element.horaLLegada).getTime() - new Date(element.horaSalida).getTime();
-            let currTime = currentTimeNow - new Date(element.horaSalida).getTime(); // PROBLEMA
+            let currTime = currentTimeNow - new Date(element.horaSalida).getTime();
             let estado = currentTimeNow < new Date(element.horaSalida).getTime() ? 0 : 
                         (currentTimeNow < new Date(element.horaLLegada).getTime() ? 1 : 2);
             array.push(
@@ -148,9 +148,8 @@ import { styled } from '@mui/material/styles';
           setOctavaSeccion(Math.floor((8/10) * k))
           setNovenaSeccion(Math.floor((9/10) * k))         
           setFlightsSchedule(array)
-          setSearchTable(array.slice(0,20));
-          setFlagInicioContador(true);
-          console.log(array);
+          setSearchTable(array.slice(0,50));
+          setFlagInicioContador(true);  
         })
         .catch(function (error) {
           console.log(error);

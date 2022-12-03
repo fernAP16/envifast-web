@@ -5,7 +5,7 @@ import L from "leaflet";
 import airplaneIcon from "../../assets/icons/avion.png";
 
 const icon = L.icon({
-  iconSize: [18, 18],
+  iconSize: [15, 15],
   popupAnchor: [2, -20],
   iconUrl: airplaneIcon
 });

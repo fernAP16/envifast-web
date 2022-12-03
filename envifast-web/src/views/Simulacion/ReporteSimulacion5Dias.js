@@ -47,7 +47,6 @@ const ReporteSimulacion5Dias = () => {
     }
     getPlanifiedOrders(variables)
     .then(function (response) {
-      console.log(response);
       var array = [];
       for (const element of response.data) {
         array.push({
@@ -60,7 +59,7 @@ const ReporteSimulacion5Dias = () => {
       getTotalPackages(variables)
       .then(function (response){
         setTotalPackages(response.data);
-        setIsGeneratingReport(false); // A
+        setIsGeneratingReport(false);
       })
       .catch(function (error) {
         console.log(error);
@@ -77,7 +76,6 @@ const ReporteSimulacion5Dias = () => {
     setIsLoadingRoute(true);
     getPackageRoute(pack.idPackage)
     .then(function (response) {
-      console.log(response);
       var array = [];
       for (const element of response.data) {
         array.push({

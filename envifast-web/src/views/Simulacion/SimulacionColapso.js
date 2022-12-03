@@ -69,7 +69,7 @@ const Simulacion5Dias = () => {
       return L.icon({
           iconUrl : require("../../assets/icons/aeropuerto.png"),
           iconRetinaUrl: require("../../assets/icons/aeropuerto.png"),
-          iconSize : 20
+          iconSize : 15
       })
   }
 

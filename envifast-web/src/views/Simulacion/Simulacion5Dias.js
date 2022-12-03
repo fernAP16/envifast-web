@@ -66,7 +66,7 @@ const Simulacion5Dias = () => {
       return L.icon({
           iconUrl : require("../../assets/icons/aeropuerto.png"),
           iconRetinaUrl: require("../../assets/icons/aeropuerto.png"),
-          iconSize : 20
+          iconSize : 15
       })
   }
 
@@ -225,8 +225,7 @@ const Simulacion5Dias = () => {
         setOctavaSeccion(Math.floor((8/10) * k))
         setNovenaSeccion(Math.floor((9/10) * k))         
         setFlightsSchedule(array)
-        console.log(array);
-        setSearchTable(array.slice(0,10));
+        setSearchTable(array.slice(0,50));
         setIsLoading(false);
         setFlagInicioContador(true);
         handleGetAirport()
@@ -260,15 +259,13 @@ const Simulacion5Dias = () => {
         planShipmentsSimulation(variables)
         .then(function (response) {
             if(response.data === 1)
-            console.log("Logro planificar correctamente")
-            console.log(flightsSchedule);
+              console.log(flightsSchedule);
         })
         .catch(function (error) {
             console.log(error);
             setIsLoading(false);
           })
       }
-      console.log("---------------------------")
     }
   }
   
@@ -501,8 +498,11 @@ const Simulacion5Dias = () => {
     if(currentDateTime > dateFin){
       flightSchedule.estado = 2;
     } else if(date >= dateInicio){
-      flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasDestinos[0];
-      flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasDestinos[1];
+      let currentTimeNow = currentDateTime.getTime();
+      let difTime = new Date(flightSchedule.horaLLegada).getTime() - new Date(flightSchedule.horaSalida).getTime();
+      let currTime = currentTimeNow - new Date(flightSchedule.horaSalida).getTime();
+      flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0] + (flightSchedule.coordenadasDestinos[0] - flightSchedule.coordenadasOrigen[0])*currTime/difTime
+      flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1] + (flightSchedule.coordenadasDestinos[1] - flightSchedule.coordenadasOrigen[1])*currTime/difTime
     } else if(currentDateTime > dateInicio){
       flightSchedule.estado = 1;
     }
