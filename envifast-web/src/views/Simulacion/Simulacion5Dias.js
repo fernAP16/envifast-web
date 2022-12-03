@@ -278,7 +278,7 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         let horas = temp.getHours();
         let minutos = temp.getMinutes();
-        temp.setMinutes(temp.getMinutes() + 4);
+        temp.setMinutes(temp.getMinutes() + 1);
         setCurrentDateTime(temp);
         let daysBetween = parseInt((currentDateTime.getTime() - initialDate.getTime()) / (1000 * 3600 * 24));
         if(daysBetween === 5){
