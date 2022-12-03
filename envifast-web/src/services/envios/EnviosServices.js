@@ -147,6 +147,14 @@ export const getPlanifiedOrders = (variables) => {
     )
 }
 
+export const getTotalPackages = (variables) => {
+    return axios.get(
+        API_URL.url + "orders/countPlanifiedOrders?fecha=" + variables.date + "&timeInf=" + variables.timeInf.split(':')[0] + "%3A" + 
+        variables.timeInf.split(':')[1] + "&timeSup=" + variables.timeSup.split(':')[0] + "%3A" + variables.timeSup.split(':')[1] +
+        "&paraSim=" + variables.paraSim + "&indicador=" + variables.indicador
+    )
+}
+
 export const getPackageRoute = (idPackage) => {
     return axios.get(
         API_URL.url + "packages/route/{id}?id=" + idPackage

@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React from 'react'
 import { useLocation } from 'react-router-dom'
-import { getCoordenadasAeropuertos, getPackageRoute, getPlanifiedOrders } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, getPackageRoute, getPlanifiedOrders, getTotalPackages } from '../../services/envios/EnviosServices';
 import './Simulacion5Dias.css';
 
 const ReporteSimulacion5Dias = () => {
@@ -15,6 +15,7 @@ const ReporteSimulacion5Dias = () => {
   const [airportsCoordinates, setAirportsCoordinates] = React.useState([]);
   const [isGeneratingReport, setIsGeneratingReport] = React.useState(true);
   const [isLoadingRoute, setIsLoadingRoute] = React.useState(false);
+  const [totalPackages, setTotalPackages] = React.useState(null);
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -55,9 +56,16 @@ const ReporteSimulacion5Dias = () => {
           timeRegistering: element.fecha.split('T')[1]
         })
       };
-      console.log(array);
       setPackages(array);
-      setIsGeneratingReport(false);
+      getTotalPackages(variables)
+      .then(function (response){
+        setTotalPackages(response.data);
+        setIsGeneratingReport(false); // A
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      
     })
     .catch(function (error) {
         console.log(error);
@@ -132,7 +140,7 @@ const ReporteSimulacion5Dias = () => {
                   <Typography className='container-report-label'>Cantidad de paquetes planificados: </Typography>
                 </Grid>
                 <Grid item xs={1}>
-                  <TextField size='small' disabled={true} value={packages ? packages.length : '-'}></TextField>
+                  <TextField size='small' disabled={true} value={totalPackages ? totalPackages : '-'}></TextField>
                 </Grid>
               </Grid>
             </Grid>
