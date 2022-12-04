@@ -82,7 +82,6 @@ const Envios  = (props) => {
         }
         getShipmentsByInput(variables)
         .then(function (response) {
-            console.log(response);
             var arrayShipments = [];
             for (const element of response.data) {
                 arrayShipments.push({
@@ -103,7 +102,6 @@ const Envios  = (props) => {
                     tiempoTotal: element.tiempoTotal
                 })
             };
-            console.log(arrayShipments)
             setShipments(arrayShipments);
             setIsLoadingInit(false);
         })
@@ -171,7 +169,6 @@ const Envios  = (props) => {
             destino: countryTo.id,
             fechaEnvio: date
         }
-        console.log(variables);
         registerShipment(variables)
         .then(function (response) {
             setIsLoading(false);
