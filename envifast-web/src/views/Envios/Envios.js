@@ -472,79 +472,85 @@ const Envios  = (props) => {
                 <DialogContent>
                     <DialogContentText id="register-dialog-description">
                         <Grid>
-                            <Typography className='register-label'>Emisor:</Typography>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' className='input-' label='Nombre completo' fullWidth value={shipmentDetail.nombreEmisor} disabled={true}></TextField>
+                            <Grid>
+                                <Grid>
+                                    <Typography className='register-label'>Emisor:</Typography>
+                                    <Grid container spacing={1} className='container-textfields'>
+                                        <Grid item xs={8}>
+                                            <TextField size='small' className='input-' label='Nombre completo' fullWidth value={shipmentDetail.nombreEmisor} disabled={true}></TextField>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField size='small' label='Ciudad' fullWidth value={shipmentDetail.origen.ciudad.nombre}  disabled={true}></TextField>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={1} className='container-textfields'>
+                                        <Grid item xs={8}>
+                                            <TextField size='small' className='' label='Correo electrónico' value={shipmentDetail.correoEmisor} disabled={true} fullWidth></TextField>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField size='small' className='' label='Número de celular' value={shipmentDetail.numeroEmisor} disabled={true} fullWidth></TextField>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
+                                <Grid>
+                                    <Typography className='register-label'>Destinatario:</Typography>
+                                    <Grid container spacing={1} className='container-textfields'>
+                                        <Grid item xs={8}>
+                                            <TextField size='small' label='Nombre completo' fullWidth value={shipmentDetail.nombreDestinatario} disabled={true}></TextField>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField size='small' label='Ciudad' fullWidth value={shipmentDetail.destino.ciudad.nombre}  disabled={true}></TextField>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={1} className='container-textfields'>
+                                        <Grid item xs={8}>
+                                            <TextField size='small' className='' label='Correo electrónico' value={shipmentDetail.correoDestinatario} disabled={true} fullWidth></TextField>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField size='small' className='' label='Número de celular' value={shipmentDetail.telefonoDestinatario} disabled={true} fullWidth></TextField>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid container spacing={1} className='container-textfields'>
+                                    <Grid item xs={4}>
+                                        <Typography className='register-label'>N° de paquetes:</Typography>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <TextField size='small' className='' label='Cant.' value={shipmentDetail.cantPaquetes} disabled={true}></TextField>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <Grid>
                                 <Grid item xs={4}>
-                                    <TextField size='small' label='Ciudad' fullWidth value={shipmentDetail.origen.ciudad.nombre}  disabled={true}></TextField>
+                                    <Typography className='register-label'>Listado de paquetes:</Typography>
                                 </Grid>
+                                <TableContainer component={Paper} className="table-packages-detail">
+                                    <Table stickyHeader aria-label="customized table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <StyledTableCell className='table-flights-cell row-cell' align="center" width='10px'>N°</StyledTableCell>
+                                            <StyledTableCell className='table-flights-cell row-cell' align="center">Paquete</StyledTableCell>
+                                            <StyledTableCell className='table-flights-cell row-cell' align="center">Acciones</StyledTableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody> 
+                                        {shipmentDetail.paquetes && 
+                                        shipmentDetail.paquetes.map((pack, index) => (
+                                            <StyledTableRow key={pack.id}>
+                                                <StyledTableCell className='table-flights-cell row-cell' align="center" width='10px'>{index+1}</StyledTableCell>
+                                                <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.id}</StyledTableCell>
+                                                <StyledTableCell className='table-flights-cell row-cell' align="center">
+                                                    <Button className='button-return' onClick={() => handleSeeRoute(pack)}>
+                                                        <Typography className='text-plan'>Ver plan de vuelo</Typography>
+                                                    </Button>
+                                                </StyledTableCell>
+                                            </StyledTableRow>
+                                        ))
+                                        }
+                                    </TableBody>
+                                    </Table>
+                                </TableContainer>
                             </Grid>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' className='' label='Correo electrónico' value={shipmentDetail.correoEmisor} disabled={true} fullWidth></TextField>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField size='small' className='' label='Número de celular' value={shipmentDetail.numeroEmisor} disabled={true} fullWidth></TextField>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Grid>
-                            <Typography className='register-label'>Destinatario:</Typography>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' label='Nombre completo' fullWidth value={shipmentDetail.nombreDestinatario} disabled={true}></TextField>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField size='small' label='Ciudad' fullWidth value={shipmentDetail.destino.ciudad.nombre}  disabled={true}></TextField>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={1} className='container-textfields'>
-                                <Grid item xs={8}>
-                                    <TextField size='small' className='' label='Correo electrónico' value={shipmentDetail.correoDestinatario} disabled={true} fullWidth></TextField>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField size='small' className='' label='Número de celular' value={shipmentDetail.telefonoDestinatario} disabled={true} fullWidth></TextField>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Grid container spacing={1} className='container-textfields'>
-                            <Grid item xs={4}>
-                                <Typography className='register-label'>N° de paquetes:</Typography>
-                            </Grid>
-                            <Grid item xs={2}>
-                                <TextField size='small' className='' label='Cant.' value={shipmentDetail.cantPaquetes} disabled={true}></TextField>
-                            </Grid>
-                        </Grid>
-                        <Grid>
-                            <Grid item xs={4}>
-                                <Typography className='register-label'>Listado de paquetes:</Typography>
-                            </Grid>
-                        <TableContainer component={Paper} className="table-packages-shipment">
-                            <Table stickyHeader aria-label="customized table">
-                            <TableHead>
-                                <TableRow>
-                                    <StyledTableCell className='table-flights-cell row-cell' align="center">N°</StyledTableCell>
-                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Paquete</StyledTableCell>
-                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Acciones</StyledTableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody> 
-                                {shipmentDetail.paquetes && 
-                                shipmentDetail.paquetes.map((pack, index) => (
-                                    <StyledTableRow key={pack.id}>
-                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
-                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.id}</StyledTableCell>
-                                        <StyledTableCell className='table-flights-cell row-cell' align="center">
-                                            <Button className='button-return' onClick={() => handleSeeRoute(pack)}>Ver ruta</Button>
-                                        </StyledTableCell>
-                                    </StyledTableRow>
-                                ))
-                                }
-                            </TableBody>
-                            </Table>
-                        </TableContainer>
                         </Grid>
                     </DialogContentText>
                 </DialogContent>
@@ -562,7 +568,7 @@ const Envios  = (props) => {
                 {"Paquete: " + packageSelected.idPackage}
                 </DialogTitle>
                 <DialogContent>
-                    <Typography>{"Ruta del paquete: "}</Typography>
+                    <Typography>{"Plan de vuelo del paquete: "}</Typography>
                     <TableContainer component={Paper} className="table-package">
                         <Table stickyHeader aria-label="customized table">
                         <TableHead>

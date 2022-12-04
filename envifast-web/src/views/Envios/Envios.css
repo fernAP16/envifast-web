@@ -130,9 +130,9 @@
     opacity: 0.8;
 }
 
-.table-packages-shipment{
+.table-packages-detail{
     height: 180px;
-    width: 520px;
+    width: 550px;
     overflow-y: scroll;
     margin-top: 10px;
 }
@@ -142,4 +142,9 @@
     width: 1000px;
     overflow-y: scroll;
     margin-top: 10px;
+}
+
+.text-plan{
+    font-size: 10px;
+    text-align: center;
 }
