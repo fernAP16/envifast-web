@@ -129,3 +129,17 @@
     -webkit-text-fill-color: #000000 !important;
     opacity: 0.8;
 }
+
+.table-packages-shipment{
+    height: 180px;
+    width: 520px;
+    overflow-y: scroll;
+    margin-top: 10px;
+}
+
+.table-package{
+    height: 225px;
+    width: 1000px;
+    overflow-y: scroll;
+    margin-top: 10px;
+}

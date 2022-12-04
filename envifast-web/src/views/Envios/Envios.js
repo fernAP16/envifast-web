@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import './Envios.css'
-import { getAeropuertos, getShipmentsByInput, registerDateTimes, registerFlights, registerShipment } from '../../services/envios/EnviosServices';
+import { getAeropuertos, getPackageRoute, getShipmentsByInput, registerDateTimes, registerFlights, registerShipment } from '../../services/envios/EnviosServices';
 
 const Envios  = (props) => {
     const [shipments, setShipments] = React.useState([]);
@@ -31,6 +31,30 @@ const Envios  = (props) => {
     const [daysRegister, setDaysRegister] = React.useState(0);
     const [isRegisteringFlights, setIsRegisteringFlights] = React.useState(false);
     const [flightsRegistered, setFlightsRegistered] = React.useState(false);
+    const [packageFlights, setPackagesFlights] = React.useState([]);
+    const [packageSelected, setPackageSelected] = React.useState({});
+    const [isSelected, setIsSelected] = React.useState(false);
+    const [isLoadingRoute, setIsLoadingRoute] = React.useState(false);
+
+    const StyledTableCell = styled(TableCell)(({ theme }) => ({
+        [`&.${tableCellClasses.head}`]: {
+          backgroundColor: "#AFD6D6",
+          color: theme.palette.common.black,
+        },
+        [`&.${tableCellClasses.body}`]: {
+          fontSize: 14,
+        },
+      }));
+    
+      const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        '&:nth-of-type(odd)': {
+          backgroundColor: theme.palette.action.hover,
+        },
+        // hide last border
+        '&:last-child td, &:last-child th': {
+          border: 0,
+        },
+      }));
 
     React.useEffect(() => {
         getAeropuertos()
@@ -71,7 +95,7 @@ const Envios  = (props) => {
                     correoDestinatario: element.destinatarioCorreo,
                     telefonoDestinatario: element.destinatarioTelefonoNumero,
                     paquetes: element.paquetes,
-                    estado: 0,
+                    estado: element.estado,
                     origen: element.origen,
                     destino: element.destino,
                     cantPaquetes: element.paquetes.length,
@@ -128,7 +152,7 @@ const Envios  = (props) => {
 
     const handleConfirmRegister = () => {
         setConfirmRegister(false);
-        setIsLoading(true);
+        setIsLoadingRoute(true);
         let date = new Date();
         date.setHours(date.getHours() - 5);
         let variables = {
@@ -157,6 +181,36 @@ const Envios  = (props) => {
             console.log(error);
             setIsLoading(false);
         })
+    }
+
+    const handleSeeRoute = (pack) => {
+        setIsLoadingRoute(true);
+        getPackageRoute(pack.id)
+        .then(function (response) {
+          var array = [];
+          for (const element of response.data) {
+            array.push({
+              origen: element.ciudadOrigen,
+              destino: element.ciudadDestino,
+              horaSalida: element.horaSalida,
+              horaLLegada: element.horaLLegada
+            })        
+          };
+          setPackagesFlights(array);
+          setPackageSelected({
+            idPackage: pack.id,
+          })
+          setIsLoadingRoute(false);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+        setIsSelected(true);
+    }
+
+    const handleReturnToDetail = () => {
+        setPackagesFlights([])
+        setIsSelected(false);
     }
 
     const handleReturn = () => {
@@ -389,7 +443,7 @@ const Envios  = (props) => {
                 </DialogActions>
             </Dialog>
             <Dialog
-                open={isLoading}
+                open={isLoading }
                 >
                 <DialogTitle>
                     Cargando...
@@ -413,7 +467,7 @@ const Envios  = (props) => {
             </Dialog>
             {shipmentDetail &&
             <Dialog
-                open={isDetail}
+                open={isDetail && !isSelected}
                 >
                 <DialogTitle>
                     {'Detalle del envío ' + shipmentDetail.codigo}
@@ -466,14 +520,86 @@ const Envios  = (props) => {
                                 <TextField size='small' className='' label='Cant.' value={shipmentDetail.cantPaquetes} disabled={true}></TextField>
                             </Grid>
                         </Grid>
+                        <Grid>
+                            <Grid item xs={4}>
+                                <Typography className='register-label'>Listado de paquetes:</Typography>
+                            </Grid>
+                        <TableContainer component={Paper} className="table-packages-shipment">
+                            <Table stickyHeader aria-label="customized table">
+                            <TableHead>
+                                <TableRow>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">N°</StyledTableCell>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Paquete</StyledTableCell>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Acciones</StyledTableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody> 
+                                {shipmentDetail.paquetes && 
+                                shipmentDetail.paquetes.map((pack, index) => (
+                                    <StyledTableRow key={pack.id}>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{pack.id}</StyledTableCell>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">
+                                            <Button className='button-return' onClick={() => handleSeeRoute(pack)}>Ver ruta</Button>
+                                        </StyledTableCell>
+                                    </StyledTableRow>
+                                ))
+                                }
+                            </TableBody>
+                            </Table>
+                        </TableContainer>
+                        </Grid>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions className='actions-confirm'>
-                    <Button className='button-register' onClick={() => setIsDetail(false)} autoFocus>Volver</Button>
+                    <Button className='button-register' onClick={() => {setIsDetail(false);shipmentDetail(null)}} autoFocus>Volver</Button>
                 </DialogActions>
             </Dialog>
             }
-            <Dialog open={isLoadingInit}>
+            {packageSelected && !isLoading &&
+            <Dialog
+                open={isSelected}
+                maxWidth="1000px"
+            >
+                <DialogTitle>
+                {"Paquete: " + packageSelected.idPackage}
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>{"Ruta del paquete: "}</Typography>
+                    <TableContainer component={Paper} className="table-package">
+                        <Table stickyHeader aria-label="customized table">
+                        <TableHead>
+                            <TableRow>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">N°</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de origen</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de destino</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Salida</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell row-cell' align="center">Llegada</StyledTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody> 
+                            {packageFlights && 
+                            packageFlights.map((flight, index) => (
+                                <StyledTableRow key={flight.name}>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.origen}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.destino}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida.split('T')[0] + ', ' + flight.horaSalida.split('T')[1]}</StyledTableCell>
+                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaLLegada.split('T')[0] + ', ' + flight.horaLLegada.split('T')[1]}</StyledTableCell>                        
+                                </StyledTableRow>
+                            ))
+                            }
+                        </TableBody>
+                        </Table>
+                    </TableContainer>
+                </DialogContent>
+                <DialogActions>
+                <Button className='button-return' onClick={handleReturnToDetail}>Volver</Button>
+                </DialogActions>
+            </Dialog>
+            }
+
+            <Dialog open={isLoadingInit || isLoadingRoute}>
                 <DialogTitle>
                     Cargando...
                 </DialogTitle>
