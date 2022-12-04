@@ -2,7 +2,7 @@ import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
 import { getCoordenadasAeropuertos, getVuelosPorDia, registerFlights,registerDateTimes, planShipmentsSimulation, getFlightsAirport } from '../../services/envios/EnviosServices';
-import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, DialogActions } from '@mui/material';
+import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, DialogActions, Checkbox, FormControlLabel } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
 import AirplaneIcon from '../../assets/icons/avion.png';
@@ -57,6 +57,7 @@ const Simulacion5Dias = () => {
   const [valueSearch, setValueSearch] = React.useState('')
   const [searchTable, setSearchTable] = React.useState([]);
   const [arrive5Days, setArrive5Days] = React.useState(false);
+  const [checkValue, setCheckValue] = React.useState(false);
 
   String.prototype.replaceAt = function(index, replacement) {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length);
@@ -269,8 +270,6 @@ const Simulacion5Dias = () => {
     }
   }
   
-
-
   // Contador que modificara el tiempo:
   React.useEffect(() => {
     if(flagInicioContador){
@@ -577,11 +576,12 @@ const Simulacion5Dias = () => {
                             duration_flight: flight.duracion
                           } ?? {}
                         }></AirplaneMarker>
-                        {/* <Polyline
+                        { checkValue && 
+                        <Polyline
                           color='#19D2A6'
                           weight={0.5}
                           positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
-                        ></Polyline> */}
+                        ></Polyline>}
                     </div>
                     :
                     <></>
@@ -602,7 +602,7 @@ const Simulacion5Dias = () => {
                 </Grid>
               </Grid>
             </Box> 
-            <Grid container alignItems='center'>
+            <Grid container alignItems='center' marginBottom='10px' >
               <Grid item xs={5}>
                 <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
               </Grid>
@@ -616,9 +616,17 @@ const Simulacion5Dias = () => {
                 </Button>
               </Grid>
             </Grid>
-            <Grid container alignItems='center' marginTop='10px' marginBottom='10px'>
+            <Grid container alignItems='center' marginBottom='10px' >
               <Grid item xs={5}>
-                <Typography fontWeight="bold">Filtrar vuelo(s): </Typography>
+                <Typography fontWeight="bold" position='relative'>Configuraciones: </Typography>
+              </Grid>
+              <Grid item xs={7}>
+                <FormControlLabel control={<Checkbox checked={checkValue} onChange={() => setCheckValue(!checkValue)}defaultChecked className='checkbox-flights'/>} label={<Typography fontWeight="bold" position='relative'>Mostrar rutas de vuelos </Typography>}/>
+              </Grid>
+            </Grid>
+            <Grid container alignItems='center' marginBottom='10px'>
+              <Grid item xs={5}>
+                <Typography fontWeight="bold">Filtrar vuelos: </Typography>
               </Grid>
               <Grid item xs={7}>
                 <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
@@ -664,7 +672,7 @@ const Simulacion5Dias = () => {
         </Grid>
         <Dialog open={isLoading}>
           <DialogTitle>
-            Cargando...
+              Generando simulación...
           </DialogTitle>
           <DialogContent>
             <Grid item container justifyContent='center'>

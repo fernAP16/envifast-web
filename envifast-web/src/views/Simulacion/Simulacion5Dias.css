@@ -78,7 +78,7 @@
 }
 
 .table-simulation-flights{
-    height: 520px;
+    height: 469px;
     width: 400px;
     overflow-y: scroll;
     margin-top: 10px;
@@ -165,4 +165,8 @@
 .alert-button{
     background-color: yellow !important;
     color: #000000;
+}
+
+.checkbox-flights{
+    color: #19D2A6 !important;
 }
