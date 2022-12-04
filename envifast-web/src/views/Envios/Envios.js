@@ -198,6 +198,7 @@ const Envios  = (props) => {
     }
 
     const handleVerDetalle = (shipment) => {
+        // Obtener paquetes con sus rutas
         setShipmentDetail(shipment);
         setIsDetail(true);
     }

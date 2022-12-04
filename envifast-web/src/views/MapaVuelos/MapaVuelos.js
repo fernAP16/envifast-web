@@ -11,7 +11,7 @@ import L from "leaflet";
 
 import AirplaneMarker from "./AirplaneMarker";
 import {useState} from 'react'
-import { Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Checkbox, FormControlLabel, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { isElementOfType } from 'react-dom/test-utils';
 import { Box } from '@mui/system';
 import { Icon } from '@iconify/react';
@@ -31,20 +31,7 @@ import { styled } from '@mui/material/styles';
     const [currentDateTimePrint, setCurrentDateTimePrint] = React.useState(new Date());
     const [valueSearch, setValueSearch] = React.useState('')
     const [searchTable, setSearchTable] = React.useState([]);
-    const [initialDate, setInitialDateTime] = React.useState(new Date());
-    const [flagInicioContador, setFlagInicioContador] = React.useState(false);
-    const [currentTrack, setCurrentTrack] = React.useState({});
-
-    // variables para la animacion
-    const [primeraSeccion, setPrimeraSeccion] = React.useState(1);
-    const [segundaSeccion, setSegundaSeccion] = React.useState(1);
-    const [terceraSeccion, setTerceraSeccion] = React.useState(1);
-    const [cuartaSeccion, setCuartaSeccion] = React.useState(1);
-    const [quintaSeccion, setQuintaSeccion] = React.useState(1);
-    const [sextaSeccion, setSextaSeccion] = React.useState(1);
-    const [septimaSeccion, setSeptimaSeccion] = React.useState(1);
-    const [octavaSeccion, setOctavaSeccion] = React.useState(1);
-    const [novenaSeccion, setNovenaSeccion] = React.useState(1);
+    const [checkValue, setCheckValue] = React.useState(false);
 
 
     const getIcon = () => {
@@ -137,19 +124,9 @@ import { styled } from '@mui/material/styles';
               }
             )
           };
-          var k = array.length;
-          setPrimeraSeccion(Math.floor(k/10))
-          setSegundaSeccion(Math.floor(k/5))
-          setTerceraSeccion(Math.floor((3/10) * k))
-          setCuartaSeccion(Math.floor((4/10) * k))
-          setQuintaSeccion(Math.floor( k / 2))
-          setSextaSeccion(Math.floor((6/10) * k))
-          setSeptimaSeccion(Math.floor((7/10) * k))
-          setOctavaSeccion(Math.floor((8/10) * k))
-          setNovenaSeccion(Math.floor((9/10) * k))         
+          var k = array.length;       
           setFlightsSchedule(array)
           setSearchTable(array.slice(0,50));
-          setFlagInicioContador(true);  
         })
         .catch(function (error) {
           console.log(error);
@@ -205,11 +182,12 @@ import { styled } from '@mui/material/styles';
                                     duration_flight: flight.duracion
                                   } ?? {}
                                 }></AirplaneMarker>
-                                {/* <Polyline
+                                { checkValue && 
+                                <Polyline
                                   color='#19D2A6'
-                                  weight={0.4}
+                                  weight={0.5}
                                   positions={[[flight.coordenadasOrigen[0], flight.coordenadasOrigen[1]],[flight.coordenadasDestinos[0], flight.coordenadasDestinos[1]]]}
-                                ></Polyline> */}
+                                ></Polyline>}
                             </div>
                              :
                              <></>
@@ -230,6 +208,14 @@ import { styled } from '@mui/material/styles';
                       </Grid>
                     </Grid>
                   </Box> 
+                  <Grid container alignItems='center' marginBottom='10px' >
+                    <Grid item xs={5}>
+                      <Typography fontWeight="bold" position='relative'>Configuraciones: </Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <FormControlLabel control={<Checkbox checked={checkValue} onChange={() => setCheckValue(!checkValue)}defaultChecked className='checkbox-flights'/>} label={<Typography fontWeight="bold" position='relative'>Mostrar rutas de vuelos </Typography>}/>
+                    </Grid>
+                  </Grid>
                   <Grid container alignItems='center' marginTop='10px' marginBottom='10px'>
                     <Grid item xs={5}>
                       <Typography fontWeight="bold">Filtrar vuelo(s): </Typography>
