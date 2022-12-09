@@ -34,6 +34,7 @@ const Simulacion5Dias = () => {
   const [startDateString, setStartDateString] = React.useState('dd/mm/aaaa');
   const [startDate, setStartDate] = React.useState(null);
   const [currentDateTime, setCurrentDateTime] = React.useState(null);
+  const [currentDateTimeSeconds, setCurrentDateTimeSeconds] = React.useState(null);
   const [currentTrack, setCurrentTrack] = React.useState({});
   const [flightsSchedule, setFlightsSchedule] = React.useState([]);
   const [stateButtons, setStateButtons] = React.useState(0);
@@ -244,7 +245,9 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         let horas = temp.getHours();
         let minutos = temp.getMinutes();
-        temp.setMinutes(temp.getMinutes() + 1);
+        // temp.setMinutes(temp.getMinutes() + 1);
+        // setCurrentDateTime(temp);
+        temp.setSeconds(temp.getSeconds() + 30)
         setCurrentDateTime(temp);
         if(currentDateTime.getDate() - initialDate.getDate() === 1 && currentDateTime.getHours() == 16){ // CAMBIAR
           let lastDate = currentDateTime;
@@ -264,7 +267,7 @@ const Simulacion5Dias = () => {
           enviarPlanificador(horas)
         }
       }
-    }, 200) 
+    }, 100) 
     return () => {
       clearInterval(interval);
     };
@@ -460,6 +463,9 @@ const Simulacion5Dias = () => {
     let jsonLlegada= "\""  + flightSchedule.horaLLegada + "\""
     let dateInicio = new Date(JSON.parse(jsonSalida))
     let dateFin = new Date(JSON.parse(jsonLlegada))
+  
+    // para que lleguen a la hora correcta
+    // dateFin.setHours(dateFin.getHours() + 1)
     
     setCurrentTrack({
         lat: flightSchedule.coordenadasActual[0],
@@ -471,10 +477,13 @@ const Simulacion5Dias = () => {
     let date = new Date(currentDateTime);
     date.setSeconds(date.getSeconds() - 100);
 
+    
+
+    
     if(currentDateTime > dateFin){
       flightSchedule.estado = 2;
     } else if(date >= dateInicio){
-      let currentTimeNow = currentDateTime.getTime();
+      let currentTimeNow = currentDateTime.getTime(); // con getTime obtienes los milisegundos.
       let difTime = new Date(flightSchedule.horaLLegada).getTime() - new Date(flightSchedule.horaSalida).getTime();
       let currTime = currentTimeNow - new Date(flightSchedule.horaSalida).getTime();
       flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0] + (flightSchedule.coordenadasDestinos[0] - flightSchedule.coordenadasOrigen[0])*currTime/difTime
@@ -482,6 +491,7 @@ const Simulacion5Dias = () => {
     } else if(currentDateTime > dateInicio){
       flightSchedule.estado = 1;
     }
+    
   }
 
   const AirportMarket = () => {
@@ -505,6 +515,7 @@ const Simulacion5Dias = () => {
     setStartDate(event.target.value);
     setStartDateString(formatDate(event.target.value));
     setCurrentDateTime(new Date(event.target.value + ' 00:00:00'));
+    setCurrentDateTimeSeconds(new Date(event.target.value + ' 00:00:00'));
     setInitialDate(new Date(event.target.value + ' 00:00:00'))
     setStateButtons(1);
     setDisableStart(false);

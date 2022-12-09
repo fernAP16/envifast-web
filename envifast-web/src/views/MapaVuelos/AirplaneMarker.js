@@ -29,8 +29,8 @@ export default function AirplaneMarker({ data }) {
       // mostrarla a segundo osea * 60. El 1000 tambien es necesario ponerlo porque la duracion
       // esta en milisegundos.
       // duration={(0.003472) * duration_flight * 60 * 10} // esta duracion esta en milisegundos
-      // duration={(0.003472) * duration_flight * 743.88} // tuneando la duracion
-      duration={(0.003472) * duration_flight * 743.88}
+      // duration={(0.003472) * duration_flight * 743.88} // Original de la presentacion
+      duration={(0.003472) * duration_flight * 380 * 10} // sin tanta notoriedad los pasos
     />
   );
 }
