@@ -205,7 +205,8 @@ const Simulacion5Dias = () => {
               coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
               coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
               coordenadasActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
-              estado: 0
+              estado: 0,
+              distanciaRecorrida: 0
             }
           )
         };
@@ -282,7 +283,7 @@ const Simulacion5Dias = () => {
         let minutos = temp.getMinutes();
         // temp.setMinutes(temp.getMinutes() + 1);
         // setCurrentDateTime(temp);
-        temp.setSeconds(temp.getSeconds() + 30)
+        temp.setSeconds(temp.getSeconds() + 15)
         setCurrentDateTime(temp);
         if(currentDateTime.getDate() - initialDate.getDate() === 1 && currentDateTime.getHours() == 16){ // CAMBIAR
           let lastDate = currentDateTime;
@@ -302,7 +303,7 @@ const Simulacion5Dias = () => {
           enviarPlanificador(horas)
         }
       }
-    }, 100) 
+    }, 50) 
     return () => {
       clearInterval(interval);
     };
@@ -328,7 +329,7 @@ const Simulacion5Dias = () => {
         for(var i = 0 ; i < primeraSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200) // antes estaba en 1.1
+      }, 50) // antes estaba en 1.1
       return () => {
         clearInterval(interval);
       };
@@ -343,7 +344,7 @@ const Simulacion5Dias = () => {
         for(var i = primeraSeccion; i < segundaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -358,7 +359,7 @@ const Simulacion5Dias = () => {
         for(var i = segundaSeccion; i < terceraSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -373,7 +374,7 @@ const Simulacion5Dias = () => {
         for(var i = terceraSeccion; i < cuartaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -388,7 +389,7 @@ const Simulacion5Dias = () => {
         for(var i = cuartaSeccion; i < quintaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -403,7 +404,7 @@ const Simulacion5Dias = () => {
         for(var i = quintaSeccion; i < sextaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -419,7 +420,7 @@ const Simulacion5Dias = () => {
         for(var i = sextaSeccion; i < septimaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -434,7 +435,7 @@ const Simulacion5Dias = () => {
         for(var i = septimaSeccion; i < octavaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -449,7 +450,7 @@ const Simulacion5Dias = () => {
         for(var i = octavaSeccion; i < novenaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -466,7 +467,7 @@ const Simulacion5Dias = () => {
             show_interval(flightsSchedule[i])
           }
         }
-      }, 200)
+      }, 50)
       return () => {
         clearInterval(interval);
       };
@@ -512,10 +513,11 @@ const Simulacion5Dias = () => {
     let date = new Date(currentDateTime);
     date.setSeconds(date.getSeconds() - 100);
 
-    
+    let dateTemp = new Date(currentDateTime);
+    dateTemp.setSeconds(dateTemp.getSeconds() - 18);
 
     
-    if(currentDateTime > dateFin){
+    if(dateTemp > dateFin){//currentDateTime
       flightSchedule.estado = 2;
     } else if(date >= dateInicio){
       let currentTimeNow = currentDateTime.getTime(); // con getTime obtienes los milisegundos.
@@ -523,6 +525,11 @@ const Simulacion5Dias = () => {
       let currTime = currentTimeNow - new Date(flightSchedule.horaSalida).getTime();
       flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0] + (flightSchedule.coordenadasDestinos[0] - flightSchedule.coordenadasOrigen[0])*currTime/difTime
       flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1] + (flightSchedule.coordenadasDestinos[1] - flightSchedule.coordenadasOrigen[1])*currTime/difTime
+      // if(flightSchedule.distanciaRecorrida < 1)
+      //   flightSchedule.distanciaRecorrida += 0.001
+      // flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0] + (flightSchedule.coordenadasDestinos[0] - flightSchedule.coordenadasOrigen[0])*flightSchedule.distanciaRecorrida
+      // flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1] + (flightSchedule.coordenadasDestinos[1] - flightSchedule.coordenadasOrigen[1])*flightSchedule.distanciaRecorrida
+      
     } else if(currentDateTime > dateInicio){
       flightSchedule.estado = 1;
     }
@@ -581,7 +588,7 @@ const Simulacion5Dias = () => {
             <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm')}</Typography>
             <MapContainer
                 className="mapa-vuelo"
-                center = {{lat: '21.658522', lng: '-20.591226'}}
+                center = {{lat: '22.658522', lng: '-23.591226'}}
                 zoom = {2.7}
                 minZoom = {2.0}
                 maxZoom = {18.0}

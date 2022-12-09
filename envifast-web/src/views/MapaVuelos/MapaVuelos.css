@@ -7,7 +7,7 @@
 
 .date-map{
     position: absolute;
-    margin: 660px 0px 0px 490px;
+    margin: 660px 0px 0px 315px;
     font-size: 20px;
     z-index: 2000;
 }
@@ -21,7 +21,7 @@
 
 .mapa-vuelo{
     position: relative;
-    max-width: 830px;
+    max-width: 650px; /* 830*/
     max-height: 710px;
     border-radius: 10px;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
