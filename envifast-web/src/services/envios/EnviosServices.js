@@ -165,3 +165,11 @@ export const getPlanifiedOrdersd2d = () => {
         API_URL.url + "orders/plan"
     )
 }
+
+// airports/capacity?fecha=2022-12-08&hora=16%3A00
+export const getCapacityAirports = (variables) => {
+    return axios.get(
+        API_URL.url + "airports/capacity?fecha=" + variables.date + "&hora=" + variables.time.split(':')[0] + "%3A" + 
+        variables.time.split(':')[1]
+    )
+}

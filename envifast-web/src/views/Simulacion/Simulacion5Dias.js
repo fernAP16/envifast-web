@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
-import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, registerFlights,registerDateTimes, planShipmentsSimulation, getFlightsAirport } from '../../services/envios/EnviosServices';
+import { MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'; // objeto principal para los mapas
+import { getCoordenadasAeropuertos, getVuelosPorDia, registerFlights,registerDateTimes, planShipmentsSimulation, getFlightsAirport, getCapacityAirports } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, DialogActions, Checkbox, FormControlLabel } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -20,7 +20,6 @@ import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
 import { Icon } from '@iconify/react';
-import Popup from '../MapaVuelos/VerPlanVuelo';
 import { isCompositeComponent } from 'react-dom/test-utils';
 import { useNavigate } from 'react-router-dom';
 import * as ROUTES from "../../routes/routes";
@@ -101,7 +100,9 @@ const Simulacion5Dias = () => {
           id: element.id,
           cityName: element.cityName,
           lat: element.x_pos,
-          lng: element.y_pos
+          lng: element.y_pos,
+          maxCapacity: element.maxCapacity,
+          currentCapacity: -1
         })
       };
       setAirportsCoordinates(arrayAirports);
@@ -259,8 +260,16 @@ const Simulacion5Dias = () => {
         }
         planShipmentsSimulation(variables)
         .then(function (response) {
-            if(response.data === 1)
-              console.log(flightsSchedule);
+          let varAir = {
+            date: fechaInicio,
+            time: horaInicio,
+          }
+          getCapacityAirports(varAir)
+          .then(function (response){
+            let array = response.data
+            for (var i=0; i<array.length; i++) airportsCoordinates[i].currentCapacity = array[i].usedCapacity;
+          })
+          .catch(function (error){})
         })
         .catch(function (error) {
             console.log(error);
@@ -507,11 +516,22 @@ const Simulacion5Dias = () => {
     }
   }
 
+  function obtainCapacity() {
+    let temp = new Date();
+    temp.setHours(temp.getHours() - 5)
+    return temp.toISOString().substring(0, 19);
+  }
+
   const AirportMarket = () => {
     return (
       <>
       {airportsCoordinates.map((airport) => (
-          <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
+          <Marker position={[airport.lat , airport.lng]} icon={getIcon()}>
+            <Popup>
+              Capac. máx.: {airport.maxCapacity}
+              {airport.currentCapacity !== -1 ? <><br/>Capac. disp.: {airport.currentCapacity}</> : <></>}
+            </Popup>
+          </Marker>
       ))}
       </> 
     )
