@@ -75,6 +75,7 @@ const Envios  = (props) => {
     },[])
 
     const getShipments = () => {
+        setIsLoadingInit(true);
         setShipments([]);
         let variables = {
             input: input,
@@ -171,12 +172,12 @@ const Envios  = (props) => {
         }
         registerShipment(variables)
         .then(function (response) {
-            setIsLoading(false);
+            setIsLoadingRoute(false);
             setShipmentRegistered(true);
         })
         .catch(function (error) {
             console.log(error);
-            setIsLoading(false);
+            setIsLoadingRoute(false);
         })
     }
 
@@ -559,7 +560,7 @@ const Envios  = (props) => {
                 </DialogActions>
             </Dialog>
             }
-            {packageSelected && !isLoading &&
+            {packageSelected && !isLoading && 
             <Dialog
                 open={isSelected}
                 maxWidth="1000px"
@@ -568,33 +569,41 @@ const Envios  = (props) => {
                 {"Paquete: " + packageSelected.idPackage}
                 </DialogTitle>
                 <DialogContent>
-                    <Typography>{"Plan de vuelo del paquete: "}</Typography>
-                    <TableContainer component={Paper} className="table-package">
-                        <Table stickyHeader aria-label="customized table">
-                        <TableHead>
-                            <TableRow>
-                            <StyledTableCell className='table-flights-cell row-cell' align="center">N°</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de origen</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de destino</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell row-cell' align="center">Salida</StyledTableCell>
-                            <StyledTableCell className='table-flights-cell row-cell' align="center">Llegada</StyledTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody> 
-                            {packageFlights && 
-                            packageFlights.map((flight, index) => (
-                                <StyledTableRow key={flight.name}>
-                                <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
-                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.origen}</StyledTableCell>
-                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.destino}</StyledTableCell>
-                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida.split('T')[0] + ', ' + flight.horaSalida.split('T')[1]}</StyledTableCell>
-                                <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaLLegada.split('T')[0] + ', ' + flight.horaLLegada.split('T')[1]}</StyledTableCell>                        
-                                </StyledTableRow>
-                            ))
-                            }
-                        </TableBody>
-                        </Table>
-                    </TableContainer>
+                    {packageFlights.length !== 0 ?  
+                    (
+                        <>
+                            <Typography>{"Plan de vuelo del paquete: "}</Typography>
+                            <TableContainer component={Paper} className="table-package">
+                                <Table stickyHeader aria-label="customized table">
+                                <TableHead>
+                                    <TableRow>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">N°</StyledTableCell>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de origen</StyledTableCell>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Ciudad de destino</StyledTableCell>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Salida</StyledTableCell>
+                                    <StyledTableCell className='table-flights-cell row-cell' align="center">Llegada</StyledTableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody> 
+                                    {packageFlights && 
+                                    packageFlights.map((flight, index) => (
+                                        <StyledTableRow key={flight.name}>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{index+1}</StyledTableCell>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.origen}</StyledTableCell>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.destino}</StyledTableCell>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaSalida.split('T')[0] + ', ' + flight.horaSalida.split('T')[1]}</StyledTableCell>
+                                        <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.horaLLegada.split('T')[0] + ', ' + flight.horaLLegada.split('T')[1]}</StyledTableCell>                        
+                                        </StyledTableRow>
+                                    ))
+                                    }
+                                </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </>
+                    ) : 
+                    <>
+                    Actualmente no se encuentra un plan de vuelo
+                    </>}
                 </DialogContent>
                 <DialogActions>
                 <Button className='button-return' onClick={handleReturnToDetail}>Volver</Button>
