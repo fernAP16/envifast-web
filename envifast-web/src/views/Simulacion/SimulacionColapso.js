@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
-import { MapContainer, TileLayer, Marker, Polyline} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, getAirportsDateTime, planShipmentsSimulation, registerFlights, registerDateTimes } from '../../services/envios/EnviosServices';
+import { MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'; // objeto principal para los mapas
+import { getCoordenadasAeropuertos, getVuelosPorDia, getAirportsDateTime, planShipmentsSimulation, registerFlights, registerDateTimes, getCapacityAirports } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, Checkbox, FormControlLabel } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -20,7 +20,6 @@ import 'leaflet/dist/leaflet.css';
 import './Simulacion5Dias.css';
 import AirplaneMarker from '../MapaVuelos/AirplaneMarker';
 import { Icon } from '@iconify/react';
-import Popup from '../MapaVuelos/VerPlanVuelo';
 import { isCompositeComponent } from 'react-dom/test-utils';
 import * as ROUTES from "../../routes/routes";
 import { useNavigate } from 'react-router-dom';
@@ -73,6 +72,30 @@ const Simulacion5Dias = () => {
           iconRetinaUrl: require("../../assets/icons/aeropuerto.png"),
           iconSize : 15
       })
+  }
+
+  const getGreenIcon = () => {
+    return L.icon({
+      iconUrl : require("../../assets/icons/verde-aeropuerto.png"),
+      iconRetinaUrl: require("../../assets/icons/verde-aeropuerto.png"),
+      iconSize : 15
+    })
+  }
+
+  const getYellowIcon = () => {
+    return L.icon({
+      iconUrl : require("../../assets/icons/amarillo-aeropuerto.png"),
+      iconRetinaUrl: require("../../assets/icons/amarillo-aeropuerto.png"),
+      iconSize : 15
+    })
+  }
+
+  const getRedIcon = () => {
+    return L.icon({
+      iconUrl : require("../../assets/icons/rojo-aeropuerto.png"),
+      iconRetinaUrl: require("../../assets/icons/rojo-aeropuerto.png"),
+      iconSize : 15
+    })
   }
 
   // 2023-03-13 //
@@ -139,7 +162,9 @@ const Simulacion5Dias = () => {
           id: element.id,
           cityName: element.cityName,
           lat: element.x_pos,
-          lng: element.y_pos
+          lng: element.y_pos,
+          maxCapacity: element.maxCapacity,
+          currentCapacity: 0
         })
       };
       setAirportsCoordinates(arrayAirports);
@@ -227,8 +252,18 @@ const Simulacion5Dias = () => {
         }
         planShipmentsSimulation(variables)
         .then(function (response) {
-            if(response.data === 1)
-              console.log(flightsSchedule);
+          let varAir = {
+            date: fechaInicio,
+            time: horaInicio,
+          }
+          getCapacityAirports(varAir)
+          .then(function (response){
+            let array = response.data
+            for (var i=0; i<array.length; i++) airportsCoordinates[i].currentCapacity = array[i].usedCapacity;
+          })
+          .catch(function (error){
+            console.log(error);
+          })
         })
         .catch(function (error) {
             console.log(error);
@@ -498,7 +533,11 @@ const Simulacion5Dias = () => {
     return (
       <>
       {airportsCoordinates.map((airport) => (
-          <Marker position={[airport.lat , airport.lng]} icon={getIcon()}></Marker>
+          <Marker position={[airport.lat , airport.lng]} icon={airport.currentCapacity <= airport.maxCapacity/2 ? getGreenIcon() : (airport.currentCapacity <= 3*airport.maxCapacity/4 ? getYellowIcon() : getRedIcon())}>
+            <Popup>
+              Capac. máxima: {airport.maxCapacity}<br/>Capac. utilizada: {airport.currentCapacity}
+            </Popup>
+          </Marker>
       ))}
       </> 
     )
@@ -677,9 +716,6 @@ const Simulacion5Dias = () => {
             </Grid>
           </DialogContent>
         </Dialog>
-        <Popup openPopUp = {openPopUp} setOpenPopUp = {setOpenPopUp}> 
-
-        </Popup>
       </div>
   )
 }

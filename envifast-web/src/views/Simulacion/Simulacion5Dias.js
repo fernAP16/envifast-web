@@ -70,6 +70,30 @@ const Simulacion5Dias = () => {
       })
   }
 
+  const getGreenIcon = () => {
+    return L.icon({
+      iconUrl : require("../../assets/icons/verde-aeropuerto.png"),
+      iconRetinaUrl: require("../../assets/icons/verde-aeropuerto.png"),
+      iconSize : 15
+    })
+  }
+
+  const getYellowIcon = () => {
+    return L.icon({
+      iconUrl : require("../../assets/icons/amarillo-aeropuerto.png"),
+      iconRetinaUrl: require("../../assets/icons/amarillo-aeropuerto.png"),
+      iconSize : 15
+    })
+  }
+
+  const getRedIcon = () => {
+    return L.icon({
+      iconUrl : require("../../assets/icons/rojo-aeropuerto.png"),
+      iconRetinaUrl: require("../../assets/icons/rojo-aeropuerto.png"),
+      iconSize : 15
+    })
+  }
+
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: "#AFD6D6",
@@ -102,7 +126,7 @@ const Simulacion5Dias = () => {
           lat: element.x_pos,
           lng: element.y_pos,
           maxCapacity: element.maxCapacity,
-          currentCapacity: -1
+          currentCapacity: 0
         })
       };
       setAirportsCoordinates(arrayAirports);
@@ -526,10 +550,9 @@ const Simulacion5Dias = () => {
     return (
       <>
       {airportsCoordinates.map((airport) => (
-          <Marker position={[airport.lat , airport.lng]} icon={getIcon()}>
+          <Marker position={[airport.lat , airport.lng]} icon={airport.currentCapacity <= airport.maxCapacity/2 ? getGreenIcon() : (airport.currentCapacity <= 3*airport.maxCapacity/4 ? getYellowIcon() : getRedIcon())}>
             <Popup>
-              Capac. máx.: {airport.maxCapacity}
-              {airport.currentCapacity !== -1 ? <><br/>Capac. disp.: {airport.currentCapacity}</> : <></>}
+              Capac. máxima: {airport.maxCapacity}<br/>Capac. utilizada: {airport.currentCapacity}
             </Popup>
           </Marker>
       ))}
