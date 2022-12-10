@@ -254,7 +254,7 @@ const Simulacion5Dias = () => {
       if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
 
       } else {
-        if(fechaPlanificacon === "2023-03-13" && horaInicio === "14:00"){
+        
 
         
         let variables = {
@@ -273,6 +273,7 @@ const Simulacion5Dias = () => {
           }
           // se llama al reporte si es que el planificador retorna 0
           if(response.data === 0){
+            if(fechaPlanificacon === "2023-03-13" && horaInicio === "14:00"){
             let lastDate = currentDateTime;
             console.log("La api devolvio 0, entra al reporte")
             console.log(lastDate)
@@ -286,6 +287,7 @@ const Simulacion5Dias = () => {
               }
             });
           }
+          }
           
           getCapacityAirports(varAir)
           .then(function (response){
@@ -295,12 +297,14 @@ const Simulacion5Dias = () => {
           .catch(function (error){
             console.log(error);
           })
-        })
-        .catch(function (error) {
+        }
+          
+          )
+          .catch(function (error) {
             console.log(error);
             setIsLoading(false);
           })
-      }
+      
     }
     }
   }
