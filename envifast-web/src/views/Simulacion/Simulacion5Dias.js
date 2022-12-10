@@ -7,6 +7,9 @@ import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
 import AirplaneIcon from '../../assets/icons/avion.png';
 import AirportIcon from '../../assets/icons/aeropuerto.png';
+import AirportGreenIcon from '../../assets/icons/verde-aeropuerto.png';
+import AirportRedIcon from '../../assets/icons/rojo-aeropuerto.png';
+import AirportYellowIcon from '../../assets/icons/amarillo-aeropuerto.png';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -551,9 +554,9 @@ const Simulacion5Dias = () => {
       <>
       {airportsCoordinates.map((airport) => (
           <Marker position={[airport.lat , airport.lng]} icon={airport.currentCapacity <= airport.maxCapacity/2 ? getGreenIcon() : (airport.currentCapacity <= 3*airport.maxCapacity/4 ? getYellowIcon() : getRedIcon())}>
-            <Popup>
+            {/*<Popup>
               Capac. máxima: {airport.maxCapacity}<br/>Capac. utilizada: {airport.currentCapacity}
-            </Popup>
+            </Popup>*/}
           </Marker>
       ))}
       </> 
@@ -601,8 +604,7 @@ const Simulacion5Dias = () => {
             <Typography className='date-map'>{"Tiempo actual: " + (currentDateTime ? currentDateTime.toLocaleString(): 'dd/mm/aaaa hh:mm')}</Typography>
             <MapContainer
                 className="mapa-vuelo"
-                // center = {{lat: '28.058522', lng: '-20.591226'}}
-                center = {{lat: '21.658522', lng: '-20.591226'}}
+                center = {{lat: '22.658522', lng: '-23.891226'}}
                 zoom = {2.7}
                 minZoom = {2.0}
                 maxZoom = {18.0}
@@ -633,83 +635,121 @@ const Simulacion5Dias = () => {
           </Grid>
           <Box marginLeft="20px" marginTop="10px"> 
             <Box className='box-legend'> 
-              <Grid display="flex">
+              <Grid>
                 <Grid container alignItems='center'>
-                  <Grid item xs={4}>
+                  <Grid item xs={3}>
                     <Typography fontWeight="bold" marginLeft='2px'>Leyenda</Typography>
                   </Grid>
-                  <Grid item xs={1}><img src={AirportIcon} width="20px" height="20px"></img></Grid>
-                  <Grid item xs={4}><Typography>Aeropuerto</Typography></Grid>
-                  <Grid item xs={1}><img src={AirplaneIcon} width="20px" height="20px"></img></Grid>
-                  <Grid item xs={2}><Typography>Avión</Typography></Grid>
+                  <Grid item xs={0.5}><img src={AirportIcon} width="20px" height="20px"></img></Grid>
+                  <Grid item xs={2.5}><Typography>Aeropuerto</Typography></Grid>
+                  <Grid item xs={0.5}><img src={AirplaneIcon} width="20px" height="20px"></img></Grid>
+                  <Grid item xs={2.5}><Typography>Avión</Typography></Grid>
+                  <Grid item xs={0.5}><Icon icon="akar-icons:minus" color="#19d2a6" width="24px"/></Grid>
+                  <Grid item xs={2.5}><Typography>Trayectos</Typography></Grid>
+                </Grid>
+                <Grid container alignItems='center'>
+                  <Grid item xs={3}>
+                  </Grid>
+                  <Grid item xs={0.5}><img src={AirportGreenIcon} width="20px" height="20px"></img></Grid>
+                  <Grid item xs={2.5}><Typography>Capacidad baja</Typography></Grid>
+                  <Grid item xs={0.5}><img src={AirportYellowIcon} width="20px" height="20px"></img></Grid>
+                  <Grid item xs={2.5}><Typography>Capacidad media</Typography></Grid>
+                  <Grid item xs={0.5}><img src={AirportRedIcon} width="20px" height="20px"></img></Grid>
+                  <Grid item xs={2.5}><Typography>Capacidad llena</Typography></Grid>
                 </Grid>
               </Grid>
             </Box> 
-            <Grid container alignItems='center' marginBottom='10px' >
-              <Grid item xs={5}>
+            <Grid container alignItems='center' marginBottom='10px'>
+              <Grid item xs={2.2}>
                 <Typography fontWeight="bold" position='relative'>Fecha de inicio: </Typography>
               </Grid>
-              <Grid item xs={5}>
-                <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate} 
-                  inputProps={{ min: "2022-08-02", max: "2023-05-24" }} disabled={stateButtons === 2}/>
+              <Grid item xs={2.6}>
+                <TextField type='date' size='small' value={startDate} fullWidth onChange={handleDate} inputProps={{ min: "2022-08-02", max: "2023-05-24" }}/>
               </Grid>
-              <Grid item xs={2} align='right'>
+              <Grid item xs={0.2}>
+              </Grid>
+              <Grid item xs={2.2}>
+                <Typography fontWeight="bold" position='relative'>Configuración: </Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <FormControlLabel control={<Checkbox checked={checkValue} onChange={() => setCheckValue(!checkValue)}defaultChecked className='checkbox-flights'/>} label={<Typography fontWeight="bold" position='relative'>Mostrar rutas de vuelos </Typography>}/>
+              </Grid>
+              <Grid item xs={0.8} align='right'>
                 <Button className={'button-control ' + (disableStart ? 'button-disabled-a' : '')} disabled={disableStart} onClick={handleStart}>
                   <Icon icon="material-symbols:play-arrow-rounded" width='30px' />
                 </Button>
               </Grid>
             </Grid>
-            <Grid container alignItems='center' marginBottom='10px' >
-              <Grid item xs={5}>
-                <Typography fontWeight="bold" position='relative'>Configuraciones: </Typography>
+            <Grid container>
+              <Grid>
+                <Grid container alignItems='center' marginBottom='10px'>
+                  <Grid item xs={4}>
+                    <Typography fontWeight="bold">Filtrar vuelos: </Typography>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
+                  </Grid>
+                </Grid>
+                <Typography fontWeight="bold">Listado de vuelos</Typography>
+                <TableContainer component={Paper} className="table-simulation-flights">
+                  <Table className='table-flights-body' stickyHeader aria-label="customized table">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell className='table-flights-cell cell-ID' align="center">Nombre</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Origen</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Destino</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-state' align="center">Estado</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody> 
+                      {(searchTable) && 
+                        searchTable.map((flight) => (
+                          <StyledTableRow key={flight.name}>
+                            <StyledTableCell className='table-flights-cell' align="center">{flight.id}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">
+                                <div className='table-state'>
+                                    <Typography className='state-text'
+                                        border={flight.estado === 0 ? "1.5px solid #FFFA80" : flight.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
+                                        backgroundColor={flight.estado === 0 ? "#FFFA80" : flight.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
+                                    >
+                                      {flight.estado === 0 ? "Por volar" : flight.estado === 1 ? "En vuelo" : "Aterrizó"}
+                                    </Typography>    
+                                </div>
+                            </StyledTableCell>
+                          </StyledTableRow>
+                        ))
+                      }
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Grid>
-              <Grid item xs={7}>
-                <FormControlLabel control={<Checkbox checked={checkValue} onChange={() => setCheckValue(!checkValue)}defaultChecked className='checkbox-flights'/>} label={<Typography fontWeight="bold" position='relative'>Mostrar rutas de vuelos </Typography>}/>
+              <Grid marginLeft='20px'>
+              <Typography fontWeight="bold">Listado de almacenes</Typography>
+                <TableContainer component={Paper} className="table-airports">
+                  <Table className='table-flights-body' stickyHeader aria-label="customized table">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell className='table-flights-cell cell-ID' align="center">Ciudad</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Capac. máx.</StyledTableCell>
+                        <StyledTableCell className='table-flights-cell cell-city'align="center">Capac. usada</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody> 
+                      {(airportsCoordinates) && 
+                        airportsCoordinates.map((airport) => (
+                          <StyledTableRow key={airport.name}>
+                            <StyledTableCell className='table-flights-cell' align="center">{airport.cityName}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airport.maxCapacity}</StyledTableCell>
+                            <StyledTableCell className='table-flights-cell' align="center">{airport.currentCapacity}</StyledTableCell>
+                          </StyledTableRow>
+                        ))
+                      }
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Grid>
-            </Grid>
-            <Grid container alignItems='center' marginBottom='10px'>
-              <Grid item xs={5}>
-                <Typography fontWeight="bold">Filtrar vuelos: </Typography>
-              </Grid>
-              <Grid item xs={7}>
-                <TextField size='small' fullWidth disabled={stateButtons !== 2} value={valueSearch} onChange={(e) => onChangeSearchTable(e.target.value)}></TextField>
-              </Grid>
-            </Grid>
-            <Grid>
-              <Typography fontWeight="bold">Listado de vuelos</Typography>
-              <TableContainer component={Paper} className="table-simulation-flights">
-                <Table stickyHeader aria-label="customized table">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">Nombre</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">Origen</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">Destino</StyledTableCell>
-                      <StyledTableCell className='table-flights-cell row-cell' align="center">Estado</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody> 
-                    {(searchTable) && 
-                      searchTable.map((flight) => (
-                        <StyledTableRow key={flight.name}>
-                          <StyledTableCell className='table-flights-cell row-cell' align="center">{flight.id}</StyledTableCell>
-                          <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoOrigen-1].cityName}</StyledTableCell>
-                          <StyledTableCell className='table-flights-cell row-cell' align="center">{airportsCoordinates[flight.idAeropuertoDestino-1].cityName}</StyledTableCell>
-                          <StyledTableCell className='table-flights-cell row-cell' align="center">
-                              <div>
-                                  <Typography className='state-text'
-                                      border={flight.estado === 0 ? "1.5px solid #FFFA80" : flight.estado === 1 ? "1.5px solid #FFA0A0" : "1.5px solid #B6FFD8"}
-                                      backgroundColor={flight.estado === 0 ? "#FFFA80" : flight.estado === 1 ? "#FFA0A0" : "#B6FFD8"}
-                                  >
-                                    {flight.estado === 0 ? "Por volar" : flight.estado === 1 ? "En vuelo" : "Aterrizó"}
-                                  </Typography>    
-                              </div>
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      ))
-                    }
-                  </TableBody>
-                </Table>
-              </TableContainer>
             </Grid>
           </Box>                         
         </Grid>
