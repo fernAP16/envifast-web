@@ -21,6 +21,11 @@ const Layout = (props) => {
                     ml: { sm: `100px` },
                     }}
                 >
+                    <Toolbar className="toolbar-main">
+                        <Typography>
+                            Usuario
+                        </Typography>
+                    </Toolbar>
                 </AppBar>
                 <Drawer
                     className="layoutDrawer"
@@ -33,6 +38,7 @@ const Layout = (props) => {
                     component="main"
                     style={{marginLeft:"220px", marginTop:"20px"}}
                 >
+                    <Toolbar />
                     {props.children}
                 </Box>
             </Box>
