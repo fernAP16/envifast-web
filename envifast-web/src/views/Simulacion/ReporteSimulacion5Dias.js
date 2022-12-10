@@ -42,9 +42,10 @@ const ReporteSimulacion5Dias = () => {
       date: lastDate.toISOString().split('T')[0],
       timeInf: from,
       timeSup: to,
-      paraSim: 1,
-      indicador: (type === 1 ? 0 : 1)
+      paraSim: type,
+      indicador: (type === 1 ? 0 : 1) // 
     }
+    console.log(variables)
     getPlanifiedOrders(variables)
     .then(function (response) {
       var array = [];

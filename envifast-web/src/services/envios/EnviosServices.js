@@ -26,6 +26,7 @@ export const getVuelosPorDia = (variables) => {
     );
 }
 
+
 export const generarEnviosPorDia = (variables) => {
     const obj = {
         fecha: variables.fecha
@@ -129,6 +130,15 @@ export const getShipmentsByInput = (variables) => {
 export const registerFlights = (variables) => {
     return axios.post(
         API_URL.url + "flights/generate?fecha=" + variables.date + "&dias=" + variables.days + "&paraSim=" + variables.paraSim
+    )
+}
+
+// la api es :'v
+// la url para el service que dura 2 min es:
+// http://inf226g2.inf.pucp.edu.pe:8080/flights/generateColapsoData?fecha=2023-03-09
+export const registerFlightsCollapse = (variables) =>{
+    return axios.get(
+        API_URL.url + "flights/generateColapsoData?fecha=" + variables.date 
     )
 }
 

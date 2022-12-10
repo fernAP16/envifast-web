@@ -1,7 +1,7 @@
 import React from 'react';
 import './../../App';
 import { MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'; // objeto principal para los mapas
-import { getCoordenadasAeropuertos, getVuelosPorDia, getAirportsDateTime, planShipmentsSimulation, registerFlights, registerDateTimes, getCapacityAirports } from '../../services/envios/EnviosServices';
+import { getCoordenadasAeropuertos, registerFlightsCollapse, getVuelosPorDia, getAirportsDateTime, planShipmentsSimulation, registerFlights, registerDateTimes, getCapacityAirports } from '../../services/envios/EnviosServices';
 import { Grid, Button, Typography, Box, TextField, Dialog, DialogTitle, DialogContent, CircularProgress, Checkbox, FormControlLabel } from '@mui/material';
 import L from "leaflet";
 import DriftMarker from "leaflet-drift-marker";
@@ -52,15 +52,8 @@ const Simulacion5Dias = () => {
   const [novenaSeccion, setNovenaSeccion] = React.useState(1);
   const [periodo, setPeriodo] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [openPopUp, setOpenPopUp] = React.useState(false);
-  const [flagPeriodo, setFlagPeriodo] = React.useState(false);
-  const [flagPeriodo2, setFlagPeriodo2] = React.useState(true);
-  const [flagPeriodo3, setFlagPeriodo3] = React.useState(false);
-  const [flagPeriodo4, setFlagPeriodo4] = React.useState(false);
-  const [flightsPeriodo, setFlightsPeriodo] = React.useState(null);
   const [flagInicioContador, setFlagInicioContador] = React.useState(false);
   const [initialDate, setInitialDate] = React.useState(null);
-  const [diferenciaDias, setDiferenciaDias] = React.useState(1);
   const [valueSearch, setValueSearch] = React.useState('')
   const [searchTable, setSearchTable] = React.useState([]);
   const [arrive5Days, setArrive5Days] = React.useState(false);
@@ -149,8 +142,22 @@ const Simulacion5Dias = () => {
   }
 
   const handleRegisterDays = () => {
-    setStateButtons(2);
-    setPeriodo(periodo + 1);
+    console.log(currentDateTime.toISOString().slice(0, 10))
+    let variables = {
+      date: currentDateTime.toISOString().slice(0, 10),
+      days: 3,
+      paraSim: 1
+    }
+    registerFlightsCollapse(variables)
+    .then(function (response) {
+      setStateButtons(2);
+      setPeriodo(periodo + 1);
+    })
+    .catch(function (error) {
+        console.log("Entro a un error la api de sleep")
+        console.log(error);
+        setIsLoading(false);
+    })
   }
 
 
@@ -193,8 +200,8 @@ const Simulacion5Dias = () => {
         for (const element of response.data){
           let diaSalida = stringToDay(element.horaSalida)
           let diaLlegada = stringToDay(element.horaLLegada)
-          diaSalida.setDate(diaSalida.getDate() - 1)
-          diaLlegada.setDate(diaLlegada.getDate() - 1)
+          diaSalida.setDate(diaSalida.getDate() - 4)
+          diaLlegada.setDate(diaLlegada.getDate() - 4)
           let horaSalidaString = dayToString(diaSalida)
           let horaLlegadaString = dayToString(diaLlegada)
           array.push(
@@ -208,8 +215,7 @@ const Simulacion5Dias = () => {
               coordenadasOrigen: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
               coordenadasDestinos: [airportsCoordinates[element.idAeropuertoDestino - 1].lat,airportsCoordinates[element.idAeropuertoDestino - 1].lng],
               coordenadasActual: [airportsCoordinates[element.idAeropuertoOrigen - 1].lat,airportsCoordinates[element.idAeropuertoOrigen - 1].lng],
-              estado: 0,
-              distanciaRecorrida: 0
+              estado: 0
             }
           )
         };
@@ -260,6 +266,22 @@ const Simulacion5Dias = () => {
             date: fechaInicio,
             time: horaInicio,
           }
+          // se llama al reporte si es que el planificador retorna 0
+          if(response.data === 0){
+            let lastDate = currentDateTime;
+            console.log("La api devolvio 0, entra al reporte")
+            console.log(lastDate)
+            navigate(ROUTES.SIMULACION5DIASREPORTE, {// hay otro indicador que devuelve una cantidad de envios, 100
+              state: {
+                  firstDate: startDate, // 
+                  lastDate: lastDate, // 2023-03-13
+                  from: "12:00", // timeinf
+                  to: "13:59", // timeSup
+                  type: 2 // 2 para el colapso, 
+              }
+            });
+          }
+          
           getCapacityAirports(varAir)
           .then(function (response){
             let array = response.data
@@ -284,29 +306,13 @@ const Simulacion5Dias = () => {
         let temp = currentDateTime;
         let horas = temp.getHours();
         let minutos = temp.getMinutes();
-        // temp.setMinutes(temp.getMinutes() + 1);
-        // setCurrentDateTime(temp);
-        temp.setSeconds(temp.getSeconds() + 15)
+        temp.setMinutes(temp.getMinutes() + 1);
         setCurrentDateTime(temp);
-        if(currentDateTime.getDate() - initialDate.getDate() === 1 && currentDateTime.getHours() == 16){ // CAMBIAR
-          let lastDate = currentDateTime;
-          lastDate.setDate(lastDate.getDate()-1);
-          navigate(ROUTES.SIMULACION5DIASREPORTE, {
-            // hay otro indicador que devuelve una cantidad de envios, 100
-            state: {
-                firstDate: startDate, // 
-                lastDate: lastDate, // 2023-03-13
-                from: "12:00", // timeinf
-                to: "13:59", // timeSup
-                type: 2 // 2 para el colapso, 
-            }
-          });
-        }
         if(horas % 2 === 0  && minutos === 0){ 
           enviarPlanificador(horas)
         }
       }
-    }, 50) 
+    }, 200) 
     return () => {
       clearInterval(interval);
     };
@@ -332,7 +338,7 @@ const Simulacion5Dias = () => {
         for(var i = 0 ; i < primeraSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50) // antes estaba en 1.1
+      }, 200) // antes estaba en 1.1
       return () => {
         clearInterval(interval);
       };
@@ -347,7 +353,7 @@ const Simulacion5Dias = () => {
         for(var i = primeraSeccion; i < segundaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -362,7 +368,7 @@ const Simulacion5Dias = () => {
         for(var i = segundaSeccion; i < terceraSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -377,7 +383,7 @@ const Simulacion5Dias = () => {
         for(var i = terceraSeccion; i < cuartaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -392,7 +398,7 @@ const Simulacion5Dias = () => {
         for(var i = cuartaSeccion; i < quintaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -407,7 +413,7 @@ const Simulacion5Dias = () => {
         for(var i = quintaSeccion; i < sextaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -423,7 +429,7 @@ const Simulacion5Dias = () => {
         for(var i = sextaSeccion; i < septimaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -438,7 +444,7 @@ const Simulacion5Dias = () => {
         for(var i = septimaSeccion; i < octavaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -453,7 +459,7 @@ const Simulacion5Dias = () => {
         for(var i = octavaSeccion; i < novenaSeccion; i++){
           show_interval(flightsSchedule[i])
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -470,7 +476,7 @@ const Simulacion5Dias = () => {
             show_interval(flightsSchedule[i])
           }
         }
-      }, 50)
+      }, 200)
       return () => {
         clearInterval(interval);
       };
@@ -528,10 +534,7 @@ const Simulacion5Dias = () => {
       let currTime = currentTimeNow - new Date(flightSchedule.horaSalida).getTime();
       flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0] + (flightSchedule.coordenadasDestinos[0] - flightSchedule.coordenadasOrigen[0])*currTime/difTime
       flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1] + (flightSchedule.coordenadasDestinos[1] - flightSchedule.coordenadasOrigen[1])*currTime/difTime
-      // if(flightSchedule.distanciaRecorrida < 1)
-      //   flightSchedule.distanciaRecorrida += 0.001
-      // flightSchedule.coordenadasActual[0] = flightSchedule.coordenadasOrigen[0] + (flightSchedule.coordenadasDestinos[0] - flightSchedule.coordenadasOrigen[0])*flightSchedule.distanciaRecorrida
-      // flightSchedule.coordenadasActual[1] = flightSchedule.coordenadasOrigen[1] + (flightSchedule.coordenadasDestinos[1] - flightSchedule.coordenadasOrigen[1])*flightSchedule.distanciaRecorrida
+      
       
     } else if(currentDateTime > dateInicio){
       flightSchedule.estado = 1;
@@ -544,9 +547,9 @@ const Simulacion5Dias = () => {
       <>
       {airportsCoordinates.map((airport) => (
           <Marker position={[airport.lat , airport.lng]} icon={airport.currentCapacity <= airport.maxCapacity/2 ? getGreenIcon() : (airport.currentCapacity <= 3*airport.maxCapacity/4 ? getYellowIcon() : getRedIcon())}>
-            {/*<Popup>
+            <Popup>
               Capac. máxima: {airport.maxCapacity}<br/>Capac. utilizada: {airport.currentCapacity}
-            </Popup>*/}
+            </Popup>
           </Marker>
       ))}
       </> 
