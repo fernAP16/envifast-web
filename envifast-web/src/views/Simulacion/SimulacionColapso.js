@@ -254,12 +254,17 @@ const Simulacion5Dias = () => {
       if(fechaPlanificacon === fechaInicio && horaInicio === "22:00"){
 
       } else {
+        if(fechaPlanificacon === "2023-03-13" && horaInicio === "14:00"){
+
+        
         let variables = {
           fecha: fechaPlanificacon,
           timeInf: horaInicio,
           timeSup: horaFin,
           paraSim: 1
         }
+
+        console.log(variables)
         planShipmentsSimulation(variables)
         .then(function (response) {
           let varAir = {
@@ -296,6 +301,7 @@ const Simulacion5Dias = () => {
             setIsLoading(false);
           })
       }
+    }
     }
   }
 
