@@ -286,23 +286,32 @@ const Simulacion5Dias = () => {
           paraSim: 1
         }
         planShipmentsSimulation(variables)
-        .then(function (response) {
-          let varAir = {
-            date: fechaInicio,
-            time: horaInicio,
-          }
-          getCapacityAirports(varAir)
-          .then(function (response){
-            let array = response.data
-            for (var i=0; i<array.length; i++) airportsCoordinates[i].currentCapacity = array[i].usedCapacity;
-          })
-          .catch(function (error){})
-        })
+        .then(function (response) {})
         .catch(function (error) {
             console.log(error);
             setIsLoading(false);
           })
       }
+    }
+  }
+
+  const actualizarCapacidad = (horaActual) => {
+    if(currentDateTime != null && !arrive5Days){
+      let fechaPlanificacon = currentDateTime.toISOString().split('T')[0]
+      let fechaInicio = initialDate.toISOString().split('T')[0]
+      let horaInicioDate = new Date(fechaPlanificacon)
+      horaInicioDate.setHours(horaActual - 7)
+      let horaInicio = horaInicioDate.toISOString().split('T')[1].substring(0, 5)
+      let varAir = {
+        date: fechaInicio,
+        time: horaInicio,
+      }
+      getCapacityAirports(varAir)
+      .then(function (response){
+        let array = response.data
+        for (var i=0; i<array.length; i++) airportsCoordinates[i].currentCapacity = array[i].usedCapacity;
+      })
+      .catch(function (error){})
     }
   }
   
@@ -331,6 +340,9 @@ const Simulacion5Dias = () => {
         }
         if(horas % 2 === 0  && minutos === 0){ 
           enviarPlanificador(horas)
+        }
+        if(minutos === 0){
+          actualizarCapacidad(horas)
         }
       }, 200) 
       return () => {
